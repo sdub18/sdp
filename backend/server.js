@@ -11,26 +11,27 @@ function connectionHandler(conn){
   var remoteAddress = conn.remoteAddress + ':' + conn.remotePort;
   console.log('new client connection from %s', remoteAddress);
   
-  clients.push({port:conn.remotePort});
-  console.log(clients);
-  if (clients.length > 1){
-    console.log('yerr');
+  clients.push({id:clients.length+1,port:conn.remotePort});
+  if (clients.length > 2){
     conn.end();
     clients.pop()
-    console.log(clients);
   }
+  console.log(clients);
 
   conn.on('data', onConnData);
   conn.on('close', onConnClose);
   conn.on('error', onConnError);
 
   function onConnData(d){
-    console.log('connection data from: %s: %j', remoteAddress, d);
+    console.log('connection data from: %s: %j', remoteAddress, Buffer.from(d, 'hex'));
     conn.write(d);
   }
 
   function onConnClose(){
     console.log('connection from %s closed', remoteAddress);
+    client_idx = clients.indexOf(obj => obj.port === remotePort);
+    clients.splice(client_idx, 1);
+    console.log(clients);
   }
 
   function onConnError(err){
