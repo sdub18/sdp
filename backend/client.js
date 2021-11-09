@@ -1,11 +1,23 @@
-const { SSL_OP_EPHEMERAL_RSA } = require('constants');
 const net = require('net');
-const { send } = require('process');
+const { exit } = require('process');
+
 const options = {port: 9000}
 const client = net.createConnection(options, ()=>{
     console.log("established new connection with %s:%s", client.localAddress, client.localPort);
 });
 
+
+client.on('data', (d)=>{
+    console.log(''+d);
+})
+client.on('error', (err)=>{
+    console.log(err.message);
+})
+client.on('close', ()=>{
+    console.log('connection terminated');
+    client.end();
+    exit();
+})
 
 async function sendData() {
     while(1){
@@ -15,12 +27,6 @@ async function sendData() {
     
     }    
 }
-
-
-client.on('data', (d)=>{
-    console.log(''+d);
-})
-
 
 function sleep(ms){
     return new Promise((resolve)=>{

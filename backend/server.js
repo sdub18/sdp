@@ -1,14 +1,24 @@
 const net = require("net");
 
 const server = net.createServer()
-server.on('connection', connectionHandler);
+var clients = [];
 
+server.on('connection', connectionHandler);
 server.listen(9000, ()=>console.log('opened server on ', server.address()));
 
 
 function connectionHandler(conn){
   var remoteAddress = conn.remoteAddress + ':' + conn.remotePort;
-  console.log('new client connection from %s', remoteAddress)
+  console.log('new client connection from %s', remoteAddress);
+  
+  clients.push({port:conn.remotePort});
+  console.log(clients);
+  if (clients.length > 1){
+    console.log('yerr');
+    conn.end();
+    clients.pop()
+    console.log(clients);
+  }
 
   conn.on('data', onConnData);
   conn.on('close', onConnClose);
@@ -26,6 +36,6 @@ function connectionHandler(conn){
   function onConnError(err){
     console.log('Connection %s error: %s', remoteAddress, err.message);
   }
-
-
 }
+
+//TODO: handle when server randomly goes out
