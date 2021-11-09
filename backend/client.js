@@ -23,7 +23,7 @@ async function sendData() {
     while(1){
         randInt = getRandomIntInRange(0,10);
         client.write(''+randInt);
-        await sleep(5000);
+        await sleep(10000);
     
     }    
 }
