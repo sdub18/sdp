@@ -1,3 +1,7 @@
+function getRandomIntInRange(min, max) {
+  return Math.floor(min + (Math.random() * (max - min)));
+}
+
 const express = require("express");
 
 const PORT = process.env.PORT || 3001;
@@ -8,10 +12,8 @@ let i = 0;
 let x = [];
 let y = [];
 app.get("/api", (req, res) => {
-    i += 1;
-    x.push(i);
-    y.push(i * i)
-    res.json({ message: "Hello from server! Counting up... " + i, xAxis: ""+x, yAxis: ""+y});
+    let rand = getRandomIntInRange(25, 175);
+    res.json({ message: "Random number: " + rand, xAxis: x, yAxis: rand});
   });
   
 app.listen(PORT, () => {

@@ -41,7 +41,7 @@ for (let i = 0; i < 401; i++) {
     }
 }
 
-export default function Graph() {
+export default function StaticGraph() {
     const classes = useStyles()
   return (
     <Box

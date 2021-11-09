@@ -3,7 +3,8 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import Graph from "./Graph";
+import DynamicGraph from "./DynamicGraph";
+import StaticGraph from "./StaticGraph"
 
 ReactDOM.render(
   <React.StrictMode>
