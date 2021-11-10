@@ -1,10 +1,15 @@
 const net = require('net');
 const { exit } = require('process');
 
-const options = {port: 9000}
+//change HOST to your PC's ip address
+const HOST = "192.168.1.11";
+const PORT = 49160;
+
+const options = {family: 4, host:HOST, port: PORT}
 const client = net.createConnection(options, ()=>{
     console.log("established new connection with %s:%s", client.localAddress, client.localPort);
 });
+
 
 
 client.on('data', (d)=>{
@@ -23,7 +28,7 @@ async function sendData() {
     while(1){
         randInt = getRandomIntInRange(0,10);
         client.write(''+randInt);
-        await sleep(10000);
+        await sleep(2000);
     
     }    
 }

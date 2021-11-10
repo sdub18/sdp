@@ -3,7 +3,11 @@ const net = require("net");
 const server = net.createServer();
 server.maxConnections = 2;
 server.on('connection', connectionHandler);
-server.listen(9000, ()=>console.log('opened server on ', server.address()));
+var options = {host: "0.0.0.0", port:49160};
+
+server.listen(options, ()=>console.log('opened server on ', server.address()));
+
+console.log(server.address());
 
 const CLIENTS_MAX = 2;
 var clients = [];
@@ -22,7 +26,10 @@ function connectionHandler(conn){
   function onConnData(d){
     // change this function to fit structure of frontend
     // and how it fetches data from backend
-    console.log('connection data from: %s: %j', conn.remotePort, d);
+    //console.log('connection data from: %s: %j', conn.remotePort, d);  
+    // write to some file to save historic data
+
+    console.log(d.toString());
     conn.write(d);
   }
 
