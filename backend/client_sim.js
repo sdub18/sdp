@@ -2,7 +2,7 @@ const net = require('net');
 const { exit } = require('process');
 
 //change HOST to your PC's ip address
-const HOST = "192.168.1.11";
+const HOST = "localhost";
 const PORT = 49160;
 
 const options = {family: 4, host:HOST, port: PORT}

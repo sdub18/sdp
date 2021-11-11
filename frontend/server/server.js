@@ -8,7 +8,6 @@ var options = {host: "0.0.0.0", port:49160};
 server.listen(options, ()=>console.log('opened server on ', server.address()));
 
 console.log(server.address());
-
 var clients = [];
 
 function connectionHandler(conn){
