@@ -8,6 +8,7 @@
 
 #include <arpa/inet.h>
 #include <errno.h>
+#include <pthread.h>
 
 #define HOST "192.168.1.11"
 #define PORT 49160
