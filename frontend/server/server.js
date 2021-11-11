@@ -1,14 +1,31 @@
 const net = require("net");
+const express = require("express");
+const app = express();
+const CLIENT_TO_MIDDLE_PORT = process.env.PORT || 49160;
+const MIDDLE_TO_FRONT_PORT = process.env.PORT || 3001;
+var current = 4;
+var x = "Pointless string";
+
+function getRandomIntInRange(min, max) {
+  return Math.floor(min + (Math.random() * (max - min)));
+}
 
 const server = net.createServer();
-server.maxConnections = 6;
 server.on('connection', connectionHandler);
-var options = {host: "0.0.0.0", port:49160};
+var options = {host: "0.0.0.0", port:CLIENT_TO_MIDDLE_PORT};
 
 server.listen(options, ()=>console.log('opened server on ', server.address()));
 
 console.log(server.address());
 var clients = [];
+
+app.get("/api", (req, res) => {
+  res.json({ message: "Pointless message: ", xAxis: x, yAxis: current});
+});
+
+app.listen(MIDDLE_TO_FRONT_PORT, () => {
+  console.log(`Server listening on ${MIDDLE_TO_FRONT_PORT}`);
+});
 
 function connectionHandler(conn){
   clients.push({id:clients.length+1,port:conn.remotePort});
@@ -27,8 +44,10 @@ function connectionHandler(conn){
     //console.log('connection data from: %s: %j', conn.remotePort, d);  
     // write to some file to save historic data
 
+    //console.log(d.toString());
+    //conn.write(d);
+    current = d.toString();
     console.log(d.toString());
-    conn.write(d);
   }
 
   function onConnClose(){

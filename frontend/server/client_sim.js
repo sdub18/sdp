@@ -26,9 +26,9 @@ client.on('close', ()=>{
 
 async function sendData() {
     while(1){
-        randInt = getRandomIntInRange(0,10);
+        randInt = getRandomIntInRange(25,175);
         client.write(''+randInt);
-        await sleep(2000);
+        await sleep(1);
     
     }    
 }

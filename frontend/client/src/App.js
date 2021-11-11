@@ -45,7 +45,7 @@ function App() {
     getPosts()
     const interval=setInterval(()=>{
       getPosts()
-     },1)
+     },2)
      return()=>clearInterval(interval)
   },[])
   
