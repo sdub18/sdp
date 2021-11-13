@@ -11,8 +11,10 @@ const yMax = 200;
 const width = 700;
 const height = 400;
 
+// instantiate "client (frontend)" websocket"
 const socket = io('http://localhost:3001');
 
+// instanstiate coordinates array
 let coordinates = [];
 for (let i = 0; i < xMax; i++) {
   coordinates.push({

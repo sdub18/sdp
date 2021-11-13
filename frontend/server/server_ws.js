@@ -2,16 +2,18 @@ const net = require("net");
 
 const CLIENT_TO_MIDDLE_PORT = process.env.PORT || 49160;
 const MIDDLE_TO_FRONT_PORT = process.env.PORT || 3001;
-var current = 4;
-var x = "Pointless string";
+var current = 0;
 
-
+// create connection to listen for add-ons
+// manage multiple addons in 
 const C2M_server = net.createServer();
 C2M_server.on('connection', connectionHandler);
 var options = {host: "0.0.0.0", port:CLIENT_TO_MIDDLE_PORT};
 C2M_server.listen(options, ()=>console.log('opened C2M_server on ', C2M_server.address()));
-var clients = [];
+var addons = [];
 
+// create websocket to communicate to frontend
+// upon connection, emit data every 2 ms
 const server = require('http').createServer({MIDDLE_TO_FRONT_PORT});
 const io = require('socket.io')(server,{
   cors:{
@@ -31,11 +33,11 @@ server.listen(MIDDLE_TO_FRONT_PORT, () => {
 });
 
 function connectionHandler(conn){
-  clients.push({id:clients.length+1,port:conn.remotePort});
+  addons.push({id:addons.length+1,port:conn.remotePort});
   var remoteAddress = conn.remoteAddress + ':' + conn.remotePort;
   console.log('new client connection from %s', remoteAddress);
 
-  console.log(clients);
+  console.log(addons);
 
   conn.on('data', onConnData);
   conn.on('close', onConnClose);
@@ -48,9 +50,9 @@ function connectionHandler(conn){
 
   function onConnClose(){
     console.log('connection from %s closed', conn.remotePort);
-    client_idx = clients.indexOf(obj => obj.port === conn.remotePort);
-    clients.splice(client_idx, 1);
-    console.log(clients);
+    addon_idx = addons.indexOf(obj => obj.port === conn.remotePort);
+    addons.splice(addon_idx, 1);
+    console.log(addons);
   }
 
   function onConnError(err){
