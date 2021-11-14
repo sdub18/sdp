@@ -1,8 +1,11 @@
+const { SSL_OP_EPHEMERAL_RSA } = require("constants");
 const net = require("net");
+const { exit } = require("process");
+const { PassThrough } = require("stream");
 
 const CLIENT_TO_MIDDLE_PORT = process.env.PORT || 49160;
 const MIDDLE_TO_FRONT_PORT = process.env.PORT || 3001;
-var current = 0;
+var data = [];
 
 // create connection to listen for add-ons
 // manage multiple addons in 
@@ -24,7 +27,9 @@ const io = require('socket.io')(server,{
 
 io.on("connection", (client)=>{
   setInterval(()=>{
-    client.emit('data', current);
+    for (const pkt of data){
+      client.emit('data', pkt);
+    }
   }, 2)
 })
 
@@ -44,9 +49,9 @@ function connectionHandler(conn){
   conn.on('error', onConnError);
 
   function onConnData(d){
-    current = d.toString();
-    console.log(d.toString());
+    data = parseData(d);
   }
+
 
   function onConnClose(){
     console.log('connection from %s closed', conn.remotePort);
@@ -59,5 +64,37 @@ function connectionHandler(conn){
     console.log('Connection %s error: %s', remoteAddress, err.message);
   }
 }
+
+/**
+ * Converts byte streamed data received into a list of data packet objects
+ * Handles when data packets are concatenated due to TCP stream
+ * @param {Buffer} recv_data 
+ * @returns List of data packet objects 
+ */
+function parseData(recv_data){
+  var pkts = [];
+  var tmp_pkt = '';
+  var start = false;
+  
+  for (let pair of recv_data.entries()){
+    let char = String.fromCharCode(pair[1]); 
+  
+    if (pair[1] == 0){
+      pkts.push(JSON.parse(tmp_pkt));
+      tmp_pkt = '';
+      start = false;
+    }
+
+    if (start == true){
+      tmp_pkt += char;
+    }
+    
+    if (pair[1] == 1){
+      start = true;
+    }
+  }
+  return pkts;
+}
+
 
 //TODO: handle when C2M_server randomly goes out
