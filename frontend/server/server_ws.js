@@ -50,6 +50,7 @@ function connectionHandler(conn){
 
   function onConnData(d){
     data = parseData(d);
+    console.log(data);
   }
 
 

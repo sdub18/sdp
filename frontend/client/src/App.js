@@ -31,15 +31,17 @@ function App() {
 
   React.useEffect(()=>{
     socket.on('data', (data_pt) => {
+      console.log("hi");
+      //console.log(data_pt.data.current)
       for (let i = 0; i < coordinates.length - 1; i++) {
         coordinates[i] = coordinates[i+1];
         coordinates[i].x -= 1;
       }
       coordinates[coordinates.length - 1] = {
         x: coordinates.length - 1,
-        y: data_pt
+        y: data_pt.data.current
       };
-      setThing(data_pt);
+      setThing(data_pt.data.current);
       setDisplayedCoords(coordinates);
     });
   }, []);
