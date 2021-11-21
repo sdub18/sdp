@@ -31,7 +31,6 @@ export default function DynamicGraph(props) {
     for (let i = 0; i < props.xMax + props.xIncrement; i += props.xIncrement) {
         ticks.push(i);
     }
-    console.log(ticks);
   return (
     <Box
         className={classes.marginAutoItem}
