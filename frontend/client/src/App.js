@@ -23,57 +23,69 @@ for (let i = 0; i < xMax; i++) {
   });
 }
 
-var addon_manager = [];
+var charts_manager = [{"type": "current", 
+                        "coords": tmp.slice(0)},
+                        {"type": "ambient temp", 
+                        "coords": tmp.slice(0)}];
+var current = tmp.slice(0);
+var temp_ambient = tmp.slice(0);
 
 function App() {
 
-  const [addons, setAddons] = React.useState([]);
+  const [charts, setCharts] = React.useState([]);
   const [thing, setThing] = React.useState(0);
 
   React.useEffect(()=>{
     socket.on('data', (pkt) => {
-      if (!addon_manager.some(e => e.port === pkt.port)){
-        addon_manager.push({
-          "port": pkt.port,
-          "coords": tmp
-        });
-      }
-      
-      var addon_idx = addon_manager.findIndex(e => e.port === pkt.port);
+      for (let j = 0 ; j < charts_manager.length; j++){
+        for (let i = 0; i < tmp.length - 1; i++) {
+          charts_manager[j].coords[i] = charts_manager[j].coords[i+1];
+          charts_manager[j].coords[i].x -= 1;
+        }
+        if (j==0){
+          charts_manager[j].coords[tmp.length - 1] = {
+            x: tmp.length - 1,
+            y: pkt.data.current
+          };
+        }
+        else{
+          charts_manager[j].coords[tmp.length - 1] = {
+            x: tmp.length - 1,
+            y: pkt.data.temp_ambient
+          };
+        }
+        
 
-      for (let i = 0; i < tmp.length - 1; i++) {
-        addon_manager[addon_idx].coords[i] = addon_manager[addon_idx].coords[i+1];
-        addon_manager[addon_idx].coords[i].x -= 1;
-      }
-      addon_manager[addon_idx].coords[tmp.length - 1] = {
-        x: tmp.length - 1,
-        y: pkt.data.current
-      };
+      }      
+      
 
       setThing(pkt.data.current);
-      setAddons(addon_manager);
+      setCharts(charts_manager);
     });
   }, []);
     
-  
-  addons.map((addon) => {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <DynamicGraph
-            data={addon.coords}
+  let graphs = charts.map((chart, index) => {
+    return (  
+      <DynamicGraph
+            title={chart.type}
+            data={chart.coords}
             yMin={yMin}
             yMax={yMax}
             xMax={xMax}
             xIncrement={xIncrement}
             width={width}
             height={height}
-          ></DynamicGraph>
-        </header>
-      </div>
-    );
-  });
+      ></DynamicGraph>
+    )
+  })
+  return (
+    <div className="App">
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <ul>{graphs}</ul>
+      </header>
+    </div>
+  );
 }
 
 export default App;
