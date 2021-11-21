@@ -14,55 +14,66 @@ const height = 400;
 // instantiate "client (frontend)" websocket"
 const socket = io('http://localhost:3001');
 
-// instanstiate coordinates array
-let coordinates = [];
+// instanstiate tmp array
+let tmp = [];
 for (let i = 0; i < xMax; i++) {
-  coordinates.push({
+  tmp.push({
     x: i,
-    y: 50
+    y: 0
   });
 }
 
+var addon_manager = [];
 
 function App() {
 
-  const [displayedCoords, setDisplayedCoords] = React.useState([]);
+  const [addons, setAddons] = React.useState([]);
   const [thing, setThing] = React.useState(0);
 
   React.useEffect(()=>{
-    socket.on('data', (data_pt) => {
-      console.log("hi");
-      //console.log(data_pt.data.current)
-      for (let i = 0; i < coordinates.length - 1; i++) {
-        coordinates[i] = coordinates[i+1];
-        coordinates[i].x -= 1;
+    socket.on('data', (pkt) => {
+      if (!addon_manager.some(e => e.port === pkt.port)){
+        addon_manager.push({
+          "port": pkt.port,
+          "coords": tmp
+        });
       }
-      coordinates[coordinates.length - 1] = {
-        x: coordinates.length - 1,
-        y: data_pt.data.current
+      
+      var addon_idx = addon_manager.findIndex(e => e.port === pkt.port);
+
+      for (let i = 0; i < tmp.length - 1; i++) {
+        addon_manager[addon_idx].coords[i] = addon_manager[addon_idx].coords[i+1];
+        addon_manager[addon_idx].coords[i].x -= 1;
+      }
+      addon_manager[addon_idx].coords[tmp.length - 1] = {
+        x: tmp.length - 1,
+        y: pkt.data.current
       };
-      setThing(data_pt.data.current);
-      setDisplayedCoords(coordinates);
+
+      setThing(pkt.data.current);
+      setAddons(addon_manager);
     });
   }, []);
     
   
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <DynamicGraph
-          data={displayedCoords}
-          yMin={yMin}
-          yMax={yMax}
-          xMax={xMax}
-          xIncrement={xIncrement}
-          width={width}
-          height={height}
-        ></DynamicGraph>
-      </header>
-    </div>
-  );
+  addons.map((addon) => {
+    return (
+      <div className="App">
+        <header className="App-header">
+          <img src={logo} className="App-logo" alt="logo" />
+          <DynamicGraph
+            data={addon.coords}
+            yMin={yMin}
+            yMax={yMax}
+            xMax={xMax}
+            xIncrement={xIncrement}
+            width={width}
+            height={height}
+          ></DynamicGraph>
+        </header>
+      </div>
+    );
+  });
 }
 
 export default App;
