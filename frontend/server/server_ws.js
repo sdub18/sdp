@@ -1,31 +1,27 @@
-const { SSL_OP_EPHEMERAL_RSA } = require("constants");
 const net = require("net");
-const { exit } = require("process");
-const { PassThrough } = require("stream");
 
+// required PORTS
 const CLIENT_TO_MIDDLE_PORT = process.env.PORT || 49160;
 const MIDDLE_TO_FRONT_PORT = process.env.PORT || 3001;
-var data = [];
 
-// create connection to listen for add-ons
-// manage multiple addons in 
+// create server to listen for add-ons
+// manage multiple addons in list
 const C2M_server = net.createServer();
 C2M_server.on('connection', connectionHandler);
-var options = {host: "0.0.0.0", port:CLIENT_TO_MIDDLE_PORT};
-C2M_server.listen(options, ()=>console.log('opened C2M_server on ', C2M_server.address()));
+C2M_server.listen({host: "0.0.0.0", port:CLIENT_TO_MIDDLE_PORT}, ()=>console.log('opened C2M_server on ', C2M_server.address()));
 var addons = [];
 
-// create websocket to communicate to frontend
+// create server using websocket to communicate to frontend
 // upon connection, emit data every 2 ms
-const server = require('http').createServer({MIDDLE_TO_FRONT_PORT});
-const io = require('socket.io')(server,{
+const M2F_server = require('http').createServer({MIDDLE_TO_FRONT_PORT});
+const M2F_socket = require('socket.io')(M2F_server,{
   cors:{
     origin: true,
     credentials: true
   }
 });
 
-io.on("connection", (client)=>{
+M2F_socket.on("connection", (client)=>{
   setInterval(()=>{
     for (const pkt of data){
       client.emit('data', pkt);
@@ -33,10 +29,12 @@ io.on("connection", (client)=>{
   }, 2)
 })
 
-server.listen(MIDDLE_TO_FRONT_PORT, () => {
+M2F_server.listen(MIDDLE_TO_FRONT_PORT, () => {
   console.log(`C2M_server listening on ${MIDDLE_TO_FRONT_PORT}`);
 });
 
+
+var data = [];  // hold separated data packets (one pkt for each addon) in list
 function connectionHandler(conn){
   addons.push({id:addons.length+1,port:conn.remotePort});
   var remoteAddress = conn.remoteAddress + ':' + conn.remotePort;
