@@ -64,7 +64,8 @@ function App() {
   
   const chooseChart = (event) => {
     let type = event.target.value;
-	setChartDrop(type);
+    socket.emit("chart_type_selection", type);
+	  setChartDrop(type);
     let chart = charts.find(chart => chart.type == type);
     setDisplayedChart(chart);
   }

@@ -32,6 +32,12 @@ M2F_socket.on("connection", (client)=>{
   }, 2)
 })
 
+M2F_socket.on("connection", (socket) => {
+  socket.on("chart_type_selection", (arg) => {
+    console.log(arg); // world
+  });
+});
+
 M2F_server.listen(MIDDLE_TO_FRONT_PORT, () => {
   console.log(`C2M_server listening on ${MIDDLE_TO_FRONT_PORT}`);
 });
