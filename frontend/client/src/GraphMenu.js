@@ -23,10 +23,10 @@ const useStyles = makeStyles(theme => ({
   export default function GraphMenu(props) {
     const classes = useStyles();
 
+	//iterate through chart types and create control label for each
     let formlabels = props.labels.map((label, index) => {
-        return (<FormControlLabel key={index} value={label} control={<Radio />} label={label}/>);
-        }
-    );
+        return <FormControlLabel key={index} value={label} control={<Radio />} label={label}/>;
+	});
     
     return(
         <FormControl component="fieldset">
@@ -37,3 +37,5 @@ const useStyles = makeStyles(theme => ({
     </FormControl>
     );
 }
+
+// TODO: Style component
