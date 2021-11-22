@@ -23,6 +23,7 @@ for (let i = 0; i < xMax; i++) {
   });
 }
 
+// manages the type of charts to keep track of (should be constant since we keep track of limited number of sensor data types)
 var charts_manager = [{"type": "current", 
                         "coords": tmp.slice(0)},
                         {"type": "temp_ambient", 
@@ -53,7 +54,8 @@ function App() {
       setCharts(charts_manager);
     });
   }, []);
-    
+  
+  // graphs components
   let graphs = charts.map((chart, index) => {
     return (  
       <DynamicGraph
@@ -69,6 +71,7 @@ function App() {
       ></DynamicGraph>
     )
   })
+
   return (
     <div className="App">
       <header className="App-header">
