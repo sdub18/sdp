@@ -3,7 +3,8 @@ import logo from './logo.svg';
 import './App.css';
 import DynamicGraph from "./DynamicGraph";
 import io from 'socket.io-client';
-import GraphMenu from "./GraphMenu";
+import ChartButtons from "./ChartButtons";
+import AddonDropdown from "./AddonDropdown";
 
 
 
@@ -40,6 +41,7 @@ var chart_types = charts_manager.map(chart => chart.type);
 function App() {
 
   const [charts, setCharts] = React.useState([]);
+  const [chartDrop, setChartDrop] = React.useState("");
   const [thing, setThing] = React.useState(0);
   const [displayedChart, setDisplayedChart] = React.useState({});
 
@@ -62,15 +64,29 @@ function App() {
   
   const chooseChart = (event) => {
     let type = event.target.value;
+	setChartDrop(type);
     let chart = charts.find(chart => chart.type == type);
     setDisplayedChart(chart);
   }
+
+  // const [addonDrop, setAddonDrop] = React.useState("");
+  // const chooseAddon = (event) => {
+  // 	let addon = event.target.value	
+  // 	setAddonDrop(addon)
+  // 	setChartDrop("")
+  // 	need to have someway to hold all addons with their respective chart managers and to select correct addon
+  // }
+  // <AddonDropdown labels={addon_ids} value={addonDrop} onChangeHandler={chooseAddon}/>
+  // Dropdown should be used to select which addon to watch over
+  // 
 
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <GraphMenu labels={chart_types} onChangeHandler={chooseChart}/>
+
+		<br/>
+		<ChartButtons labels={chart_types} onChangeHandler={chooseChart}/>
         <DynamicGraph
             title={displayedChart.type}
             data={displayedChart.coords}
