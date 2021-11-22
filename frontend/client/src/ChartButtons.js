@@ -20,7 +20,7 @@ const useStyles = makeStyles(theme => ({
     }
   }));
 
-  export default function GraphMenu(props) {
+  export default function ChartButtons(props) {
     const classes = useStyles();
 
 	//iterate through chart types and create control label for each
