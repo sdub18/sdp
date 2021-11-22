@@ -35,10 +35,13 @@ async function sendData() {
         let V = 11 + (getRandomIntInRange(0,10)/10);
         let Ta = 60 + getRandomIntInRange(0,5);
         let Tc = 80 + getRandomIntInRange(0,5);
+        let x = 0;
+        let y = 9.8;
+        let z = 0;
         
         let header = String.fromCharCode(1);
         let end = String.fromCharCode(0);
-        let data = `{"current": ${I}, "voltage": ${V}, "temp_ambient": ${Ta}, "temp_casing": ${Tc}}`;
+        let data = `{"current": ${I}, "voltage": ${V}, "temp_ambient": ${Ta}, "temp_casing": ${Tc}, "accelereation": {"x": ${x}, "y": ${y}, "z": ${z}}}`;
         let data_pkt = `{"port": ${client.address().port}, "data":${data}}`;
         data_pkt = header + data_pkt + end;
         
