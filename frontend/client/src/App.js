@@ -3,6 +3,9 @@ import logo from './logo.svg';
 import './App.css';
 import DynamicGraph from "./DynamicGraph";
 import io from 'socket.io-client';
+import GraphMenu from "./GraphMenu";
+
+
 
 const xMax = 100; // keep this number an even number * 100
 const xIncrement = 100;
@@ -32,10 +35,13 @@ var charts_manager = [{"type": "current",
                         "coords": tmp.slice(0)}
                       ];
 
+var chart_types = charts_manager.map(chart => chart.type);
+
 function App() {
 
   const [charts, setCharts] = React.useState([]);
   const [thing, setThing] = React.useState(0);
+  const [displayedChart, setDisplayedChart] = React.useState({});
 
   React.useEffect(()=>{
     socket.on('data', (pkt) => {
@@ -49,34 +55,32 @@ function App() {
             y: pkt.data[chart.type]  
         }
       })
-
       setThing(pkt.data.current);
       setCharts(charts_manager);
     });
   }, []);
   
-  // graphs components
-  let graphs = charts.map((chart, index) => {
-    return (  
-      <DynamicGraph
-            key = {index}
-            title={chart.type}
-            data={chart.coords}
-            yMin={yMin}
-            yMax={yMax}
-            xMax={xMax}
-            xIncrement={xIncrement}
-            width={width}
-            height={height}
-      ></DynamicGraph>
-    )
-  })
+  const chooseChart = (event) => {
+    let type = event.target.value;
+    let chart = charts.find(chart => chart.type == type);
+    setDisplayedChart(chart);
+  }
 
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <ul>{graphs}</ul>
+        <GraphMenu labels={chart_types} onChangeHandler={chooseChart}/>
+        <DynamicGraph
+            title={displayedChart.type}
+            data={displayedChart.coords}
+            yMin={yMin}
+            yMax={yMax}
+            xMax={xMax}
+            xIncrement={xIncrement}
+            width={width}
+            height={height}>
+          </DynamicGraph>
       </header>
     </div>
   );
