@@ -6,6 +6,7 @@ const MIDDLE_TO_FRONT_PORT = process.env.PORT || 3001;
 
 // create server to listen for add-ons
 // manage multiple addons in list
+// 0.0.0.0 means all IPv4 addresses on the local machine
 const C2M_server = net.createServer();
 C2M_server.on('connection', connectionHandler);
 C2M_server.listen({host: "0.0.0.0", port:CLIENT_TO_MIDDLE_PORT}, ()=>console.log('opened C2M_server on ', C2M_server.address()));
@@ -21,6 +22,8 @@ const M2F_socket = require('socket.io')(M2F_server,{
   }
 });
 
+// Emits data packet by packet, as multiple concatenated packets may have been received due to TCP, and separated
+// Issue is mentioned above parseData()
 M2F_socket.on("connection", (client)=>{
   setInterval(()=>{
     for (const pkt of data){
@@ -48,10 +51,10 @@ function connectionHandler(conn){
 
   function onConnData(d){
     data = parseData(d);
-    console.log(data);
+    //console.log(data);
   }
 
-
+  // Removes the {id: xxxx, port: yyyy} element from the addons array from the port that was closed
   function onConnClose(){
     console.log('connection from %s closed', conn.remotePort);
     addon_idx = addons.indexOf(obj => obj.port === conn.remotePort);
@@ -68,16 +71,14 @@ function connectionHandler(conn){
  * Converts byte streamed data received into a list of data packet objects
  * Handles when data packets are concatenated due to TCP stream
  * @param {Buffer} recv_data 
- * @returns List of data packet objects 
+ * @returns List of data packet JSON objects 
  */
 function parseData(recv_data){
   var pkts = [];
   var tmp_pkt = '';
   var start = false;
-  
   for (let pair of recv_data.entries()){
     let char = String.fromCharCode(pair[1]); 
-  
     if (pair[1] == 0){
       pkts.push(JSON.parse(tmp_pkt));
       tmp_pkt = '';
