@@ -25,8 +25,11 @@ for (let i = 0; i < xMax; i++) {
 
 var charts_manager = [{"type": "current", 
                         "coords": tmp.slice(0)},
-                        {"type": "ambient temp", 
-                        "coords": tmp.slice(0)}];
+                        {"type": "temp_ambient", 
+                        "coords": tmp.slice(0)},
+                        {"type": "temp_casing", 
+                        "coords": tmp.slice(0)}
+                      ];
 var current = tmp.slice(0);
 var temp_ambient = tmp.slice(0);
 
@@ -37,27 +40,16 @@ function App() {
 
   React.useEffect(()=>{
     socket.on('data', (pkt) => {
-      for (let j = 0 ; j < charts_manager.length; j++){
-        for (let i = 0; i < tmp.length - 1; i++) {
-          charts_manager[j].coords[i] = charts_manager[j].coords[i+1];
-          charts_manager[j].coords[i].x -= 1;
+      charts_manager.forEach((chart) => {
+        for (let i = 0; i < tmp.length-1; i++){
+          chart.coords[i] = chart.coords[i+1]
+          chart.coords[i].x -= 1;
         }
-        if (j==0){
-          charts_manager[j].coords[tmp.length - 1] = {
-            x: tmp.length - 1,
-            y: pkt.data.current
-          };
+        chart.coords[tmp.length - 1] = {
+            x: tmp.length-1,
+            y: pkt.data[chart.type]  
         }
-        else{
-          charts_manager[j].coords[tmp.length - 1] = {
-            x: tmp.length - 1,
-            y: pkt.data.temp_ambient
-          };
-        }
-        
-
-      }      
-      
+      })
 
       setThing(pkt.data.current);
       setCharts(charts_manager);
@@ -67,6 +59,7 @@ function App() {
   let graphs = charts.map((chart, index) => {
     return (  
       <DynamicGraph
+            key = {index}
             title={chart.type}
             data={chart.coords}
             yMin={yMin}
