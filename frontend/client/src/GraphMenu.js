@@ -1,6 +1,10 @@
 import React from "react";
 import { makeStyles } from '@material-ui/core/styles'
-import Box from '@mui/material/Box';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
 
 
 const useStyles = makeStyles(theme => ({
@@ -14,4 +18,22 @@ const useStyles = makeStyles(theme => ({
     graph: {
         margin: "auto"
     }
-  }))
+  }));
+
+  export default function GraphMenu(props) {
+    const classes = useStyles();
+
+    let formlabels = props.labels.map((label, index) => {
+        return (<FormControlLabel key={index} value={label} control={<Radio />} label={label}/>);
+        }
+    );
+    
+    return(
+        <FormControl component="fieldset">
+        <FormLabel component="legend">Chart Types</FormLabel>
+        <RadioGroup row aria-label="Chart Types" name="row-radio-buttons-group" onChange={props.onChangeHandler}>
+        {formlabels}
+        </RadioGroup>
+    </FormControl>
+    );
+}
