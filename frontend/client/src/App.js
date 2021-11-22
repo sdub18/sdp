@@ -30,8 +30,6 @@ var charts_manager = [{"type": "current",
                         {"type": "temp_casing", 
                         "coords": tmp.slice(0)}
                       ];
-var current = tmp.slice(0);
-var temp_ambient = tmp.slice(0);
 
 function App() {
 
