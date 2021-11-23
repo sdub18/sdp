@@ -36,7 +36,7 @@ export default function DynamicGraph(props) {
         className={classes.marginAutoItem}
         position="relative"
     >
-        <h1 display="inline" textAlign="center">Sump Pump</h1>
+        <h1 display="inline" textAlign="center">{props.title}</h1>
         <LineChart
         className={classes.graph}
         width={props.width}
