@@ -11,6 +11,7 @@ const C2M_server = net.createServer();
 C2M_server.on('connection', connectionHandler);
 C2M_server.listen({host: "0.0.0.0", port:CLIENT_TO_MIDDLE_PORT}, ()=>console.log('opened C2M_server on ', C2M_server.address()));
 var addons = [];
+var graphShown = "";
 
 // create server using websocket to communicate to frontend
 // upon connection, emit data every 2 ms
@@ -27,14 +28,21 @@ const M2F_socket = require('socket.io')(M2F_server,{
 M2F_socket.on("connection", (client)=>{
   setInterval(()=>{
     for (const pkt of data){
-      client.emit('data', pkt);
+      if (graphShown == "current") {
+        client.emit('data', pkt.data.current);
+      } else if (graphShown == "temp_ambient") {
+        client.emit('data', pkt.data.temp_ambient);
+      } else {
+        client.emit('data', pkt.data.temp_casing);
+      }
     }
-  }, 2)
+  }, 9)
 })
 
 M2F_socket.on("connection", (socket) => {
   socket.on("chart_type_selection", (arg) => {
-    console.log(arg); // world
+    console.log(arg);
+    graphShown = arg;
   });
 });
 

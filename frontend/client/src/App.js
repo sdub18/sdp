@@ -47,6 +47,7 @@ function App() {
 
   React.useEffect(()=>{
     socket.on('data', (pkt) => {
+      console.log(pkt);
       charts_manager.forEach((chart) => {
         for (let i = 0; i < tmp.length-1; i++){
           chart.coords[i] = chart.coords[i+1]
@@ -54,10 +55,10 @@ function App() {
         }
         chart.coords[tmp.length - 1] = {
             x: tmp.length-1,
-            y: pkt.data[chart.type]  
+            y: pkt 
         }
       })
-      setThing(pkt.data.current);
+      setThing(pkt);
       setCharts(charts_manager);
     });
   }, []);
