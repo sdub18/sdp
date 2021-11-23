@@ -7,20 +7,19 @@ import ChartButtons from "./ChartButtons";
 import AddonDropdown from "./AddonDropdown";
 
 
-
-const xMax = 100; // keep this number an even number * 100
-const xIncrement = 100;
-const yMin = 0;
-const yMax = 200;
-const width = 700;
-const height = 400;
+const config = {"xMax" : 100, 
+                "xIncrement" : 100,
+                "yMin" : 0,
+                "yMax" : 200,
+                "width" : 700,
+                "height" : 400};
 
 // instantiate "client (frontend)" websocket"
 const socket = io('http://localhost:3001');
 
 // instanstiate tmp array
 let tmp = [];
-for (let i = 0; i < xMax; i++) {
+for (let i = 0; i < config.xMax; i++) {
   tmp.push({
     x: i,
     y: 0
@@ -92,12 +91,12 @@ function App() {
         <DynamicGraph
             title={displayedChart.type}
             data={displayedChart.coords}
-            yMin={yMin}
-            yMax={yMax}
-            xMax={xMax}
-            xIncrement={xIncrement}
-            width={width}
-            height={height}>
+            yMin={config.yMin}
+            yMax={config.yMax}
+            xMax={config.xMax}
+            xIncrement={config.xIncrement}
+            width={config.width}
+            height={config.height}>
           </DynamicGraph>
       </header>
     </div>
