@@ -21,7 +21,7 @@ const M2F_socket = require('socket.io')(M2F_server,{cors:{origin: true, credenti
 // Emits data packet by packet, as multiple concatenated packets may have been received due to TCP, and separated
 // Issue is mentioned above parseData()
 M2F_socket.on("connection", (client)=>{
-  socket.on("chart_type_selection", (arg) => {chartType = arg});
+  client.on("chart_type_selection", (arg) => {chartType = arg});
   setInterval(()=>{
     for (const pkt of data){
       client.emit('data', pkt.data[chartType])
@@ -34,34 +34,21 @@ M2F_server.listen(MIDDLE_TO_FRONT_PORT, () => {
 });
 
 
-var data = [];  // hold separated data packets (one pkt for each addon) in list
+const data = [];  // hold separated data packets (one pkt for each addon) in list
 function connectionHandler(conn){
+  const remoteAddress = conn.remoteAddress + ':' + conn.remotePort;
   addons.push({id:addons.length+1,port:conn.remotePort});
-  var remoteAddress = conn.remoteAddress + ':' + conn.remotePort;
   console.log('new client connection from %s', remoteAddress);
-
   console.log(addons);
 
-  conn.on('data', onConnData);
-  conn.on('close', onConnClose);
-  conn.on('error', onConnError);
-
-  function onConnData(d){
-    data = parseData(d);
-    //console.log(data);
-  }
-
-  // Removes the {id: xxxx, port: yyyy} element from the addons array from the port that was closed
-  function onConnClose(){
+  conn.on('error', () => {console.log('Connection %s error: %s', remoteAddress, err.message)});
+  conn.on('data', (recv_d) => parseData(recv_d, data));
+  conn.on('close', () => {
     console.log('connection from %s closed', conn.remotePort);
     addon_idx = addons.indexOf(obj => obj.port === conn.remotePort);
     addons.splice(addon_idx, 1);
     console.log(addons);
-  }
-
-  function onConnError(err){
-    console.log('Connection %s error: %s', remoteAddress, err.message);
-  }
+  });
 }
 
 /**
@@ -70,27 +57,24 @@ function connectionHandler(conn){
  * @param {Buffer} recv_data 
  * @returns List of data packet JSON objects 
  */
-function parseData(recv_data){
-  var pkts = [];
-  var tmp_pkt = '';
-  var start = false;
+function parseData(recv_data, pkts_array){
+  pkts_array.length = 0;
+  let tmp_pkt = '';
+  let start = false;
+  
   for (let pair of recv_data.entries()){
     let char = String.fromCharCode(pair[1]); 
+    
     if (pair[1] == 0){
-      pkts.push(JSON.parse(tmp_pkt));
+      pkts_array.push(JSON.parse(tmp_pkt));
       tmp_pkt = '';
       start = false;
     }
 
-    if (start == true){
-      tmp_pkt += char;
-    }
-    
-    if (pair[1] == 1){
-      start = true;
-    }
+    if (start == true) tmp_pkt += char;
+    if (pair[1] == 1) start = true;
   }
-  return pkts;
+  return pkts_array;
 }
 
 
