@@ -40,7 +40,7 @@ function App() {
     });
   }, []);
   
-  const chooseChart = (event) => {
+  const chooseChartType = (event) => {
     const type = event.target.value;
     socket.emit("chart_type_selection", type);
 	  setChartType(type);
@@ -61,7 +61,7 @@ function App() {
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <ChartButtons labels={chart_types} onChangeHandler={chooseChart}/>
+        <ChartButtons labels={chart_types} onChangeHandler={chooseChartType}/>
         {chartType != "" &&
           <DynamicGraph
                 title={chartType}
