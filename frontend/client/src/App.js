@@ -61,19 +61,19 @@ function App() {
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-
-		<br/>
-		<ChartButtons labels={chart_types} onChangeHandler={chooseChart}/>
-        <DynamicGraph
-            title={chartType}
-            data={coords}
-            yMin={config.yMin}
-            yMax={config.yMax}
-            xMax={config.xMax}
-            xIncrement={config.xIncrement}
-            width={config.width}
-            height={config.height}>
-          </DynamicGraph>
+        <ChartButtons labels={chart_types} onChangeHandler={chooseChart}/>
+        {chartType != "" &&
+          <DynamicGraph
+                title={chartType}
+                data={coords}
+                yMin={config.yMin}
+                yMax={config.yMax}
+                xMax={config.xMax}
+                xIncrement={config.xIncrement}
+                width={config.width}
+                height={config.height}>
+            </DynamicGraph>
+        }
       </header>
     </div>
   );

@@ -1,25 +1,23 @@
 const net = require("net");
 
-// required PORTS
 const CLIENT_TO_MIDDLE_PORT = process.env.PORT || 49160;
 const MIDDLE_TO_FRONT_PORT = process.env.PORT || 3001;
 
-// create server to listen for add-ons
+// server to listen for add-ons
 // manage multiple addons in list
 // 0.0.0.0 means all IPv4 addresses on the local machine
 const C2M_server = net.createServer();
 C2M_server.on('connection', connectionHandler);
-C2M_server.listen({host: "0.0.0.0", port:CLIENT_TO_MIDDLE_PORT}, ()=>console.log('opened C2M_server on ', C2M_server.address()));
-var addons = [];
-var chartType = "";
+C2M_server.listen({host: "0.0.0.0", port:CLIENT_TO_MIDDLE_PORT}, () => console.log('opened C2M_server on ', C2M_server.address()));
+const addons = [];
+let chartType = "";
 
-// create server using websocket to communicate to frontend
+// create server that implements a websocket to communicate to frontend
 // upon connection, emit data every 2 ms
 const M2F_server = require('http').createServer({MIDDLE_TO_FRONT_PORT});
 const M2F_socket = require('socket.io')(M2F_server,{cors:{origin: true, credentials: true}});
 
-// Emits data packet by packet, as multiple concatenated packets may have been received due to TCP, and separated
-// Issue is mentioned above parseData()
+// emits individual data points for chart depending on user's selected chartType
 M2F_socket.on("connection", (client)=>{
   client.on("chart_type_selection", (arg) => {chartType = arg});
   setInterval(()=>{
@@ -29,9 +27,7 @@ M2F_socket.on("connection", (client)=>{
   }, 9)
 })
 
-M2F_server.listen(MIDDLE_TO_FRONT_PORT, () => {
-  console.log(`C2M_server listening on ${MIDDLE_TO_FRONT_PORT}`);
-});
+M2F_server.listen(MIDDLE_TO_FRONT_PORT, () => {console.log(`C2M_server listening on ${MIDDLE_TO_FRONT_PORT}`)});
 
 
 const data = [];  // hold separated data packets (one pkt for each addon) in list
@@ -41,7 +37,7 @@ function connectionHandler(conn){
   console.log('new client connection from %s', remoteAddress);
   console.log(addons);
 
-  conn.on('error', () => {console.log('Connection %s error: %s', remoteAddress, err.message)});
+  conn.on('error', (err) => {console.log('Connection %s error: %s', remoteAddress, err.message)});
   conn.on('data', (recv_d) => parseData(recv_d, data));
   conn.on('close', () => {
     console.log('connection from %s closed', conn.remotePort);
