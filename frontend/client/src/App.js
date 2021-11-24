@@ -14,60 +14,39 @@ const config = {"xMax" : 100,
                 "width" : 700,
                 "height" : 400};
 
-// instantiate "client (frontend)" websocket"
+// instantiate "client (frontend)" websocket connected to M2F server on port 3001"
 const socket = io('http://localhost:3001');
 
-// instanstiate tmp array
-let tmp = [];
-for (let i = 0; i < config.xMax; i++) {
-  tmp.push({
-    x: i,
-    y: 0
-  });
-}
+// instanstiate coordinates array
+const coordinates = [];
+for (let i = 0; i < config.xMax; i++) coordinates.push({x: i, y: 0})
 
-// manages the type of charts to keep track of (should be constant since we keep track of limited number of sensor data types)
-var charts_manager = [{"type": "current", 
-                        "coords": tmp.slice(0)},
-                        {"type": "temp_ambient", 
-                        "coords": tmp.slice(0)},
-                        {"type": "temp_casing", 
-                        "coords": tmp.slice(0)}
-                      ];
-
-var chart_types = charts_manager.map(chart => chart.type);
+const chart_types = ["current", "temp_ambient", "temp_casing"];
 
 function App() {
-
-  const [charts, setCharts] = React.useState([]);
-  const [chartDrop, setChartDrop] = React.useState("");
+  const [chartType, setChartType] = React.useState("");
   const [thing, setThing] = React.useState(0);
-  const [displayedChart, setDisplayedChart] = React.useState({});
+  const [coords, setCoords] = React.useState([]);
 
   React.useEffect(()=>{
-    socket.on('data', (pkt) => {
-      console.log(pkt);
-      charts_manager.forEach((chart) => {
-        for (let i = 0; i < tmp.length-1; i++){
-          chart.coords[i] = chart.coords[i+1]
-          chart.coords[i].x -= 1;
-        }
-        chart.coords[tmp.length - 1] = {
-            x: tmp.length-1,
-            y: pkt 
-        }
-      })
-      setThing(pkt);
-      setCharts(charts_manager);
+    socket.on('data', (data_pt) => {
+      for (let i = 0; i < coordinates.length-1; i++){
+        coordinates[i] = coordinates[i+1]
+        coordinates[i].x -= 1;
+      }
+      coordinates[coordinates.length - 1] = {
+          x: coordinates.length-1,
+          y: data_pt
+      }
+      setThing(data_pt);
+      setCoords(coordinates);
     });
   }, []);
   
   const chooseChart = (event) => {
-    let type = event.target.value;
+    const type = event.target.value;
     socket.emit("chart_type_selection", type);
-	  setChartDrop(type);
-    let chart = charts.find(chart => chart.type == type);
-    setDisplayedChart(chart);
+	  setChartType(type);
   }
 
   // const [addonDrop, setAddonDrop] = React.useState("");
@@ -89,8 +68,8 @@ function App() {
 		<br/>
 		<ChartButtons labels={chart_types} onChangeHandler={chooseChart}/>
         <DynamicGraph
-            title={displayedChart.type}
-            data={displayedChart.coords}
+            title={chartType}
+            data={coords}
             yMin={config.yMin}
             yMax={config.yMax}
             xMax={config.xMax}
