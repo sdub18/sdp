@@ -76,6 +76,3 @@ function parseData(recv_data, pkts_array){
   }
   return pkts_array;
 }
-
-
-//TODO: handle when C2M_server randomly goes out
