@@ -16,29 +16,18 @@ var chartType = "";
 // create server using websocket to communicate to frontend
 // upon connection, emit data every 2 ms
 const M2F_server = require('http').createServer({MIDDLE_TO_FRONT_PORT});
-const M2F_socket = require('socket.io')(M2F_server,{
-  cors:{
-    origin: true,
-    credentials: true
-  }
-});
+const M2F_socket = require('socket.io')(M2F_server,{cors:{origin: true, credentials: true}});
 
 // Emits data packet by packet, as multiple concatenated packets may have been received due to TCP, and separated
 // Issue is mentioned above parseData()
 M2F_socket.on("connection", (client)=>{
+  socket.on("chart_type_selection", (arg) => {chartType = arg});
   setInterval(()=>{
     for (const pkt of data){
       client.emit('data', pkt.data[chartType])
     }
   }, 9)
 })
-
-M2F_socket.on("connection", (socket) => {
-  socket.on("chart_type_selection", (arg) => {
-    console.log(arg);
-    chartType = arg;
-  });
-});
 
 M2F_server.listen(MIDDLE_TO_FRONT_PORT, () => {
   console.log(`C2M_server listening on ${MIDDLE_TO_FRONT_PORT}`);
