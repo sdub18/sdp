@@ -70,6 +70,7 @@ function App() {
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <AddonDropdown labels={addons} value={selectedAddon} onChangeHandler={chooseAddon}/>
+        <br/>
         <ChartButtons labels={chart_types} onChangeHandler={chooseChartType}/>
         {chartType != "" &&
           <DynamicGraph
