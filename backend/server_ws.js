@@ -12,6 +12,7 @@ C2M_server.listen({host: "0.0.0.0", port:CLIENT_TO_MIDDLE_PORT}, () => console.l
 let addons = [];
 let chartType = "";
 let selectedAddonID = 0;
+let update = false;
 
 // create server that implements a websocket to communicate to frontend
 // upon connection, emit data every 2 ms
@@ -28,7 +29,7 @@ M2F_socket.on("connection", (client)=>{
       update = false;
     }
     for (const pkt of data){
-      if (typeof(pkt.data)!== "number") client.emit('data', pkt.data[chartType]);
+      if (typeof(pkt.data)!== "number" && pkt.id === selectedAddonID) client.emit('data', pkt.data[chartType]);
     }
   }, 9)
 })
