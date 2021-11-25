@@ -11,6 +11,7 @@ C2M_server.on('connection', connectionHandler);
 C2M_server.listen({host: "0.0.0.0", port:CLIENT_TO_MIDDLE_PORT}, () => console.log('opened C2M_server on ', C2M_server.address()));
 let addons = [];
 let chartType = "";
+let selectedAddonID = 0;
 
 // create server that implements a websocket to communicate to frontend
 // upon connection, emit data every 2 ms
@@ -20,9 +21,14 @@ const M2F_socket = require('socket.io')(M2F_server,{cors:{origin: true, credenti
 // emits individual data points for chart depending on user's selected chartType
 M2F_socket.on("connection", (client)=>{
   client.on("chart_type_selection", (arg) => {chartType = arg});
+  client.on("addon_selection", (arg) => {selectedAddonID = arg});
   setInterval(()=>{
+    if (update){
+      client.emit("updateAddons", addons.map(a => a.id));
+      update = false;
+    }
     for (const pkt of data){
-      client.emit('data', pkt.data[chartType])
+      if (typeof(pkt.data)!== "number") client.emit('data', pkt.data[chartType]);
     }
   }, 9)
 })
@@ -41,13 +47,18 @@ function connectionHandler(conn){
     for (let pkt of data){
       if (!addons.some(addon => addon.id === pkt.id)) {
         addons.push(pkt);
+        conn.write("nice");
+        console.log(addons);
+        update = true;
       }
     }
   });
   conn.on('close', () => {
     console.log('connection from %s closed', conn.remotePort);
-    addon_idx = addons.findIndex(x => x.data == conn.remotePort);
+    addon_idx = addons.findIndex(addon => addon.data == conn.remotePort);
     addons.splice(addon_idx, 1);
+    console.log(addons);
+    update = true;
   });
 }
 

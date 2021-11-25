@@ -18,6 +18,7 @@ function connectionHandler(conn){
 
     client.on('data', (d)=>{
         console.log(''+d);
+        canSend = true;
     })
     client.on('error', (err)=>{
         console.log(err.message);
@@ -25,6 +26,7 @@ function connectionHandler(conn){
     client.on('close', ()=>{
         console.log('connection terminated');
         client.end();
+        canSend = false;
         exit();
     })
 }
@@ -55,10 +57,10 @@ async function sendData(port) {
         let load = `{"id": ${UID}, "data":${data}}`;  
         data_pkt = header + load + end;
             
-        client.emit('data',data_pkt);
+        client.write(data_pkt);
         console.log(data_pkt);
         
-        await sleep(1000);  
+        await sleep(1);  
     }    
 }
 

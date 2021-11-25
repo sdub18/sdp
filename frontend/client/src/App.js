@@ -27,8 +27,11 @@ function App() {
   const [chartType, setChartType] = React.useState("");
   const [thing, setThing] = React.useState(0);
   const [coords, setCoords] = React.useState([]);
+  const [addons, setAddons] = React.useState([]);
+  const [selectedAddon, setSelectedAddon] = React.useState("");
 
   React.useEffect(()=>{
+    socket.on("updateAddons", (updatedAddons) => {setAddons(updatedAddons)});
     socket.on('data', (data_pt) => {
       for (let i = 0; i < coordinates.length-1; i++){
         coordinates[i].y = coordinates[i+1].y
@@ -46,6 +49,11 @@ function App() {
 	  setChartType(type);
   }
 
+  const chooseAddon = (event) => {
+    const addon = event.target.value
+    socket.emit("addon_selection", addon);
+    setSelectedAddon(addon);
+  }
   // const [addonDrop, setAddonDrop] = React.useState("");
   // const chooseAddon = (event) => {
   // 	let addon = event.target.value	
@@ -61,6 +69,7 @@ function App() {
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
+        <AddonDropdown labels={addons} value={selectedAddon} onChangeHandler={chooseAddon}/>
         <ChartButtons labels={chart_types} onChangeHandler={chooseChartType}/>
         {chartType != "" &&
           <DynamicGraph
