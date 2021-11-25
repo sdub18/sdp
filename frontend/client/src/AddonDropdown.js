@@ -31,7 +31,7 @@ const useStyles = makeStyles(theme => ({
     return(
         <Box sx={{ minWidth: 120 }}>
 			<FormControl fullWidth>
-				<InputLabel>Chart Type</InputLabel>
+				<InputLabel>Motor Addon ID</InputLabel>
 				<Select
 				labelId="chart-select-label"
 				id="chart-select"
