@@ -33,15 +33,24 @@ M2F_server.listen(MIDDLE_TO_FRONT_PORT, () => {console.log(`C2M_server listening
 const data = [];  // hold separated data packets (one pkt for each addon) in list
 function connectionHandler(conn){
   const remoteAddress = conn.remoteAddress + ':' + conn.remotePort;
-  addons.push({id:addons.length+1,port:conn.remotePort});
   console.log('new client connection from %s', remoteAddress);
   console.log(addons);
 
   conn.on('error', (err) => {console.log('Connection %s error: %s', remoteAddress, err.message)});
-  conn.on('data', (recv_d) => parseData(recv_d, data));
+  conn.on('data', (recv_d) => {
+    parseData(recv_d, data)
+    for (const pkt of data){
+      if (!addons.some(addon => addon.id === pkt.id)) {
+        console.log(pkt);
+        console.log(addons.indexOf(pkt));
+        addons.push(pkt);
+        console.log(addons);
+      }
+    }
+  });
   conn.on('close', () => {
     console.log('connection from %s closed', conn.remotePort);
-    addon_idx = addons.indexOf(obj => obj.port === conn.remotePort);
+    addon_idx = addons.indexOf(x => x === c );
     addons.splice(addon_idx, 1);
     console.log(addons);
   });
@@ -55,19 +64,20 @@ function connectionHandler(conn){
  */
 function parseData(recv_data, pkts_array){
   pkts_array.length = 0;
-  let tmp_pkt = '';
+  let pkt = '';
   let start = false;
   
   for (let pair of recv_data.entries()){
     let char = String.fromCharCode(pair[1]); 
     
     if (pair[1] == 0){
-      pkts_array.push(JSON.parse(tmp_pkt));
-      tmp_pkt = '';
+      parsed_pkt = JSON.parse(pkt);
+      pkts_array.push(parsed_pkt);
+      pkt = '';
       start = false;
     }
 
-    if (start == true) tmp_pkt += char;
+    if (start == true) pkt += char;
     if (pair[1] == 1) start = true;
   }
   return pkts_array;
