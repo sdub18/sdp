@@ -9,7 +9,7 @@ const MIDDLE_TO_FRONT_PORT = process.env.PORT || 3001;
 const C2M_server = net.createServer();
 C2M_server.on('connection', connectionHandler);
 C2M_server.listen({host: "0.0.0.0", port:CLIENT_TO_MIDDLE_PORT}, () => console.log('opened C2M_server on ', C2M_server.address()));
-const addons = [];
+let addons = [];
 let chartType = "";
 
 // create server that implements a websocket to communicate to frontend
@@ -34,25 +34,20 @@ const data = [];  // hold separated data packets (one pkt for each addon) in lis
 function connectionHandler(conn){
   const remoteAddress = conn.remoteAddress + ':' + conn.remotePort;
   console.log('new client connection from %s', remoteAddress);
-  console.log(addons);
 
   conn.on('error', (err) => {console.log('Connection %s error: %s', remoteAddress, err.message)});
   conn.on('data', (recv_d) => {
     parseData(recv_d, data)
-    for (const pkt of data){
+    for (let pkt of data){
       if (!addons.some(addon => addon.id === pkt.id)) {
-        console.log(pkt);
-        console.log(addons.indexOf(pkt));
         addons.push(pkt);
-        console.log(addons);
       }
     }
   });
   conn.on('close', () => {
     console.log('connection from %s closed', conn.remotePort);
-    addon_idx = addons.indexOf(x => x === c );
+    addon_idx = addons.findIndex(x => x.data == conn.remotePort);
     addons.splice(addon_idx, 1);
-    console.log(addons);
   });
 }
 
