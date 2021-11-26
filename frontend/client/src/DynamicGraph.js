@@ -36,7 +36,6 @@ export default function DynamicGraph(props) {
         className={classes.marginAutoItem}
         position="relative"
     >
-        <h1 display="inline" textAlign="center">{props.title}</h1>
         <LineChart
         className={classes.graph}
         width={props.width}
@@ -68,7 +67,7 @@ export default function DynamicGraph(props) {
         {/*<Tooltip />*/}
         <Legend />
         <Line
-            name="Current (A)"
+            name={props.title}
             type="linear"
             dataKey="y"
             stroke="#8884d8"
