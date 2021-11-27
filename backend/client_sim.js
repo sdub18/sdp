@@ -57,8 +57,8 @@ async function sendData(port) {
         let load = `{"id": ${UID}, "data":${data}}`;  
         data_pkt = header + load + end;
             
-        client.write(data_pkt);
-        console.log(data_pkt);
+        client.write(load);
+        console.log(load);
         
         await sleep(1);  
     }    

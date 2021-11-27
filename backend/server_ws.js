@@ -1,4 +1,5 @@
 const net = require("net");
+const { PassThrough } = require("stream");
 
 const CLIENT_TO_MIDDLE_PORT = process.env.PORT || 49160;
 const MIDDLE_TO_FRONT_PORT = process.env.PORT || 3001;
@@ -29,9 +30,9 @@ M2F_socket.on("connection", (client)=>{
       update = false;
     }
     for (const pkt of data){
-      if (typeof(pkt.data)!== "number" && pkt.id === selectedAddonID) client.emit('data', pkt.data[chartType]);
+      if (pkt.id === selectedAddonID && typeof(pkt.data)!== "number") client.emit('data', pkt.data[chartType]);
     }
-  }, 9)
+  }, 1)
 })
 
 M2F_server.listen(MIDDLE_TO_FRONT_PORT, () => {console.log(`C2M_server listening on ${MIDDLE_TO_FRONT_PORT}`)});
@@ -63,29 +64,44 @@ function connectionHandler(conn){
   });
 }
 
-/**
- * Converts byte streamed data received into a list of data packet objects
- * Handles when data packets are concatenated due to TCP stream
- * @param {Buffer} recv_data 
- * @returns List of data packet JSON objects 
- */
 function parseData(recv_data, pkts_array){
   pkts_array.length = 0;
-  let pkt = '';
-  let start = false;
-  
-  for (let pair of recv_data.entries()){
-    let char = String.fromCharCode(pair[1]); 
-    
-    if (pair[1] == 0){
-      parsed_pkt = JSON.parse(pkt);
-      pkts_array.push(parsed_pkt);
-      pkt = '';
-      start = false;
-    }
+  const parens = {"{": "}", "(": ")", "[": "]"};
+  const stack = []
+  let pkt = "";
+  let status = 0;
 
-    if (start == true) pkt += char;
-    if (pair[1] == 1) start = true;
+  try {
+    pkt = JSON.parse(recv_data);
+    pkts_array.push(pkt);
   }
-  return pkts_array;
+  catch (err) {
+    //iterate through each character of buffer
+    // use valid parentheses to check when packet ends length of stack should be 0
+    // return nothing and place nothing in pkts_array if data is invalid
+    for (let char in recv_data){
+      pkt += char;
+      if (parens.hasOwnProperty(char)){
+        stack.push(char)  
+      }
+      else if (Object.values(parens).some(p => p === char)){
+        if (parens[stack.pop()] === char && stack.length === 0){
+          let parsed_pkt = JSON.parse(pkt);
+          pkts_array.push(parsed_pkt);
+          pkt = "";
+        }
+        else {
+          pkts_array.length = 0;
+          console.log("Failed to parse data");
+          status = -1;
+          break;
+        }
+      }
+      else continue;
+    }
+  }
+  
+  if (pkts_array.length > 1) console.log(pkts_array);
+  return status;
+
 }
