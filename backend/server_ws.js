@@ -10,13 +10,14 @@ const MIDDLE_TO_FRONT_PORT = process.env.PORT || 3001;
 const C2M_server = net.createServer();
 C2M_server.on('connection', connectionHandler);
 C2M_server.listen({host: "0.0.0.0", port:CLIENT_TO_MIDDLE_PORT}, () => console.log('opened C2M_server on ', C2M_server.address()));
+
+
 let addons = [];
 let chartType = "";
 let selectedAddonID = 0;
 let update = false;
 
 // create server that implements a websocket to communicate to frontend
-// upon connection, emit data every 2 ms
 const M2F_server = require('http').createServer({MIDDLE_TO_FRONT_PORT});
 const M2F_socket = require('socket.io')(M2F_server,{cors:{origin: true, credentials: true}});
 
@@ -24,7 +25,8 @@ const M2F_socket = require('socket.io')(M2F_server,{cors:{origin: true, credenti
 M2F_socket.on("connection", (client)=>{
   client.on("chart_type_selection", (arg) => {chartType = arg});
   client.on("addon_selection", (arg) => {selectedAddonID = arg});
-  setInterval(()=>{
+  setInterval(() => {
+    // only emit updateAddons event when addon is added/removed
     if (update){
       client.emit("updateAddons", addons.map(a => a.id));
       update = false;
@@ -32,8 +34,8 @@ M2F_socket.on("connection", (client)=>{
     for (const pkt of data){
       if (pkt.id === selectedAddonID && typeof(pkt.data)!== "number") client.emit('data', pkt.data[chartType]);
     }
-  }, 1)
-})
+  }, 1);
+});
 
 M2F_server.listen(MIDDLE_TO_FRONT_PORT, () => {console.log(`C2M_server listening on ${MIDDLE_TO_FRONT_PORT}`)});
 
@@ -76,6 +78,7 @@ function parseData(recv_data, pkts_array){
     pkts_array.push(pkt);
   }
   catch (err) {
+    // handles stream buffer concatenation
     //iterate through each character of buffer
     // use valid parentheses to check when packet ends length of stack should be 0
     // return nothing and place nothing in pkts_array if data is invalid
@@ -100,8 +103,5 @@ function parseData(recv_data, pkts_array){
       else continue;
     }
   }
-  
-  if (pkts_array.length > 1) console.log(pkts_array);
   return status;
-
 }

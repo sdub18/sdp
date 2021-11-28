@@ -17,7 +17,7 @@ const config = {"xMax" : 100,
                 "height" : 400};
 
 // instantiate "client (frontend)" websocket connected to M2F server on port 3001"
-const socket = io('http://localhost:3001');
+const socket = io('http://localhost:3001', {'reconnection': true, 'reconnectionAttemps': Infinity});
 
 // instanstiate coordinates array
 const coordinates = [];
@@ -39,13 +39,13 @@ function App() {
   const [selectedAddon, setSelectedAddon] = React.useState("");
 
   // update dropdown options with addons state
-  socket.on("updateAddons", (updatedAddons) => {setAddons(updatedAddons)});
+  socket.on("updateAddons", (recv_addons) => {if (recv_addons !== addons) setAddons(recv_addons)});
 
   React.useEffect(()=>{
     const timer = setInterval(() => {
       setThing(coordinates[coordinates.length-1].y);
       setCoords(coordinates);
-    }, 500);
+    }, 1000);
     return () => clearInterval(timer);
   }, []);
   
