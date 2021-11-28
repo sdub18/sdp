@@ -6,6 +6,8 @@ import io from 'socket.io-client';
 import ChartButtons from "./ChartButtons";
 import AddonDropdown from "./AddonDropdown";
 
+const ChartButtonsMemo = React.memo(ChartButtons);
+const AddonDropdownMemo = React.memo(AddonDropdown);
 
 const config = {"xMax" : 100, 
                 "xIncrement" : 100,
@@ -43,36 +45,26 @@ function App() {
     });
   }, []);
   
-  const chooseChartType = (event) => {
+  const chooseChartType = React.useCallback((event) => {
     const type = event.target.value;
     socket.emit("chart_type_selection", type);
 	  setChartType(type);
-  }
+  }, []);
 
-  const chooseAddon = (event) => {
+  const chooseAddon = React.useCallback((event) => {
     const addon = event.target.value
     socket.emit("addon_selection", addon);
     setSelectedAddon(addon);
-  }
-  // const [addonDrop, setAddonDrop] = React.useState("");
-  // const chooseAddon = (event) => {
-  // 	let addon = event.target.value	
-  // 	setAddonDrop(addon)
-  // 	setChartDrop("")
-  // 	need to have someway to hold all addons with their respective chart managers and to select correct addon
-  // }
-  // <AddonDropdown labels={addon_ids} value={addonDrop} onChangeHandler={chooseAddon}/>
-  // Dropdown should be used to select which addon to watch over
-  // 
+  }, []);
 
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <AddonDropdown labels={addons} value={selectedAddon} onChangeHandler={chooseAddon}/>
+        <AddonDropdownMemo labels={addons} value={selectedAddon} onChangeHandler={chooseAddon}/>
         <br/>
-        <ChartButtons labels={chart_types} onChangeHandler={chooseChartType}/>
-        {chartType != "" &&
+        <ChartButtonsMemo labels={chart_types} onChangeHandler={chooseChartType}/>
+        {chartType !== "" &&
           <DynamicGraph
                 title={chartType}
                 data={coords}

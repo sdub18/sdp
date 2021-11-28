@@ -1,5 +1,5 @@
 const net = require("net");
-const { PassThrough } = require("stream");
+const performance = require('perf_hooks').performance;
 
 const CLIENT_TO_MIDDLE_PORT = process.env.PORT || 49160;
 const MIDDLE_TO_FRONT_PORT = process.env.PORT || 3001;
