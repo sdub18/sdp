@@ -23,6 +23,12 @@ const socket = io('http://localhost:3001');
 const coordinates = [];
 for (let i = 0; i < config.xMax; i++) coordinates.push({x: i, y: 0})
 
+// update coordinates array with incoming data_pt
+socket.on('data', (data_pt) => {
+  for (let i = 0; i < coordinates.length-1; i++) coordinates[i].y = coordinates[i+1].y;
+  coordinates[coordinates.length-1].y = data_pt;
+});
+
 const chart_types = ["current", "temp_ambient", "temp_casing"];
 
 function App() {
@@ -32,17 +38,15 @@ function App() {
   const [addons, setAddons] = React.useState([]);
   const [selectedAddon, setSelectedAddon] = React.useState("");
 
-  React.useEffect(()=>{
-    socket.on("updateAddons", (updatedAddons) => {setAddons(updatedAddons)});
-    socket.on('data', (data_pt) => {
-      for (let i = 0; i < coordinates.length-1; i++){
-        coordinates[i].y = coordinates[i+1].y
-      }
-      coordinates[coordinates.length-1].y = data_pt;
+  // update dropdown options with addons state
+  socket.on("updateAddons", (updatedAddons) => {setAddons(updatedAddons)});
 
-      setThing(data_pt);
+  React.useEffect(()=>{
+    const timer = setInterval(() => {
+      setThing(coordinates[coordinates.length-1].y);
       setCoords(coordinates);
-    });
+    }, 500);
+    return () => clearInterval(timer);
   }, []);
   
   const chooseChartType = React.useCallback((event) => {
@@ -54,6 +58,8 @@ function App() {
   const chooseAddon = React.useCallback((event) => {
     const addon = event.target.value
     socket.emit("addon_selection", addon);
+    // reset coordinates when new addon selected
+    for (let i = 0; i < config.xMax; i++) coordinates[i].y = 0;
     setSelectedAddon(addon);
   }, []);
 
