@@ -1,3 +1,20 @@
+/*
+CLIENT (ADDON) SOFTWARE REQUIREMENTS
+Teensy:
+    getSensorData(dev_addr) - Get individual sensor data
+    formatSensorData() - Format data together into JSON format
+    init_I2C() - Connect to sensors using I2C
+    write(msg) - Send packet to ESP32 via UART (eventually change to SPI?)
+
+ESP32:
+    read(num_bytes) - Receive data from Teensy
+    connect(host, port) - Connect to middleman server via TCP
+    sendData(msg) - Send UID and port to server until server sends back data 
+        Then send data received from Teensy to middleman once handshake made (simulated here with canSend boolean)
+    setUID(UID) - Write UID to ESP32 EEPROM - need to save unique ID even with no power, just need to do once 
+    getUID() - Read UID from ESP32 EEPROM - for sendData
+*/
+
 const net = require('net');
 const { exit } = require('process');
 
