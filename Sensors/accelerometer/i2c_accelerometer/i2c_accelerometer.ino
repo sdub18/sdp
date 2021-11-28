@@ -9,7 +9,7 @@ void setup() {
 
   Serial.println("LIS3DH test!");
 
-  if (! lis.begin(0x18)) {   // change this to 0x19 for alternative i2c address
+  if (! lis.begin(0x19)) {   // change this to 0x19 for alternative i2c address
     Serial.println("Couldnt start");
     while (1) yield();
   }

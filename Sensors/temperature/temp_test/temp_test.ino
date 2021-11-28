@@ -33,7 +33,7 @@ void setup() {
   //  1  0  1   0x1D
   //  1  1  0   0x1E
   //  1  1  1   0x1F
-  if (!tempsensor.begin(0x19)) {
+  if (!tempsensor.begin(0x1A)) {
     Serial.println("Couldn't find MCP9808! Check your connections and verify the address is correct.");
     while (1);
   }

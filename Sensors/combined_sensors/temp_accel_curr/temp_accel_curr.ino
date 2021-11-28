@@ -29,38 +29,38 @@ void setup() {
 
   // MARK: ACCELEROMETER SENSOR
 
-//  Serial.println("LIS3DH test!");
-//
-//  if (! lis.begin(0x1A)) {   // change this to 0x19 for alternative i2c address
-//    Serial.println("Couldnt start");
-//    while (1) yield();
-//  }
-//  Serial.println("LIS3DH found!");
-//
-//  // lis.setRange(LIS3DH_RANGE_4_G);   // 2, 4, 8 or 16 G!
-//
-//  Serial.print("Range = "); Serial.print(2 << lis.getRange());
-//  Serial.println("G");
-//
-//  // lis.setDataRate(LIS3DH_DATARATE_50_HZ);
-//  Serial.print("Data rate set to: ");
-//  switch (lis.getDataRate()) {
-//    case LIS3DH_DATARATE_1_HZ: Serial.println("1 Hz"); break;
-//    case LIS3DH_DATARATE_10_HZ: Serial.println("10 Hz"); break;
-//    case LIS3DH_DATARATE_25_HZ: Serial.println("25 Hz"); break;
-//    case LIS3DH_DATARATE_50_HZ: Serial.println("50 Hz"); break;
-//    case LIS3DH_DATARATE_100_HZ: Serial.println("100 Hz"); break;
-//    case LIS3DH_DATARATE_200_HZ: Serial.println("200 Hz"); break;
-//    case LIS3DH_DATARATE_400_HZ: Serial.println("400 Hz"); break;
-//
-//    case LIS3DH_DATARATE_POWERDOWN: Serial.println("Powered Down"); break;
-//    case LIS3DH_DATARATE_LOWPOWER_5KHZ: Serial.println("5 Khz Low Power"); break;
-//    case LIS3DH_DATARATE_LOWPOWER_1K6HZ: Serial.println("16 Khz Low Power"); break;
-//  }
+  Serial.println("LIS3DH test!");
+
+  if (! lis.begin(0x19)) {   // change this to 0x19 for alternative i2c address
+    Serial.println("Couldnt start");
+    while (1) yield();
+  }
+  Serial.println("LIS3DH found!");
+
+  // lis.setRange(LIS3DH_RANGE_4_G);   // 2, 4, 8 or 16 G!
+
+  Serial.print("Range = "); Serial.print(2 << lis.getRange());
+  Serial.println("G");
+
+  // lis.setDataRate(LIS3DH_DATARATE_50_HZ);
+  Serial.print("Data rate set to: ");
+  switch (lis.getDataRate()) {
+    case LIS3DH_DATARATE_1_HZ: Serial.println("1 Hz"); break;
+    case LIS3DH_DATARATE_10_HZ: Serial.println("10 Hz"); break;
+    case LIS3DH_DATARATE_25_HZ: Serial.println("25 Hz"); break;
+    case LIS3DH_DATARATE_50_HZ: Serial.println("50 Hz"); break;
+    case LIS3DH_DATARATE_100_HZ: Serial.println("100 Hz"); break;
+    case LIS3DH_DATARATE_200_HZ: Serial.println("200 Hz"); break;
+    case LIS3DH_DATARATE_400_HZ: Serial.println("400 Hz"); break;
+
+    case LIS3DH_DATARATE_POWERDOWN: Serial.println("Powered Down"); break;
+    case LIS3DH_DATARATE_LOWPOWER_5KHZ: Serial.println("5 Khz Low Power"); break;
+    case LIS3DH_DATARATE_LOWPOWER_1K6HZ: Serial.println("16 Khz Low Power"); break;
+  }
 
   // MARK: TEMPERATURE SENSOR
 
-  if (!tempsensor.begin(0x19)) {
+  if (!tempsensor.begin(0x1A)) {
     Serial.println("Couldn't find MCP9808! Check your connections and verify the address is correct.");
     while (1);
   }
@@ -79,7 +79,7 @@ void setup() {
 
   Serial.println("Searching for Current Sensor ..."); // Search for INA260 Chip
 
-  if (!ina260.begin(0x18)) {
+  if (!ina260.begin()) {
     Serial.println("Couldn't find INA260 chip");
     while (1);
   }
