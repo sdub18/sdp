@@ -13,6 +13,31 @@ ESP32:
         Then send data received from Teensy to middleman once handshake made (simulated here with canSend boolean)
     setUID(UID) - Write UID to ESP32 EEPROM - need to save unique ID even with no power, just need to do once 
     getUID() - Read UID from ESP32 EEPROM - for sendData
+
+
+POTENTIALLY USEFUL CIRCUIT PYTHON LIBRARIES FOR ESP32 and TEENSY 4.1:
+Core Circuit Python Modules:
+- busio and adafruit_bus_device.i2c_device (for managing from main/master side)
+- i2cperipheral (for managing sensor/slave side)
+- socketpool (for tcp implementation)
+- wifi (for internet connection)
+- nvm (for EEPROM access)
+
+Ported Micro Python Libraries:
+- json (for data formatting)
+- uasyncio (can be used for TCP streams)
+- const (for compiling optimization)
+- machine.I2C (for i2C)
+
+CircuitPython Library Bundle Package -> existing libaries for some of our devices!
+- INA260
+- LIS3DH
+- MCP9808
+
+Lots of ways to implement and use i2c not sure which is the best
+
+
+
 */
 
 const net = require('net');
