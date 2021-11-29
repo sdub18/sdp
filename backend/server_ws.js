@@ -3,7 +3,7 @@ const performance = require('perf_hooks').performance;
 
 const CLIENT_TO_MIDDLE_PORT = process.env.PORT || 49160;
 const MIDDLE_TO_FRONT_PORT = process.env.PORT || 3001;
-
+const EMIT_PERIOD = 100;
 // server to listen for add-ons
 // manage multiple addons in list
 // 0.0.0.0 means all IPv4 addresses on the local machine
@@ -16,6 +16,7 @@ let addons = [];
 let chartType = "";
 let selectedAddonID = 0;
 let update = false;
+let val2emit = 0;
 
 // create server that implements a websocket to communicate to frontend
 const M2F_server = require('http').createServer({MIDDLE_TO_FRONT_PORT});
@@ -25,14 +26,18 @@ const M2F_socket = require('socket.io')(M2F_server,{cors:{origin: true, credenti
 M2F_socket.on("connection", (client)=>{
   client.on("chart_type_selection", (arg) => {chartType = arg});
   client.on("addon_selection", (arg) => {selectedAddonID = arg});
+  
+  setInterval(() => client.emit('data', val2emit), EMIT_PERIOD);     // emit only every EMIT_PERIOD ms
+  
   setInterval(() => {
     // only emit updateAddons event when addon is added/removed
     if (update){
       client.emit("updateAddons", addons.map(a => a.id));
       update = false;
     }
+    // update val2emit constantly
     for (const pkt of data){
-      if (pkt.id === selectedAddonID && typeof(pkt.data)!== "number") client.emit('data', pkt.data[chartType]);
+      if (pkt.id === selectedAddonID && typeof(pkt.data)!== "number") val2emit = pkt.data[chartType];
     }
   }, 1);
 });
