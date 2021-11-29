@@ -48,7 +48,7 @@ const { exit } = require('process');
 const HOST = "localhost";
 const PORT = 49160;
 const UID = process.argv[2];
-const sendFreq = 300;
+const sendFreq = 1;
 
 const options = {family: 4, host:HOST, port: PORT}
 const client = net.createConnection(options, connectionHandler);
