@@ -11,6 +11,7 @@ ESP32:
     connect(host, port) - Connect to middleman server via TCP
     sendData(msg) - Send UID and port to server until server sends back data 
         Then send data received from Teensy to middleman once handshake made (simulated here with canSend boolean)
+        We should also be able to control the speed at which the ESP32 sends the data (simulated here wiht the sleep function)
     setUID(UID) - Write UID to ESP32 EEPROM - need to save unique ID even with no power, just need to do once 
     getUID() - Read UID from ESP32 EEPROM - for sendData
 
@@ -47,6 +48,7 @@ const { exit } = require('process');
 const HOST = "localhost";
 const PORT = 49160;
 const UID = process.argv[2];
+const sendFreq = 300;
 
 const options = {family: 4, host:HOST, port: PORT}
 const client = net.createConnection(options, connectionHandler);
@@ -102,7 +104,7 @@ async function sendData(port) {
         client.write(load);
         console.log(load);
         
-        await sleep(1);  
+        await sleep(sendFreq);  
     }    
 }
 
