@@ -9,6 +9,8 @@ import AddonDropdown from "./AddonDropdown";
 const ChartButtonsMemo = React.memo(ChartButtons);
 const AddonDropdownMemo = React.memo(AddonDropdown);
 
+const RENDER_PERIOD = 50;
+
 const config = {"xMax" : 100, 
                 "xIncrement" : 100,
                 "yMin" : 0,
@@ -29,6 +31,14 @@ socket.on('data', (data_pt) => {
   coordinates[coordinates.length-1].y = data_pt;
 });
 
+// update received addons array
+let local_addons = [];
+socket.on("updateAddons", (recv_addons) => {
+  if (!(JSON.stringify(recv_addons) === JSON.stringify(local_addons))){
+    local_addons = recv_addons; 
+  }
+});
+
 const chart_types = ["current", "temp_ambient", "temp_casing"];
 
 function App() {
@@ -38,14 +48,13 @@ function App() {
   const [addons, setAddons] = React.useState([]);
   const [selectedAddon, setSelectedAddon] = React.useState("");
 
-  // update dropdown options with addons state
-  socket.on("updateAddons", (recv_addons) => {if (recv_addons !== addons) setAddons(recv_addons)});
 
-  React.useEffect(()=>{
+  React.useEffect(() => {
     const timer = setInterval(() => {
+      if (local_addons.toString() !== addons) setAddons(local_addons);
       setThing(coordinates[coordinates.length-1].y);
       setCoords(coordinates);
-    }, 1000);
+    }, RENDER_PERIOD);
     return () => clearInterval(timer);
   }, []);
   
