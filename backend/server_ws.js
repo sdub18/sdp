@@ -4,15 +4,12 @@ const CLIENT_TO_MIDDLE_PORT = process.env.PORT || 49160;
 const MIDDLE_TO_FRONT_PORT = process.env.PORT || 3001;
 const EMIT_PERIOD = 1;
 
-// server to listen for add-ons
 const C2M_server = net.createServer();
-
-// server to listen for frontend and implement websocket protocol
 const M2F_server = require('http').createServer({MIDDLE_TO_FRONT_PORT});
 const M2F_socket = require('socket.io')(M2F_server,{cors:{origin: true, credentials: true}});
 
 let addons = [];      // backend local array to manage addon ids
-let chartType = "";   //  select data type to send to frontend
+let chartType = "";   // select data type to send to frontend
 let selectedID = 0;   // select addon id to choose which data packet to access
 let val2emit = 0;     // backend local variable to update to send to frontend
 const data = [];      // hold separated data packets (one pkt for each addon) in list
@@ -25,19 +22,16 @@ C2M_server.on('connection', C2M_connectionHandler);
 C2M_server.listen({host: "0.0.0.0", port:CLIENT_TO_MIDDLE_PORT}, () => console.log('opened C2M_server on ', C2M_server.address()));
 
 function M2F_connectionHandler(client){
-  client.on("chart_type_selection", (arg) => {chartType = arg});  // update chartType upon selecting from frontend
-  client.on("addon_selection", (arg) => {selectedID = arg});      // update selectedID upong selecting from frontend
+  client.on("chart_type_selection", (arg) => {chartType = arg});
+  client.on("addon_selection", (arg) => {selectedID = arg});
   
-
   // separate the interval processes to emit the data and to select the data
-  // old method: single interval that selected data and emits it
-  // issue: if id1 selected but because of timing the data array held a packet from id2 at each interval
-  //        then no data would have been sent because it was not the right id 
   setInterval(() => client.emit('data', val2emit), EMIT_PERIOD);     
   setInterval(() => {
-    client.emit("updateAddons", addons.map(a => a.id));   // send frontend list of addonID so it can update dropdown when addon is added/removed
+    client.emit("updateAddons", addons.map(a => a.id));  
     for (const pkt of data){
-      if (pkt.id === selectedID && typeof(pkt.data)!== "number") val2emit = pkt.data[chartType];  // update val2emit to correct value given selectedID and chartType
+      if (pkt.id === selectedID && typeof(pkt.data)!== "number")
+        val2emit = pkt.data[chartType];
     }
   }, 1);
 }
@@ -49,9 +43,7 @@ function C2M_connectionHandler(conn){
   conn.on('error', (err) => {console.log('Connection %s error: %s', remoteAddress, err.message)});
   conn.on('data', (recv_d) => {
     parseData(recv_d, data)     // parse buffer stream into individual packets of data and place into data array
-    for (let pkt of data) {
-      // check each packet for new addon id
-      // new addons will not send sensor data but init packet
+    for (let pkt of data) { 
       // update local addon array if new addon detected and write back to addon to start sending sensor data
       if (!addons.some(addon => addon.id === pkt.id)) {
         addons.push(pkt);
@@ -61,7 +53,7 @@ function C2M_connectionHandler(conn){
     }
   });
   conn.on('close', () => {
-    // upon closing connection to add, must remove from addon array
+    // remove connection from addon array
     console.log('connection from %s closed', conn.remotePort);
     addon_idx = addons.findIndex(addon => addon.data == conn.remotePort);
     addons.splice(addon_idx, 1);
@@ -77,8 +69,6 @@ function parseData(recv_data, pkts_array){
   let status = 0;
 
   try {
-    // most buffers of data sent will be inidividual packets
-    // that can be immediately parsed by JSON.parse()
     pkt = JSON.parse(recv_data);
     pkts_array.push(pkt);
   }

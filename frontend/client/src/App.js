@@ -29,7 +29,6 @@ for (let i = 0; i < config.xMax; i++)   // instantiate coordinates in array
 socket.on('data', (data_pt) => {
   for (let i = 0; i < coordinates.length-1; i++) 
     coordinates[i].y = coordinates[i+1].y;
-
   coordinates[coordinates.length-1].y = data_pt;
 });
 

@@ -37,8 +37,6 @@ CircuitPython Library Bundle Package -> existing libaries for some of our device
 
 Lots of ways to implement and use i2c not sure which is the best
 
-
-
 */
 
 const net = require('net');
