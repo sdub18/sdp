@@ -9,6 +9,7 @@ Teensy:
 ESP32:
     read(num_bytes) - Receive data from Teensy
     connect(host, port) - Connect to middleman server via TCP
+    UID stands for "Unique Identifier"
     sendData(msg) - Send UID and port to server until server sends back data 
         Then send data received from Teensy to middleman once handshake made (simulated here with canSend boolean)
         We should also be able to control the speed at which the ESP32 sends the data (simulated here wiht the sleep function)
@@ -45,7 +46,8 @@ const { exit } = require('process');
 //change HOST to your PC's ip address
 const HOST = "localhost";
 const PORT = 49160;
-const UID = process.argv[2];
+// The simulated client's Unique ID can be generated from the process' PID
+const UID = process.pid;
 const sendFreq = 1;
 
 const options = {family: 4, host:HOST, port: PORT}
