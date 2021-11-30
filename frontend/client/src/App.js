@@ -5,6 +5,7 @@ import DynamicGraph from "./DynamicGraph";
 import io from 'socket.io-client';
 import ChartButtons from "./ChartButtons";
 import AddonDropdown from "./AddonDropdown";
+import { Box } from "@mui/system";
 
 const ChartButtonsMemo = React.memo(ChartButtons);
 const AddonDropdownMemo = React.memo(AddonDropdown);
@@ -17,13 +18,18 @@ const chart_types = ["current", "temp_ambient", "temp_casing"];   // all chart t
 const coordinates = [];               // frontend local copy of coordinates, used to set "coords" state variable
 const config = {"xMax" : 100,         // chart config --> consider moving to backend so we can keep multiple different copies depending on chart type
                 "xIncrement" : 100,
-                "yMin" : 0,
-                "yMax" : 200,
+                "yMin" : 50,
+                "yMax" : 130,
                 "width" : 700,
                 "height" : 400};
 
-for (let i = 0; i < config.xMax; i++)   // instantiate coordinates in array
+for (let i = 0; i < config.xMax; i++) {  // instantiate coordinates in array
   coordinates.push({x: i, y: 0});
+}
+
+var healthy = true;
+var healthText = "HEALTHY";
+var threshold = 99;
 
 // update coordinates upon receiving new data point from backend, shift y coordinates back by 1 position
 socket.on('data', (data_pt) => {
@@ -38,6 +44,14 @@ socket.on("updateAddons", (recv_addons) => {
     local_addons = recv_addons; 
 });
 
+// Function to compute the average of an array. Meant to be used with the y values of the different graphs
+function average(array) {
+  let sum = 0;
+  for (let i = 0; i < array.length; i++) {
+    sum += array[i];
+  }
+  return sum / array.length;
+}
 
 function App() {
   const [chartType, setChartType] = React.useState("");  
@@ -53,6 +67,13 @@ function App() {
       if (local_addons.toString() !== addons) setAddons(local_addons);
       setThing(coordinates[coordinates.length-1].y);
       setCoords(coordinates);
+      if (average(coords.map(element => element.y)) > threshold) {
+        healthy = false;
+        healthText = "DANGER";
+      } else {
+        healthy = true;
+        healthText = "HEALTHY"
+      }
     }, RENDER_PERIOD);
     return () => clearInterval(timer);
   }, []);
@@ -78,6 +99,7 @@ function App() {
         <AddonDropdownMemo labels={addons} value={selectedAddon} onChangeHandler={chooseAddon}/>
         <br/>
         <ChartButtonsMemo labels={chart_types} onChangeHandler={chooseChartType}/>
+        <Box style={{ color: healthy ? 'green' : 'red' }}>{healthText}</Box>
         {chartType !== "" && selectedAddon !== "" &&
           <DynamicGraph
                 title={chartType}
