@@ -23,19 +23,22 @@ const config = {"xMax" : 100,         // chart config --> consider moving to bac
                 "width" : 700,
                 "height" : 400};
 
-for (let i = 0; i < config.xMax; i++) {  // instantiate coordinates in array
-  coordinates.push({x: i, y: 0});
-}
-
 var healthy = true;
 var healthText = "HEALTHY";
-var threshold = 99;
+var thresholds = {"current": 99, "temp_ambient": 62, "temp_casing": 82, "defaultThreshold": null};
+var currentThreshold = null;
+for (let i = 0; i < config.xMax; i++) {  // instantiate coordinates in array
+  coordinates.push({x: i, y: 0, threshold: thresholds.defaultThreshold});
+}
 
 // update coordinates upon receiving new data point from backend, shift y coordinates back by 1 position
 socket.on('data', (data_pt) => {
-  for (let i = 0; i < coordinates.length-1; i++) 
+  for (let i = 0; i < coordinates.length-1; i++) {
     coordinates[i].y = coordinates[i+1].y;
+    coordinates[i].threshold = coordinates[i+1].threshold;
+  }
   coordinates[coordinates.length-1].y = data_pt;
+  coordinates[coordinates.length-1].threshold = thresholds[currentThreshold];
 });
 
 // update local copy of list of addon ids upon receiving different list than current local copy
@@ -67,7 +70,8 @@ function App() {
       if (local_addons.toString() !== addons) setAddons(local_addons);
       setThing(coordinates[coordinates.length-1].y);
       setCoords(coordinates);
-      if (average(coords.map(element => element.y)) > threshold) {
+      console.log(average(coords.map(element => element.y)), thresholds[currentThreshold]);
+      if (average(coords.map(element => element.y)) > thresholds[currentThreshold]) {
         healthy = false;
         healthText = "DANGER";
       } else {
@@ -82,6 +86,7 @@ function App() {
     const type = event.target.value;
     socket.emit("chart_type_selection", type);
 	  setChartType(type);
+    currentThreshold = type;
   }, []);
 
   const chooseAddon = React.useCallback((event) => {
