@@ -48,7 +48,7 @@ const HOST = "localhost";
 const PORT = 49160;
 // The simulated client's Unique ID can be generated from the process' PID
 const UID = process.pid;
-const sendFreq = 1;
+const sendFreq = 2;
 
 const options = {family: 4, host:HOST, port: PORT}
 const client = net.createConnection(options, connectionHandler);
@@ -77,20 +77,17 @@ function connectionHandler(conn){
 
 
 async function sendData(port) {
-    let x = 0;
-    let inc = Math.pi/1000;
+    let a = 0;
     while(1){
-        let header = String.fromCharCode(1);
-        let end = String.fromCharCode(0);
-        let data, type = "";
+        let data = "";
 
         if (!canSend){
             type = "init";
             data = port;
         }
         else{
-            let I = Math.sin(x);
-            x += inc;
+            let I = 100 + (10 * Math.sin(a));
+            a += 0.025;
             let V = 11 + (getRandomIntInRange(0,10)/10);
             let Ta = 60 + getRandomIntInRange(0,5);
             let Tc = 80 + getRandomIntInRange(0,5);
@@ -101,11 +98,10 @@ async function sendData(port) {
             data = `{"current": ${I}, "voltage": ${V}, "temp_ambient": ${Ta}, "temp_casing": ${Tc}, "accelereation": {"x": ${x}, "y": ${y}, "z": ${z}}}`;
         }
 
-        let load = `{"id": ${UID}, "data":${data}}`;  
-        data_pkt = header + load + end;
-            
-        client.write(load);
-        console.log(load);
+        data_pkt = `{"id": ${UID}, "data":${data}}`;  
+        
+        client.write(data_pkt);
+        console.log(data_pkt);
         
         await sleep(sendFreq);  
     }    

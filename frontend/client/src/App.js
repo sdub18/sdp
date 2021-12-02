@@ -16,7 +16,7 @@ const socket_options = {'reconnection': true, 'reconnectionAttempts': Infinity} 
 const socket = io('http://localhost:3001', socket_options);       // frontend websocket - connects to backend server's websocket
 const chart_types = ["current", "temp_ambient", "temp_casing"];   // all chart types --> HARDCODED AND KEPT IN FRONTEND; NOT STORED IN BACKEND
 const coordinates = [];               // frontend local copy of coordinates, used to set "coords" state variable
-const config = {"xMax" : 100,         // chart config --> consider moving to backend so we can keep multiple different copies depending on chart type
+const config = {"xMax" : 300,         // chart config --> consider moving to backend so we can keep multiple different copies depending on chart type
                 "xIncrement" : 100,
                 "yMin" : 50,
                 "yMax" : 130,
