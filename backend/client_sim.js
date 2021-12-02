@@ -9,8 +9,10 @@ Teensy:
 ESP32:
     read(num_bytes) - Receive data from Teensy
     connect(host, port) - Connect to middleman server via TCP
+    UID stands for "Unique Identifier"
     sendData(msg) - Send UID and port to server until server sends back data 
         Then send data received from Teensy to middleman once handshake made (simulated here with canSend boolean)
+        We should also be able to control the speed at which the ESP32 sends the data (simulated here wiht the sleep function)
     setUID(UID) - Write UID to ESP32 EEPROM - need to save unique ID even with no power, just need to do once 
     getUID() - Read UID from ESP32 EEPROM - for sendData
 
@@ -36,8 +38,6 @@ CircuitPython Library Bundle Package -> existing libaries for some of our device
 
 Lots of ways to implement and use i2c not sure which is the best
 
-
-
 */
 
 const net = require('net');
@@ -46,7 +46,9 @@ const { exit } = require('process');
 //change HOST to your PC's ip address
 const HOST = "localhost";
 const PORT = 49160;
-const UID = process.argv[2];
+// The simulated client's Unique ID can be generated from the process' PID
+const UID = process.pid;
+const sendFreq = 1;
 
 const options = {family: 4, host:HOST, port: PORT}
 const client = net.createConnection(options, connectionHandler);
@@ -76,9 +78,7 @@ function connectionHandler(conn){
 
 async function sendData(port) {
     while(1){
-        let header = String.fromCharCode(1);
-        let end = String.fromCharCode(0);
-        let data, type = "";
+        let data = "";
 
         if (!canSend){
             type = "init";
@@ -96,13 +96,12 @@ async function sendData(port) {
             data = `{"current": ${I}, "voltage": ${V}, "temp_ambient": ${Ta}, "temp_casing": ${Tc}, "accelereation": {"x": ${x}, "y": ${y}, "z": ${z}}}`;
         }
 
-        let load = `{"id": ${UID}, "data":${data}}`;  
-        data_pkt = header + load + end;
-            
-        client.write(load);
-        console.log(load);
+        data_pkt = `{"id": ${UID}, "data":${data}}`;  
         
-        await sleep(1);  
+        client.write(data_pkt);
+        console.log(data_pkt);
+        
+        await sleep(sendFreq);  
     }    
 }
 

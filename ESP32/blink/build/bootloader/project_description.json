@@ -1,0 +1,20 @@
+{
+    "project_name":       "bootloader",
+    "project_path":       "/Users/andy/esp/esp-idf/components/bootloader/subproject",
+    "build_dir":          "/Users/andy/Desktop/SDP_repo/sdp/ESP32/blink/build/bootloader",
+    "config_file":        "/Users/andy/Desktop/SDP_repo/sdp/ESP32/blink/sdkconfig",
+    "config_defaults":    "",
+    "app_elf":            "bootloader.elf",
+    "app_bin":            "bootloader.bin",
+    "git_revision":       "v4.3.1-dirty",
+    "target":             "esp32",
+    "phy_data_partition": "",
+    "monitor_baud" :      "115200",
+    "monitor_toolprefix": "xtensa-esp32-elf-",
+    "config_environment" : {
+        "COMPONENT_KCONFIGS" : "/Users/andy/esp/esp-idf/components/efuse/Kconfig;/Users/andy/esp/esp-idf/components/esp32/Kconfig;/Users/andy/esp/esp-idf/components/esp_common/Kconfig;/Users/andy/esp/esp-idf/components/esp_system/Kconfig;/Users/andy/esp/esp-idf/components/log/Kconfig;/Users/andy/esp/esp-idf/components/newlib/Kconfig;/Users/andy/esp/esp-idf/components/spi_flash/Kconfig",
+        "COMPONENT_KCONFIGS_PROJBUILD" : "/Users/andy/esp/esp-idf/components/bootloader/Kconfig.projbuild;/Users/andy/esp/esp-idf/components/esptool_py/Kconfig.projbuild;/Users/andy/esp/esp-idf/components/partition_table/Kconfig.projbuild"
+    },
+    "build_components" : [ "bootloader", "bootloader_support", "efuse", "esp32", "esp_common", "esp_hw_support", "esp_rom", "esp_system", "esptool_py", "hal", "log", "main", "micro-ecc", "newlib", "partition_table", "soc", "spi_flash", "xtensa", "" ],
+    "build_component_paths" : [ "/Users/andy/esp/esp-idf/components/bootloader", "/Users/andy/esp/esp-idf/components/bootloader_support", "/Users/andy/esp/esp-idf/components/efuse", "/Users/andy/esp/esp-idf/components/esp32", "/Users/andy/esp/esp-idf/components/esp_common", "/Users/andy/esp/esp-idf/components/esp_hw_support", "/Users/andy/esp/esp-idf/components/esp_rom", "/Users/andy/esp/esp-idf/components/esp_system", "/Users/andy/esp/esp-idf/components/esptool_py", "/Users/andy/esp/esp-idf/components/hal", "/Users/andy/esp/esp-idf/components/log", "/Users/andy/esp/esp-idf/components/bootloader/subproject/main", "/Users/andy/esp/esp-idf/components/bootloader/subproject/components/micro-ecc", "/Users/andy/esp/esp-idf/components/newlib", "/Users/andy/esp/esp-idf/components/partition_table", "/Users/andy/esp/esp-idf/components/soc", "/Users/andy/esp/esp-idf/components/spi_flash", "/Users/andy/esp/esp-idf/components/xtensa", "" ]
+}

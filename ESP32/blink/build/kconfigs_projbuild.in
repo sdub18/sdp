@@ -1,0 +1,5 @@
+source "/Users/andy/esp/esp-idf/components/app_update/Kconfig.projbuild"
+source "/Users/andy/esp/esp-idf/components/bootloader/Kconfig.projbuild"
+source "/Users/andy/esp/esp-idf/components/esptool_py/Kconfig.projbuild"
+source "/Users/andy/esp/esp-idf/components/partition_table/Kconfig.projbuild"
+source "/Users/andy/Desktop/SDP_repo/sdp/ESP32/blink/main/Kconfig.projbuild"
