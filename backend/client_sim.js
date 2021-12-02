@@ -78,9 +78,7 @@ function connectionHandler(conn){
 
 async function sendData(port) {
     while(1){
-        let header = String.fromCharCode(1);
-        let end = String.fromCharCode(0);
-        let data, type = "";
+        let data = "";
 
         if (!canSend){
             type = "init";
