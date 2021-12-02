@@ -85,15 +85,15 @@ async function sendData(port) {
             data = port;
         }
         else{
-            let I = 100 + getRandomIntInRange(-10, 10);
-            let V = 11 + (getRandomIntInRange(0,10)/10);
-            let Ta = 60 + getRandomIntInRange(0,5);
-            let Tc = 80 + getRandomIntInRange(0,5);
+            let I = 11 + (getRandomIntInRange(0,10)/10);
+            let P = 100 + getRandomIntInRange(-10, 10);
+            let T = 80 + getRandomIntInRange(0,5);
             let x = 0;
             let y = 9.8;
             let z = 0;
+            let rpm = 60 + (getRandomIntInRange(0,2));
             type = "data";
-            data = `{"current": ${I}, "voltage": ${V}, "temp_ambient": ${Ta}, "temp_casing": ${Tc}, "accelereation": {"x": ${x}, "y": ${y}, "z": ${z}}}`;
+            data = `{"current": ${I}, "power": ${P}, "temperature": ${T}, ang_speed: ${rpm}, "accelereation": {"x": ${x}, "y": ${y}, "z": ${z}}}`;
         }
 
         data_pkt = `{"id": ${UID}, "data":${data}}`;  
