@@ -47,7 +47,6 @@ export default function DynamicGraph(props) {
         >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis
-            label="X Axis"
             dataKey="x"
             type="number"
             tick={{fontSize: 15}}
@@ -59,9 +58,11 @@ export default function DynamicGraph(props) {
             domain={[props.yMin, props.yMax]}
         >
             <Label
-                value="Y Axis"
+                value={props.yAxisLabel}
                 position="insideTopLeft"
-                offset={10}
+                angle={-90}
+                dy={230}
+                fill="white"
             />
         </YAxis>
         {/*<Tooltip />*/}

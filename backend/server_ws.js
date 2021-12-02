@@ -44,6 +44,7 @@ function C2M_connectionHandler(conn){
   conn.on('data', (recv_d) => {
     parseData(recv_d, data)     // parse buffer stream into individual packets of data and place into data array
     for (let pkt of data) { 
+      console.log(data)
       // update local addon array if new addon detected and write back to addon to start sending sensor data
       if (!addons.some(addon => addon.id === pkt.id)) {
         addons.push(pkt);
