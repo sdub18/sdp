@@ -70,8 +70,7 @@ function App() {
       if (local_addons.toString() !== addons) setAddons(local_addons);
       setThing(coordinates[coordinates.length-1].y);
       setCoords(coordinates);
-      console.log(average(coords.map(element => element.y)), thresholds[currentThreshold]);
-      if (average(coords.map(element => element.y)) > thresholds[currentThreshold]) {
+      if (average(coordinates.map(element => element.y)) > thresholds[currentThreshold]) {
         healthy = false;
         healthText = "DANGER";
       } else {
