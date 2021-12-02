@@ -125,6 +125,6 @@ void loop() {
 
   char buffer[100];
   serializeJSON(stamp, buffer);
-  Serial.println(buffer);
+
   delay(1000);
 }
