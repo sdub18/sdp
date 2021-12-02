@@ -11,27 +11,27 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_INA260.h>
 
-Adafruit_LIS3DH lis = Adafruit_LIS3DH();
-Adafruit_MCP9808 tempsensor = Adafruit_MCP9808();
-Adafruit_INA260 ina260 = Adafruit_INA260();
+// Connected Devices
+Adafruit_LIS3DH lis = Adafruit_LIS3DH();            // Accelerometer sensor
+Adafruit_MCP9808 tempsensor = Adafruit_MCP9808();   // Temperature Sensor
+Adafruit_INA260 ina260 = Adafruit_INA260();         // Current Sensor
 
 void setup() {
-  // put your setup code here, to run once:
+  
+  // Setup Serial Baud Rate
   Serial.begin(115200);
   while (!Serial) delay(10);     // will pause Zero, Leonardo, etc until serial console opens
 
+  
   // MARK: ACCELEROMETER SENSOR
-
   Serial.println("LIS3DH test!");
 
   if (! lis.begin(0x19)) {   // change this to 0x19 for alternative i2c address
     Serial.println("Couldnt start");
     while (1) yield();
   }
+  
   Serial.println("LIS3DH found!");
-
-  // lis.setRange(LIS3DH_RANGE_4_G);   // 2, 4, 8 or 16 G!
-
   Serial.print("Range = "); Serial.print(2 << lis.getRange());
   Serial.println("G");
 
@@ -69,7 +69,6 @@ void setup() {
 
 
   // MARK: CURRENT SENSOR SETUP
-
   Serial.println("Searching for Current Sensor ..."); // Search for INA260 Chip
 
   if (!ina260.begin()) {
