@@ -10,28 +10,42 @@
 #include <Adafruit_LIS3DH.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_INA260.h>
+#include <ArduinoJson.h>
 
 // Connected Devices
 Adafruit_LIS3DH lis = Adafruit_LIS3DH();            // Accelerometer sensor
 Adafruit_MCP9808 tempsensor = Adafruit_MCP9808();   // Temperature Sensor
 Adafruit_INA260 ina260 = Adafruit_INA260();         // Current Sensor
 
-void setup() {
-  
-  // Setup Serial Baud Rate
-  Serial.begin(115200);
-  while (!Serial) delay(10);     // will pause Zero, Leonardo, etc until serial console opens
 
+/////////////////////////////////////////////////////////////////////////////
+// -------------------------- INITIAL SETUP -------------------------------//
+/////////////////////////////////////////////////////////////////////////////
+
+
+void setup() {
+
+  // -------------------- SERIAL COMMUNICATIONS -----------------------
   
-  // MARK: ACCELEROMETER SENSOR
-  Serial.println("LIS3DH test!");
+  // Setup Output Serial
+  Serial.begin(115200);
+  while (!Serial) delay(10); // Wayt until ready
+
+  // Setup Communications Serial
+  Serial1.begin(115200);
+  while (!Serial1) delay(10); // Wait until ready
+
+
+  // ------------------------ ACCELEROMETER -------------------------
 
   if (! lis.begin(0x19)) {   // change this to 0x19 for alternative i2c address
-    Serial.println("Couldnt start");
+    Serial.println("Could not start LIS3DH");
     while (1) yield();
+  } else {
+    Serial.println("LIS3DH started");
   }
-  
-  Serial.println("LIS3DH found!");
+
+  // Print Range
   Serial.print("Range = "); Serial.print(2 << lis.getRange());
   Serial.println("G");
 
@@ -51,14 +65,14 @@ void setup() {
     case LIS3DH_DATARATE_LOWPOWER_1K6HZ: Serial.println("16 Khz Low Power"); break;
   }
 
-  // MARK: TEMPERATURE SENSOR
-
+  // ------------------------ TEMPERATURE ------------------------------
+  
   if (!tempsensor.begin(0x1A)) {
-    Serial.println("Couldn't find MCP9808! Check your connections and verify the address is correct.");
+    Serial.println("Could not start MCP9808");
     while (1);
+  } else {
+    Serial.println("MCP9808 started");
   }
-    
-   Serial.println("Found MCP9808!");
 
   tempsensor.setResolution(3); // sets the resolution mode of reading, the modes are defined in the table bellow:
   // Mode Resolution SampleTime
@@ -67,75 +81,50 @@ void setup() {
   //  2    0.125°C     130 ms
   //  3    0.0625°C    250 ms
 
-
-  // MARK: CURRENT SENSOR SETUP
-  Serial.println("Searching for Current Sensor ..."); // Search for INA260 Chip
+  // --------------------------- CURRENT ------------------------------
 
   if (!ina260.begin()) {
-    Serial.println("Couldn't find INA260 chip");
+    Serial.println("Could not start INA260");
     while (1);
+  } else {
+    Serial.println("INA260 started");
   }
-  Serial.println("Found INA260 chip");
+  
 }
+
+/////////////////////////////////////////////////////////////////////////////
+// ---------------------------- MAIN LOOP ---------------------------------//
+/////////////////////////////////////////////////////////////////////////////
 
 void loop() {
 
-  // PRINT ACCELEROMETER SENSOR DATA
+  // ----------- JSON OBJECT  ------------
+  StaticJsonDocument stamp; 
   
-  // put your main code here, to run repeatedly:
-  lis.read();      // get X Y and Z data at once
-  // Then print out the raw data
-  Serial.print("X:  "); Serial.print(lis.x);
-  Serial.print("  \tY:  "); Serial.print(lis.y);
-  Serial.print("  \tZ:  "); Serial.print(lis.z);
 
-  /* Or....get a new sensor event, normalized */
-  sensors_event_t event;
-  lis.getEvent(&event);
+  // ---------- ACCELEROMETER ------------
+  lis.read();
+  stamp["x"] = lis.x
+  stamp["y"] = lis.y
+  stamp["z"] = list.z
 
-  /* Display the results (acceleration is measured in m/s^2) */
-  Serial.print("\t\tX: "); Serial.print(event.acceleration.x);
-  Serial.print(" \tY: "); Serial.print(event.acceleration.y);
-  Serial.print(" \tZ: "); Serial.print(event.acceleration.z);
-  Serial.println(" m/s^2 ");
-
-  Serial.println();
-
-  delay(100);
-
-  // PRINT TEMPERATURE SENSOR DATA
-  
- // wake up MCP9808 - power consumption ~200 mikro Ampere
-  tempsensor.wake();   // wake up, ready to read!
-
-  // Read and print out the temperature, also shows the resolution mode used for reading.
-  float c = tempsensor.readTempC();
-  float f = tempsensor.readTempF();
-  Serial.print("Temp: "); 
-  Serial.print(c, 4); Serial.print("*C\t and "); 
-  Serial.print(f, 4); Serial.println("*F.");
+  // ----------- TEMPERATURE --------------
+  tempsensor.wake();
+  stamp["c"] = tempsensor.readTempC();
+  stamp["f"] = tempsensor.readTempF();
   
   delay(50);
   tempsensor.shutdown_wake(1); // shutdown MSP9808 - power consumption ~0.1 mikro Ampere, stops temperature sampling
-  Serial.println("");
-  delay(100);
 
-  // PRINT CURRENT SENSOR DATA
-  
-  Serial.print("Current: ");
-  Serial.print(ina260.readCurrent());
-  Serial.println(" mA");
+  // ------------- CURRENT ----------------
+  stamp["mA"] = ina260.readCurrent()
+  stamp["mV"] = ina260.readBusVoltage()
+  stamp["mW"] = ina260.readPower()
 
-  Serial.print("Bus Voltage: ");
-  Serial.print(ina260.readBusVoltage());
-  Serial.println(" mV");
+  // -------- Communicate Results ---------
 
-  Serial.print("Power: ");
-  Serial.print(ina260.readPower());
-  Serial.println(" mW");
-
-  Serial.println();
+  char buffer[100];
+  serializeJSON(stamp, buffer);
+  Serial.println(buffer);
   delay(1000);
-  
-
 }
