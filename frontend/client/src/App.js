@@ -58,7 +58,6 @@ function average(array) {
 
 function App() {
   const [chartType, setChartType] = React.useState("");  
-  const [thing, setThing] = React.useState(0);
   const [coords, setCoords] = React.useState([]);
   const [addons, setAddons] = React.useState([]);
   const [selectedAddon, setSelectedAddon] = React.useState("");
@@ -68,8 +67,7 @@ function App() {
     // update coords and addons state variable every rerender period to avoid lag
     const timer = setInterval(() => {
       if (local_addons.toString() !== addons) setAddons(local_addons);
-      setThing(coordinates[coordinates.length-1].y);
-      setCoords(coordinates);
+      setCoords([...coordinates]);
       if (average(coordinates.map(element => element.y)) > thresholds[currentThreshold]) {
         healthy = false;
         healthText = "DANGER";

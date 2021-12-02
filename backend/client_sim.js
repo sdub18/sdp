@@ -96,11 +96,10 @@ async function sendData(port) {
             data = `{"current": ${I}, "voltage": ${V}, "temp_ambient": ${Ta}, "temp_casing": ${Tc}, "accelereation": {"x": ${x}, "y": ${y}, "z": ${z}}}`;
         }
 
-        let load = `{"id": ${UID}, "data":${data}}`;  
-        data_pkt = header + load + end;
-            
-        client.write(load);
-        console.log(load);
+        data_pkt = `{"id": ${UID}, "data":${data}}`;  
+        
+        client.write(data_pkt);
+        console.log(data_pkt);
         
         await sleep(sendFreq);  
     }    
