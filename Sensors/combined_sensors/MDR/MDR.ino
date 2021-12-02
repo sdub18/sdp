@@ -99,14 +99,14 @@ void setup() {
 void loop() {
 
   // ----------- JSON OBJECT  ------------
-  StaticJsonDocument stamp; 
+  DynamicJsonDocument stamp(1024); 
   
 
   // ---------- ACCELEROMETER ------------
   lis.read();
-  stamp["x"] = lis.x
-  stamp["y"] = lis.y
-  stamp["z"] = list.z
+  stamp["x"] = lis.x;
+  stamp["y"] = lis.y;
+  stamp["z"] = lis.z;
 
   // ----------- TEMPERATURE --------------
   tempsensor.wake();
@@ -117,14 +117,14 @@ void loop() {
   tempsensor.shutdown_wake(1); // shutdown MSP9808 - power consumption ~0.1 mikro Ampere, stops temperature sampling
 
   // ------------- CURRENT ----------------
-  stamp["mA"] = ina260.readCurrent()
-  stamp["mV"] = ina260.readBusVoltage()
-  stamp["mW"] = ina260.readPower()
+  stamp["mA"] = ina260.readCurrent();
+  stamp["mV"] = ina260.readBusVoltage();
+  stamp["mW"] = ina260.readPower();
 
   // -------- Communicate Results ---------
 
-  char buffer[100];
-  serializeJSON(stamp, buffer);
+  serializeJson(stamp, Serial);
+  Serial.println();
 
   delay(1000);
 }
