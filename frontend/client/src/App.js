@@ -14,21 +14,22 @@ let local_addons = [];          // frontend local copy of connected addons
 const RENDER_PERIOD = 50;       // rerender period in milliseconds
 const socket_options = {'reconnection': true, 'reconnectionAttempts': Infinity} // options to have frontend continuously try to reconnect to backend
 const socket = io('http://localhost:3001', socket_options);       // frontend websocket - connects to backend server's websocket
-const chart_types = ["current", "temp_ambient", "temp_casing"];   // all chart types --> HARDCODED AND KEPT IN FRONTEND; NOT STORED IN BACKEND
+const chart_types = ["current", "power", "temperature", "rpm"];   // all chart types --> HARDCODED AND KEPT IN FRONTEND; NOT STORED IN BACKEND
 const coordinates = [];               // frontend local copy of coordinates, used to set "coords" state variable
 const config = {"xMax" : 300,         // chart config --> consider moving to backend so we can keep multiple different copies depending on chart type
                 "xIncrement" : 100,
-                "yMin" : 50,
+                "yMin" : 0,
                 "yMax" : 130,
                 "width" : 700,
                 "height" : 400};
 
 var healthy = true;
 var healthText = "HEALTHY";
-var thresholds = {"current": 99, "temp_ambient": 62, "temp_casing": 82, "defaultThreshold": null};
-var currentThreshold = null;
+const thresholds = {"current": 100, "power": 80, "temperature": 82, "rpm": 40};
+const units = {"current": "A", "power": "W", "temperature": "F", "rpm": "RPM"};
+var currentThreshold = "current";
 for (let i = 0; i < config.xMax; i++) {  // instantiate coordinates in array
-  coordinates.push({x: i, y: 0, threshold: thresholds.defaultThreshold});
+  coordinates.push({x: i, y: 0, threshold: thresholds.current});
 }
 
 // update coordinates upon receiving new data point from backend, shift y coordinates back by 1 position
@@ -108,6 +109,7 @@ function App() {
                 data={coords}
                 yMin={config.yMin}
                 yMax={config.yMax}
+                yAxisLabel={currentThreshold + " (" + units[currentThreshold] + ")"}
                 xMax={config.xMax}
                 xIncrement={config.xIncrement}
                 width={config.width}
