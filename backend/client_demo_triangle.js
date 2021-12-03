@@ -96,8 +96,8 @@ async function sendData(port) {
             let T = 80 + getRandomIntInRange(0,5);
             let A = 40 + getRandomIntInRange(-10, 10);
             let x = 0;
-            let y = 9.8;
-            let z = 0;
+            let y = 0;
+            let z = 9.8;
             type = "data";
             data = `{"current": ${I}, "power": ${P}, "temperature": ${T}, "accelereation": {"x": ${x}, "y": ${y}, "z": ${z}}, "rpm": ${A}}`;
         }
