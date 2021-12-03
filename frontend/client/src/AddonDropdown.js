@@ -29,9 +29,10 @@ const useStyles = makeStyles(theme => ({
 
     return(
         <Box sx={{ minWidth: 120 }}>
-			<FormControl fullWidth>
-				<InputLabel>ID</InputLabel>
+			<FormControl style={{color: "white"}} fullWidth>
+				<InputLabel style={{color: "white", fontSize: 23}}>ID</InputLabel>
 				<Select
+        style={{margin: "white", color: "white", fontSize: 23}}
 				labelId="chart-select-label"
 				id="chart-select"
 				value={props.value}

@@ -25,7 +25,7 @@ const config = {"xMax" : 300,         // chart config --> consider moving to bac
 
 var healthy = true;
 var healthText = "HEALTHY";
-const thresholds = {"current": 100, "power": 80, "temperature": 82, "rpm": 40};
+const thresholds = {"current": 100, "power": 60, "temperature": 82, "rpm": 40};
 const units = {"current": "A", "power": "W", "temperature": "F", "rpm": "RPM"};
 var currentThreshold = "current";
 for (let i = 0; i < config.xMax; i++) {  // instantiate coordinates in array

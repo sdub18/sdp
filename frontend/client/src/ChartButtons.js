@@ -30,7 +30,7 @@ const useStyles = makeStyles(theme => ({
     
     return(
         <FormControl component="fieldset">
-        <FormLabel component="legend">Chart Types</FormLabel>
+        <FormLabel component="legend" style={{color: "white", fontSize: 30}}>Chart Types</FormLabel>
         <RadioGroup row aria-label="Chart Types" name="row-radio-buttons-group" onChange={props.onChangeHandler}>
         	{formlabels}
         </RadioGroup>
