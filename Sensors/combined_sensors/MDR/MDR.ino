@@ -12,9 +12,14 @@
 #include <Adafruit_INA260.h>
 #include <ArduinoJson.h>
 
+// unique id of this sensing module
+const int UID = 1;
 
 // Json Document
-StaticJsonDocument<1024> stamp; 
+StaticJsonDocument<1024> pkt;
+JsonObject stamp = pkt.createNestedObject("data"); 
+JsonObject acceleration = stamp.createNestedObject("acceleration");
+JsonObject temp = stamp.createNestedObject("temp");
 
 // Connected Devices
 Adafruit_LIS3DH lis = Adafruit_LIS3DH();            // Accelerometer sensor
@@ -26,23 +31,24 @@ Adafruit_INA260 ina260 = Adafruit_INA260();         // Current Sensor
 /////////////////////////////////////////////////////////////////////////////
 
 
-void create_packet(JsonDocument *doc) {
-  // ------------- CURRENT ----------------
-  (*doc)["current"] = ina260.readCurrent();
-  (*doc)["voltage"] = ina260.readBusVoltage();
-  (*doc)["power"] = ina260.readPower();
+void create_packet() {
+  // --------------- ID ------------------
+  pkt["id"] = UID;
   
   // ---------- ACCELEROMETER ------------
   lis.read();
-  JsonObject acceleration = (*doc).createNestedObject("acceleration");
   acceleration["x"] = lis.x;
   acceleration["y"] = lis.y;
   acceleration["z"] = lis.z;
 
   // ----------- TEMPERATURE --------------
-  JsonObject temp = (*doc).createNestedObject("temp");
   temp["c"] = tempsensor.readTempC();
   temp["f"] = tempsensor.readTempF();
+   
+   // ------------- CURRENT ----------------
+  stamp["current"] = ina260.readCurrent();
+  stamp["voltage"] = ina260.readBusVoltage();
+  stamp["power"] = ina260.readPower();
 }
 
 
@@ -124,14 +130,14 @@ void setup() {
 /////////////////////////////////////////////////////////////////////////////
 
 void loop() {
-  create_packet(&stamp);
+  create_packet();
   
   // -------- Communicate Results ---------
-  serializeJson(stamp, Serial);
-  //int bytes_sent = serializeJson(stamp, Serial1);
-  //Serial1.println();
+  serializeJson(pkt, Serial);
+  int bytes_sent = serializeJson(pkt, Serial1);
+  Serial1.println();
   Serial.println();
   //Serial.println(bytes_sent);
-  delay(1000);
+  delay(5000);
 
 }
