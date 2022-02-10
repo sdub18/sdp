@@ -12,10 +12,38 @@
 #include <Adafruit_INA260.h>
 #include <ArduinoJson.h>
 
+
+// Json Document
+StaticJsonDocument<1024> stamp; 
+
 // Connected Devices
 Adafruit_LIS3DH lis = Adafruit_LIS3DH();            // Accelerometer sensor
 Adafruit_MCP9808 tempsensor = Adafruit_MCP9808();   // Temperature Sensor
 Adafruit_INA260 ina260 = Adafruit_INA260();         // Current Sensor
+
+/////////////////////////////////////////////////////////////////////////////
+// ------------------------- HELPER FUNCTIONS -----------------------------//
+/////////////////////////////////////////////////////////////////////////////
+
+
+void create_packet(JsonDocument *doc) {
+  // ------------- CURRENT ----------------
+  (*doc)["current"] = ina260.readCurrent();
+  (*doc)["voltage"] = ina260.readBusVoltage();
+  (*doc)["power"] = ina260.readPower();
+  
+  // ---------- ACCELEROMETER ------------
+  lis.read();
+  JsonObject acceleration = (*doc).createNestedObject("acceleration");
+  acceleration["x"] = lis.x;
+  acceleration["y"] = lis.y;
+  acceleration["z"] = lis.z;
+
+  // ----------- TEMPERATURE --------------
+  JsonObject temp = (*doc).createNestedObject("temp");
+  temp["c"] = tempsensor.readTempC();
+  temp["f"] = tempsensor.readTempF();
+}
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -27,14 +55,13 @@ void setup() {
 
   // -------------------- SERIAL COMMUNICATIONS -----------------------
   
-  // Setup Output Serial
+  // Setup Serial Monitor
   Serial.begin(115200);
-  while (!Serial) delay(10); // Wayt until ready
+  while (!Serial) delay(1); // Wait until ready
 
-  // Setup Communications Serial
+  // Setup Hardware UART Serial Commms
   Serial1.begin(115200);
-  while (!Serial1) delay(10); // Wait until ready
-
+  while (!Serial1) delay(1); // Wait until ready
 
   // ------------------------ ACCELEROMETER -------------------------
 
@@ -73,7 +100,7 @@ void setup() {
   } else {
     Serial.println("MCP9808 started");
   }
-
+  tempsensor.wake();
   tempsensor.setResolution(3); // sets the resolution mode of reading, the modes are defined in the table bellow:
   // Mode Resolution SampleTime
   //  0    0.5°C       30 ms
@@ -97,34 +124,14 @@ void setup() {
 /////////////////////////////////////////////////////////////////////////////
 
 void loop() {
-
-  // ----------- JSON OBJECT  ------------
-  DynamicJsonDocument stamp(1024); 
+  create_packet(&stamp);
   
-
-  // ---------- ACCELEROMETER ------------
-  lis.read();
-  stamp["x"] = lis.x;
-  stamp["y"] = lis.y;
-  stamp["z"] = lis.z;
-
-  // ----------- TEMPERATURE --------------
-  tempsensor.wake();
-  stamp["c"] = tempsensor.readTempC();
-  stamp["f"] = tempsensor.readTempF();
-  
-  delay(50);
-  tempsensor.shutdown_wake(1); // shutdown MSP9808 - power consumption ~0.1 mikro Ampere, stops temperature sampling
-
-  // ------------- CURRENT ----------------
-  stamp["mA"] = ina260.readCurrent();
-  stamp["mV"] = ina260.readBusVoltage();
-  stamp["mW"] = ina260.readPower();
-
   // -------- Communicate Results ---------
-
   serializeJson(stamp, Serial);
+  //int bytes_sent = serializeJson(stamp, Serial1);
+  //Serial1.println();
   Serial.println();
-
+  //Serial.println(bytes_sent);
   delay(1000);
+
 }
