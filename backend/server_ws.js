@@ -29,10 +29,7 @@ function M2F_connectionHandler(client){
   setInterval(() => client.emit('data', val2emit), EMIT_PERIOD);     
   setInterval(() => {
     client.emit("updateAddons", addons.map(a => a.id));  
-    for (const pkt of data){
-      if (pkt.id === selectedID && typeof(pkt.data)!== "number")
-        val2emit = pkt.data[chartType];
-    }
+    val2emit = data;
   }, 1);
 }
 
