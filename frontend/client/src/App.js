@@ -28,7 +28,6 @@ var healthy = true;
 var healthText = "HEALTHY";
 const thresholds = {"current": 100, "power": 60, "temperature": 82, "rpm": 40};
 const units = {"current": "A", "power": "W", "temperature": "F", "rpm": "RPM"};
-var currentThreshold = "current";
 for (let i = 0; i < chart_types.length; i++) {
   coordinates.push([]);
   for (let j = 0; j < config.xMax; j++) {  // instantiate coordinates in array
@@ -38,7 +37,6 @@ for (let i = 0; i < chart_types.length; i++) {
 
 // update coordinates upon receiving new data point from backend, shift y coordinates back by 1 position
 socket.on('data', (data_pt) => {
-    console.log(data_pt);
    for (let i = 0; i < chart_types.length; i++) {
     for (let j = 0; j < coordinates[i].length-1; j++) {
       coordinates[i][j].y = coordinates[i][j+1].y;
@@ -86,13 +84,6 @@ function App() {
       }
     }, RENDER_PERIOD);
     return () => clearInterval(timer);
-  }, []);
-  
-  const chooseChartType = React.useCallback((event) => {
-    const type = event.target.value;
-    socket.emit("chart_type_selection", type);
-	  setChartType(type);
-    currentThreshold = type;
   }, []);
 
   const chooseAddon = React.useCallback((event) => {
