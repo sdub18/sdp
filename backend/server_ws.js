@@ -21,21 +21,45 @@ M2F_server.listen(MIDDLE_TO_FRONT_PORT, () => {console.log(`C2M_server listening
 C2M_server.on('connection', C2M_connectionHandler);
 C2M_server.listen({host: "0.0.0.0", port:CLIENT_TO_MIDDLE_PORT}, () => console.log('opened C2M_server on ', C2M_server.address()));
 
+// First line is the reception of what PID's graphs should be displayed. This value is stored in selectedID
+// Function then ensures that the val2emit is not null, which should be the case after at least one process has connected
+// to the server, and the user has selected a process to be viewed. After doing this, the server sends the full JSON
+// associated with that process to the frontend.
+// Function also updates the array of active PIDs and communicates that to the frontend.
 function M2F_connectionHandler(client){
-  client.on("chart_type_selection", (arg) => {chartType = arg});
   client.on("addon_selection", (arg) => {selectedID = arg});
   
   // separate the interval processes to emit the data and to select the data
-  setInterval(() => client.emit('data', val2emit), EMIT_PERIOD);     
+  setInterval(() => {
+    if (val2emit.length > 0 && val2emit !== 0) {
+      if (val2emit[0].id === selectedID) {
+        client.emit('data', val2emit);
+      }
+    }
+  }, EMIT_PERIOD);     
   setInterval(() => {
     client.emit("updateAddons", addons.map(a => a.id));  
-    for (const pkt of data){
-      if (pkt.id === selectedID && typeof(pkt.data)!== "number")
-        val2emit = pkt.data[chartType];
-    }
+    val2emit = data;
   }, 1);
 }
 
+// When the initial connection is made with the client, 'new client connection from %s' should be printed
+// The function should parse the data, where parseData(recv_d, data) places the data in a JSON that looks something like
+/*
+[
+  {
+    id: 50043,
+    data: {
+      current: 96,
+      power: 63,
+      temperature: 82,
+      accelereation: { x: 0, y: 0, z: 9.8 },
+      rpm: 36
+    }
+  }
+]
+*/
+// The function should also add something like { id: <some number>, data: <some number> } to the addons array
 function C2M_connectionHandler(conn){
   const remoteAddress = conn.remoteAddress + ':' + conn.remotePort;
   console.log('new client connection from %s', remoteAddress);
@@ -44,7 +68,6 @@ function C2M_connectionHandler(conn){
   conn.on('data', (recv_d) => {
     parseData(recv_d, data)     // parse buffer stream into individual packets of data and place into data array
     for (let pkt of data) { 
-      console.log(data)
       // update local addon array if new addon detected and write back to addon to start sending sensor data
       if (!addons.some(addon => addon.id === pkt.id)) {
         addons.push(pkt);
@@ -62,6 +85,7 @@ function C2M_connectionHandler(conn){
   });
 }
 
+// See the description for C2M_connectionHandler()
 function parseData(recv_data, pkts_array){
   pkts_array.length = 0;
   const parens = {"{": "}", "(": ")", "[": "]"};

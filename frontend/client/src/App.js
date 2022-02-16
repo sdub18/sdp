@@ -15,6 +15,7 @@ const RENDER_PERIOD = 50;       // rerender period in milliseconds
 const socket_options = {'reconnection': true, 'reconnectionAttempts': Infinity} // options to have frontend continuously try to reconnect to backend
 const socket = io('http://localhost:3001', socket_options);       // frontend websocket - connects to backend server's websocket
 const chart_types = ["current", "power", "temperature", "rpm"];   // all chart types --> HARDCODED AND KEPT IN FRONTEND; NOT STORED IN BACKEND
+const chart_types_index_map = {"current": 0, "power": 1, "temperature": 2, "rpm": 3}
 const coordinates = [];               // frontend local copy of coordinates, used to set "coords" state variable
 const config = {"xMax" : 300,         // chart config --> consider moving to backend so we can keep multiple different copies depending on chart type
                 "xIncrement" : 100,
@@ -27,19 +28,23 @@ var healthy = true;
 var healthText = "HEALTHY";
 const thresholds = {"current": 100, "power": 60, "temperature": 82, "rpm": 40};
 const units = {"current": "A", "power": "W", "temperature": "F", "rpm": "RPM"};
-var currentThreshold = "current";
-for (let i = 0; i < config.xMax; i++) {  // instantiate coordinates in array
-  coordinates.push({x: i, y: 0, threshold: thresholds.current});
+for (let i = 0; i < chart_types.length; i++) {
+  coordinates.push([]);
+  for (let j = 0; j < config.xMax; j++) {  // instantiate coordinates in array
+    coordinates[i].push({x: j, y: 0, threshold: thresholds.current});
+  }
 }
 
 // update coordinates upon receiving new data point from backend, shift y coordinates back by 1 position
 socket.on('data', (data_pt) => {
-  for (let i = 0; i < coordinates.length-1; i++) {
-    coordinates[i].y = coordinates[i+1].y;
-    coordinates[i].threshold = coordinates[i+1].threshold;
-  }
-  coordinates[coordinates.length-1].y = data_pt;
-  coordinates[coordinates.length-1].threshold = thresholds[currentThreshold];
+   for (let i = 0; i < chart_types.length; i++) {
+    for (let j = 0; j < coordinates[i].length-1; j++) {
+      coordinates[i][j].y = coordinates[i][j+1].y;
+      coordinates[i][j].threshold = coordinates[i][j+1].threshold;
+    }
+    coordinates[i][coordinates[i].length-1].y = data_pt[0].data[chart_types[i]];
+    coordinates[i][coordinates[i].length-1].threshold = thresholds[chart_types[i]];
+   }
 });
 
 // update local copy of list of addon ids upon receiving different list than current local copy
@@ -69,29 +74,26 @@ function App() {
     const timer = setInterval(() => {
       if (local_addons.toString() !== addons) setAddons(local_addons);
       setCoords([...coordinates]);
-      if (average(coordinates.map(element => element.y)) > thresholds[currentThreshold]) {
-        healthy = false;
-        healthText = "DANGER";
-      } else {
-        healthy = true;
-        healthText = "HEALTHY"
+      healthy = true;
+      healthText = "HEALTHY"
+      for (let i = 0; i < coordinates.length; i++) {
+        if (average(coordinates[i].map(element => element.y)) > thresholds[chart_types[i]]) {
+          healthy = false;
+          healthText = "DANGER";
+        }
       }
     }, RENDER_PERIOD);
     return () => clearInterval(timer);
-  }, []);
-  
-  const chooseChartType = React.useCallback((event) => {
-    const type = event.target.value;
-    socket.emit("chart_type_selection", type);
-	  setChartType(type);
-    currentThreshold = type;
   }, []);
 
   const chooseAddon = React.useCallback((event) => {
     const addon = event.target.value
     socket.emit("addon_selection", addon);
-    for (let i = 0; i < config.xMax; i++) 
-      coordinates[i].y = 0;
+    for (let i = 0; i < chart_types.length; i++) {
+      for (let j = 0; j < config.xMax; j++) {
+        coordinates[i][j].y = 0;
+      }
+    }
     setSelectedAddon(addon);
   }, []);
 
@@ -101,20 +103,24 @@ function App() {
         <img src={logo} className="App-logo" alt="logo" />
         <AddonDropdownMemo labels={addons} value={selectedAddon} onChangeHandler={chooseAddon}/>
         <br/>
-        <ChartButtonsMemo labels={chart_types} onChangeHandler={chooseChartType}/>
-        <Box style={{ color: healthy ? 'green' : 'red' }}>{healthText}</Box>
-        {chartType !== "" && selectedAddon !== "" &&
+        {/*<ChartButtonsMemo labels={chart_types} onChangeHandler={chooseChartType}/>*/}
+        {selectedAddon !== "" &&
+          <Box style={{ color: healthy ? 'green' : 'red' }}>{healthText}</Box>
+        }
+        {selectedAddon !== "" &&
+          chart_types.map((type) => (
           <DynamicGraph
-                title={chartType}
-                data={coords}
+                title={type}
+                data={coords[chart_types_index_map[type]]}
                 yMin={config.yMin}
                 yMax={config.yMax}
-                yAxisLabel={currentThreshold + " (" + units[currentThreshold] + ")"}
+                yAxisLabel={type + " (" + units[type] + ")"}
                 xMax={config.xMax}
                 xIncrement={config.xIncrement}
                 width={config.width}
                 height={config.height}>
-            </DynamicGraph>
+          </DynamicGraph>
+          ))
         }
       </header>
     </div>

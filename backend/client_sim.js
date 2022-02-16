@@ -48,7 +48,7 @@ const HOST = "localhost";
 const PORT = 49160;
 // The simulated client's Unique ID can be generated from the process' PID
 const UID = process.pid;
-const sendFreq = 1;
+const sendFreq = 10;
 
 const options = {family: 4, host:HOST, port: PORT}
 const client = net.createConnection(options, connectionHandler);
