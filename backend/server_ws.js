@@ -31,16 +31,11 @@ function M2F_connectionHandler(client){
   
   // separate the interval processes to emit the data and to select the data
   setInterval(() => {
-    if (val2emit.length > 0 && val2emit !== 0) {
-      if (val2emit[0].id === selectedID) {
-        client.emit('data', val2emit);
-      }
-    }
-  }, EMIT_PERIOD);     
-  setInterval(() => {
-    client.emit("updateAddons", addons.map(a => a.id));  
     val2emit = data;
-  }, 1);
+    if (val2emit.length > 0 && val2emit !== 0) {
+      client.emit('data', val2emit);
+    }
+  }, EMIT_PERIOD);
 }
 
 // When the initial connection is made with the client, 'new client connection from %s' should be printed
@@ -73,6 +68,7 @@ function C2M_connectionHandler(conn){
         addons.push(pkt);
         conn.write("nice");
         console.log(addons);
+        M2F_socket.emit("updateAddons", addons.map(a => a.id));
       }
     }
   });
@@ -82,6 +78,7 @@ function C2M_connectionHandler(conn){
     addon_idx = addons.findIndex(addon => addon.data == conn.remotePort);
     addons.splice(addon_idx, 1);
     console.log(addons);
+    M2F_socket.emit("updateAddons", addons.map(a => a.id));
   });
 }
 

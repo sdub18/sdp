@@ -50,7 +50,7 @@ socket.on('data', (data_pt) => {
 // update local copy of list of addon ids upon receiving different list than current local copy
 socket.on("updateAddons", (recv_addons) => {
   if (!(JSON.stringify(recv_addons) === JSON.stringify(local_addons)))
-    local_addons = recv_addons; 
+    local_addons = recv_addons;
 });
 
 // Function to compute the average of an array. Meant to be used with the y values of the different graphs
