@@ -63,6 +63,9 @@ function M2F_connectionHandler(client){
 function C2M_connectionHandler(conn){
   const remoteAddress = conn.remoteAddress + ':' + conn.remotePort;
   console.log('new client connection from %s', remoteAddress);
+  conn.setTimeout(5000, function(){
+    conn.destroy();
+  });
 
   conn.on('error', (err) => {console.log('Connection %s error: %s', remoteAddress, err.message)});
   conn.on('data', (recv_d) => {
@@ -71,7 +74,7 @@ function C2M_connectionHandler(conn){
       // update local addon array if new addon detected and write back to addon to start sending sensor data
       if (!addons.some(addon => addon.id === pkt.id)) {
         addons.push(pkt);
-        conn.write("nice");
+        conn.write(Buffer.from([0x01]));
         console.log(addons);
       }
     }
@@ -96,6 +99,7 @@ function parseData(recv_data, pkts_array){
   try {
     pkt = JSON.parse(recv_data);
     pkts_array.push(pkt);
+    console.log(pkt);
   }
   catch (err) {
     // handles stream buffer concatenation
