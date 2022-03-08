@@ -99,7 +99,6 @@ async function sendData(port) {
         data_pkt = `{"id": ${UID}, "data":${data}}`;  
         
         client.write(data_pkt);
-        console.log(data);
         console.log(data_pkt +'\n');
         
         await sleep(sendFreq);  
