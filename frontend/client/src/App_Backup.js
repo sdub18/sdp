@@ -29,8 +29,8 @@ var healthText = "HEALTHY";
 const thresholds = {"current": 100, "power": 60, "temperature": 82, "rpm": 40};
 const units = {"current": "A", "power": "W", "temperature": "F", "rpm": "RPM"};
 let active_pid = 0;
+coordinates = createEmptyProcess();
 
-/*
 socket.on('addon', (pid_int) => {
   active_pid = pid_int;
 });
@@ -95,18 +95,8 @@ function createEmptyProcess() {
   }
   return emptyArray
 }
-*/
-
-socket.on("config", (params) => {
-  socket.emit("config_response", config);
-});
-
-socket.on("graph_update", (update_data) => {
-  coordinates = update_data;
-});
 
 function App() {
-  
   const [chartType, setChartType] = React.useState("");  
   const [coords, setCoords] = React.useState([]);
   const [addons, setAddons] = React.useState([]);
@@ -114,14 +104,18 @@ function App() {
 
 
   React.useEffect(() => {
-    socket.on("updateAddons", (recv_addons) => {
-      if (!(JSON.stringify(recv_addons) === JSON.stringify(local_addons))) {
-        local_addons = recv_addons;
-      }
-      if (local_addons.toString() !== addons) setAddons(local_addons);
-    });
+    // update coords and addons state variable every rerender period to avoid lag
     const timer = setInterval(() => {
+      if (local_addons.toString() !== addons) setAddons(local_addons);
       setCoords([...coordinates]);
+      healthy = true;
+      healthText = "HEALTHY"
+      for (let i = 0; i < coordinates.length; i++) {
+        if (average(coordinates[i].map(element => element.y)) > thresholds[chart_types[i]]) {
+          healthy = false;
+          healthText = "DANGER";
+        }
+      }
     }, RENDER_PERIOD);
     return () => clearInterval(timer);
   }, []);
@@ -129,6 +123,11 @@ function App() {
   const chooseAddon = React.useCallback((event) => {
     const addon = event.target.value
     socket.emit("addon_selection", addon);
+    for (let i = 0; i < chart_types.length; i++) {
+      for (let j = 0; j < config.xMax; j++) {
+        coordinates[i][j].y = 0;
+      }
+    }
     setSelectedAddon(addon);
   }, []);
 
@@ -138,6 +137,7 @@ function App() {
         <img src={logo} className="App-logo" alt="logo" />
         <AddonDropdownMemo labels={addons} value={selectedAddon} onChangeHandler={chooseAddon}/>
         <br/>
+        {/*<ChartButtonsMemo labels={chart_types} onChangeHandler={chooseChartType}/>*/}
         {selectedAddon !== "" &&
           <Box style={{ color: healthy ? 'green' : 'red' }}>{healthText}</Box>
         }
@@ -158,33 +158,6 @@ function App() {
         }
       </header>
     </div>
-    /*
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <AddonDropdownMemo labels={addons} value={selectedAddon} onChangeHandler={chooseAddon}/>
-        <br/>
-        {selectedAddon !== "" &&
-          <Box style={{ color: healthy ? 'green' : 'red' }}>{healthText}</Box>
-        }
-        {selectedAddon !== "" &&
-          chart_types.map((type) => (
-          <DynamicGraph
-                title={type}
-                data={coords[chart_types_index_map[type]]}
-                yMin={config.yMin}
-                yMax={config.yMax}
-                yAxisLabel={type + " (" + units[type] + ")"}
-                xMax={config.xMax}
-                xIncrement={config.xIncrement}
-                width={config.width}
-                height={config.height}>
-          </DynamicGraph>
-          ))
-        }
-      </header>
-    </div>
-    */
   );
 }
 
