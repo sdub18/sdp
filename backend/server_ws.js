@@ -92,25 +92,29 @@ function C2M_connectionHandler(conn){
     for (let pkt of data) { 
       // update local addon array if new addon detected and write back to addon to start sending sensor data
       if (!addons.some(addon => addon.id === pkt.id)) {
+        pkt["data"] = conn.remotePort;
         addons.push(pkt);
         coordinates[pkt.id] = createEmptyGraph(graph_settings);
-        conn.write("nice");
+        conn.write(Buffer.from([0x01]));
         M2F_socket.emit("updateAddons", addons.map(a => a.id));
         console.log(addons.map(a => a.id));
-      }
-      for (let i = 0; i < graph_labels.length; i++) {
-        for (let j = 0; j < graph_settings.xMax - 1; j++) {
-          coordinates[pkt.id][graph_labels[i]][j].y = coordinates[pkt.id][graph_labels[i]][j+1].y;
-        }
-        coordinates[pkt.id][graph_labels[i]][graph_settings.xMax - 1].y = pkt.data[graph_labels[i]];
-      }
-      if (pkt.id === active_pid) {
-        current_coords = coordinates[active_pid];
-        sending_coords_array = [];
+      } 
+      
+      if (Object.keys(pkt).length > 1) {
         for (let i = 0; i < graph_labels.length; i++) {
-          sending_coords_array.push(current_coords[graph_labels[i]]);
+          for (let j = 0; j < graph_settings.xMax - 1; j++) {
+            coordinates[pkt.id][graph_labels[i]][j].y = coordinates[pkt.id][graph_labels[i]][j+1].y;
+          }
+          coordinates[pkt.id][graph_labels[i]][graph_settings.xMax - 1].y = pkt.data[graph_labels[i]];
         }
-        M2F_socket.emit("graph_update", sending_coords_array);
+        if (pkt.id === active_pid) {
+          current_coords = coordinates[active_pid];
+          sending_coords_array = [];
+          for (let i = 0; i < graph_labels.length; i++) {
+            sending_coords_array.push(current_coords[graph_labels[i]]);
+          }
+          M2F_socket.emit("graph_update", sending_coords_array);
+        }
       }
     }
   });
@@ -139,7 +143,7 @@ function parseData(recv_data, pkts_array){
   try {
     pkt = JSON.parse(recv_data);
     pkts_array.push(pkt);
-    console.log(pkt);
+      console.log(pkt);
   }
   catch (err) {
     // handles stream buffer concatenation

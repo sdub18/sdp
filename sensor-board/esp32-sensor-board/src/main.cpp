@@ -8,10 +8,10 @@
 #include <ArduinoJson.h>
 #include <StreamUtils.h>
 
-const char* SSID = "Anime House";   
-const char* PASS = "gentletrail804";
+const char* SSID = "BONZAI";   
+const char* PASS = "Clong123!";
+const char* HOST = "10.0.0.64"; // change to ip address of host computer
 
-const char* HOST = "192.168.1.18"; // change to ip address of host computer
 const int PORT = 49160; 
 
 // unique id of this sensing module
