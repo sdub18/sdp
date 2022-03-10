@@ -48,7 +48,7 @@ const HOST = "localhost";
 const PORT = 49160;
 // The simulated client's Unique ID can be generated from the process' PID
 const UID = process.pid;
-const sendFreq = 5;
+const sendFreq = 10;
 
 const options = {family: 4, host:HOST, port: PORT}
 const client = net.createConnection(options, connectionHandler);
@@ -105,7 +105,7 @@ async function sendData(port) {
         data_pkt = `{"id": ${UID}, "data":${data}}`;  
         
         client.write(data_pkt);
-        console.log(data_pkt);
+        console.log(data_pkt +'\n');
         
         await sleep(sendFreq);  
     }    
@@ -119,4 +119,4 @@ function sleep(ms){
 
 function getRandomIntInRange(min, max) {
     return Math.floor(min + (Math.random() * (max - min)));
-  }
+}
