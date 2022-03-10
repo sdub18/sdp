@@ -2,6 +2,7 @@ import React from "react";
 import logo from './logo.svg';
 import './App.css';
 import DynamicGraph from "./DynamicGraph";
+import HealthMonitor from "./HealthMonitor";
 import io from 'socket.io-client';
 import ChartButtons from "./ChartButtons";
 import AddonDropdown from "./AddonDropdown";
