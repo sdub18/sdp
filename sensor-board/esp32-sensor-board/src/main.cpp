@@ -8,8 +8,8 @@
 #include <ArduinoJson.h>
 #include <StreamUtils.h>
 
-const char* SSID = "BONZAI";   
-const char* PASS = "Clong123!";
+const char* SSID = "Pixel_8846";   
+const char* PASS = "andtran123";
 const char* HOST = "10.0.0.64"; // change to ip address of host computer
 
 const int PORT = 49160; 
