@@ -19,14 +19,18 @@ let coordinates = [];               // frontend local copy of coordinates, used 
 let config = {"xMax" : 300,         
   "xIncrement" : 100,
   "width" : 700,
-  "height" : 400};
-let y_axes_config = {};
+  "height" : 400,
+  "yMin": 75,
+  "yMax": 85
+};
+let yConfig = {};
 let healthy = true;
 let healthText = "HEALTHY";
 const units = {"current": "A", "power": "W", "temp": "F", "rpm": "RPM"};
 
 socket.on("y_axes_config", (recv_config) => {
-  y_axes_config = recv_config;
+  yConfig = recv_config;
+  console.log(yConfig["temp"].yMin, yConfig["temp"].yMax);
 });
 
 socket.on("graph_update", (update_data) => {
@@ -82,8 +86,8 @@ function App() {
                 key={type}
                 title={type}
                 data={coords[type]}
-                yMin={y_axes_config[type].yMin}
-                yMax={y_axes_config[type].yMax}
+                yMin={yConfig[type].yMin}
+                yMax={yConfig[type].yMax}
                 yAxisLabel={type + " (" + units[type] + ")"}
                 xMax={config.xMax}
                 xIncrement={config.xIncrement}

@@ -74,13 +74,6 @@ export default function DynamicGraph(props) {
             stroke="#8884d8"
             dot={false}
         />
-        <Line
-            name={props.threshold}
-            type="linear"
-            dataKey="threshold"
-            stroke="#1884d8"
-            dot={false}
-        />
         </LineChart>
     </Box>
   );

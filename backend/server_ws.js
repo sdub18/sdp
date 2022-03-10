@@ -15,10 +15,11 @@ let config = {"xMax" : 300,
   "xIncrement" : 100,
   "width" : 700,
   "height" : 400};
-let yConfig = {};
+
 const graph_labels = ["current", "power", "temp"];
 
-graph_labels.map((type) => {yConfig[type] = {yMin: 0, yMax:100}});
+let yConfig = {};
+graph_labels.map((type) => {yConfig[type] = {yMin: 10000, yMax:-10000}});
 
 let active_pid = null;
 let coordinates = {};
@@ -40,12 +41,7 @@ function createEmptyGraph() {
     for (let i = 0; i < graph_labels.length; i++) {
       labels_coords_dict[graph_labels[i]] = [];
       for (let j = 0; j < config.xMax; j++) {
-        labels_coords_dict[graph_labels[i]].push(
-          { 
-            yConfig: {yMin:0, yMax:100},
-            data: {x: j, y: 0, threshold: 50}
-          }
-        );
+        labels_coords_dict[graph_labels[i]].push({x: j, y: 0});
       }
     }
     return labels_coords_dict;
@@ -60,7 +56,8 @@ function M2F_connectionHandler(client){
     M2F_socket.emit("graph_update", coordinates[active_pid]);
     M2F_socket.emit("updateAddons", addons.map(a => a.id));
 
-    if (oldConfig != yConfig) client.emit("y_axes_config", yConfig);
+    //if (oldConfig != yConfig) 
+    M2F_socket.emit("y_axes_config", yConfig);
     
   }, 50);
   /*setInterval(() => {
@@ -109,17 +106,22 @@ function C2M_connectionHandler(conn){
       if (("data" in pkt) && (pkt.id in coordinates)) {
         for (let i = 0; i < graph_labels.length; i++) {
           for (let j = 0; j < config.xMax - 1; j++) {
-            coordinates[pkt.id][graph_labels[i]].data[j].y = coordinates[pkt.id][graph_labels[i]].data[j+1].y;
+            coordinates[pkt.id][graph_labels[i]][j].y = coordinates[pkt.id][graph_labels[i]][j+1].y;
           }
-          coordinates[pkt.id][graph_labels[i]][data][config.xMax - 1].y = pkt.data[graph_labels[i]];
-
-          if (active_pid === pkt.id) {
-            coordinates[pkt.id][graph_labels[i]][yConfig].yMin = min(pkt.data[graph_labels[i]],coordinates[pkt.id][graph_labels[i]][yConfig].yMin);
-            coordinates[pkt.id][graph_labels[i]][yConfig].yMax = max(pkt.data[graph_labels[i]],coordinates[pkt.id][graph_labels[i]][yConfig].yMax); 
-            yConfig = coordinates[pkt.id][graph_labels[i]][yConfig];
+          coordinates[pkt.id][graph_labels[i]][config.xMax - 1].y = pkt.data[graph_labels[i]];
+          
+          if (active_pid == pkt.id) {
+            if (yConfig[graph_labels[i]].yMax < -999) yConfig[graph_labels[i]].yMax = pkt.data[graph_labels[i]];
+            if (yConfig[graph_labels[i]].yMin > 999) yConfig[graph_labels[i]].yMin = pkt.data[graph_labels[i]];
+            //oldConfig = yConfig;
+            curMax = Math.max.apply(Math, coordinates[pkt.id][graph_labels[i]].map((point) => { return point.y; }));
+            curMin = Math.min.apply(Math, coordinates[pkt.id][graph_labels[i]].map((point) => { return point.y; }))
+            newVal = pkt.data[graph_labels[i]];
+            if (newVal > curMax) yConfig[graph_labels[i]].yMax = newVal * 1.2;
+            if (newVal < curMin) yConfig[graph_labels[i]].yMin = newVal * 0.8;
+            //console.log(curMin, curMax);
           }
         }
-        //M2F_socket.emit("graph_update", coordinates[active_pid]);
       }
     }
   });
