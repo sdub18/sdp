@@ -50,6 +50,8 @@ const PORT = 49160;
 const UID = process.pid;
 const sendFreq = 10;
 
+const id_pkt = {id: UID};
+
 const options = {family: 4, host:HOST, port: PORT}
 const client = net.createConnection(options, connectionHandler);
 let canSend = false;
@@ -62,7 +64,7 @@ function connectionHandler(conn){
 
     client.on('data', (d)=>{
         console.log(''+d);
-        canSend = true;
+        if (d == 0x01) canSend = true;
     })
     client.on('error', (err)=>{
         console.log(err.message);
@@ -79,11 +81,9 @@ function connectionHandler(conn){
 async function sendData(port) {
     let a = 0;
     while(1){
-        let data = "";
-
         if (!canSend) {
-            type = "init";
-            data = port;
+            client.write(id_pkt);
+            console.log(id_pkt);
         }
         else {
             let I = 100 + (10 * Math.sin(a));
@@ -94,15 +94,13 @@ async function sendData(port) {
             let x = 0;
             let y = 0;
             let z = 9.8;
-            type = "data";
             data = `{"current": ${I}, "power": ${P}, "temperature": ${T}, "accelereation": {"x": ${x}, "y": ${y}, "z": ${z}}, "rpm": ${A}}`;
+        
+            data_pkt = `{"id": ${UID}, "data":${data}}`;  
+        
+            client.write(data_pkt);
+            console.log(data_pkt);
         }
-
-        data_pkt = `{"id": ${UID}, "data":${data}}`;  
-        
-        client.write(data_pkt);
-        console.log(data_pkt);
-        
         await sleep(sendFreq);  
     }    
 }
