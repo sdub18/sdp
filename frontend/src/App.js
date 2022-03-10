@@ -31,7 +31,6 @@ const units = {"current": "A", "power": "W", "temp": "F", "rpm": "RPM"};
 
 socket.on("y_axes_config", (recv_config) => {
   yConfig = recv_config;
-  console.log(yConfig["temp"].yMin, yConfig["temp"].yMax);
 });
 
 socket.on("graph_update", (update_data) => {
