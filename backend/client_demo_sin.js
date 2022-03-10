@@ -50,7 +50,7 @@ const PORT = 49160;
 const UID = process.pid;
 const sendFreq = 10;
 
-const id_pkt = {id: UID};
+const id_pkt = `{"id": ${UID}}`;
 
 const options = {family: 4, host:HOST, port: PORT}
 const client = net.createConnection(options, connectionHandler);
@@ -63,8 +63,7 @@ function connectionHandler(conn){
     sendData(c_addr.port);
 
     client.on('data', (d)=>{
-        console.log(''+d);
-        if (d == 0x01) canSend = true;
+        if (d.toString('hex') == "01") canSend = true;
     })
     client.on('error', (err)=>{
         console.log(err.message);
@@ -83,20 +82,19 @@ async function sendData(port) {
     while(1){
         if (!canSend) {
             client.write(id_pkt);
-            console.log(id_pkt);
         }
         else {
             let I = 100 + (10 * Math.sin(a));
             a += 0.025;
+            let V = 10 + (getRandomIntInRange(-100, 100) / 100);
             let P = 60 + (getRandomIntInRange(-10, 10));
-            let T = 80 + getRandomIntInRange(0,5);
-            let A = 40 + getRandomIntInRange(-10, 10);
+            let Tf = 80 + getRandomIntInRange(0,5);
+            let Tc = 30 + getRandomIntInRange(-5,5);
             let x = 0;
             let y = 0;
             let z = 9.8;
-            data = `{"current": ${I}, "power": ${P}, "temperature": ${T}, "accelereation": {"x": ${x}, "y": ${y}, "z": ${z}}, "rpm": ${A}}`;
-        
-            data_pkt = `{"id": ${UID}, "data":${data}}`;  
+            let data = `{"current": ${I}, "voltage": ${V},"power": ${P}, "temp": ${Tf}, "accelereation": {"x": ${x}, "y": ${y}, "z": ${z}}}`;
+            let data_pkt = `{"id": ${UID}, "data":${data}}`;  
         
             client.write(data_pkt);
             console.log(data_pkt);

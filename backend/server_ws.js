@@ -1,28 +1,28 @@
 const net = require("net");
-const { config } = require("process");
 
 const CLIENT_TO_MIDDLE_PORT = process.env.PORT || 49160;
 const MIDDLE_TO_FRONT_PORT = process.env.PORT || 3001;
-const EMIT_PERIOD = 1;
 
 const C2M_server = net.createServer();
 const M2F_server = require('http').createServer({MIDDLE_TO_FRONT_PORT});
 const M2F_socket = require('socket.io')(M2F_server,{cors:{origin: true, credentials: true}});
 
 let addons = [];      // backend local array to manage addon ids
-let chartType = "";   // select data type to send to frontend
-let selectedID = 0;   // select addon id to choose which data packet to access
-let val2emit = 0;     // backend local variable to update to send to frontend
 const data = [];      // hold separated data packets (one pkt for each addon) in list
 
 // -----------------------------------------------------------------------------------------------------------------------
+let config = {"xMax" : 300,         
+  "xIncrement" : 100,
+  "width" : 700,
+  "height" : 400};
+let yConfig = {};
+const graph_labels = ["current", "power", "temp"];
 
-const unit_dict = {"current": "A", "power": "W", "temperature": "F", "rpm": "RPM"};
-const graph_labels = Object.keys(unit_dict);
-let graph_settings = null;
+graph_labels.map((type) => {yConfig[type] = {yMin: 0, yMax:100}});
+
 let active_pid = null;
 let coordinates = {};
-
+let oldConfig = {};
 
 M2F_socket.on("connection", M2F_connectionHandler);
 M2F_server.listen(MIDDLE_TO_FRONT_PORT, () => {console.log(`C2M_server listening on ${MIDDLE_TO_FRONT_PORT}`)});
@@ -35,29 +35,37 @@ This is the first thing that runs in the entire project infrastructure. It begin
 being used in the graphs, so the backend can store/modify data correctly and send it to the frontend. Once the response has been
 received, the JSON coordinated object is populated based on the info contained within the response.
 */
-function createEmptyGraph(graph_settings) {
+function createEmptyGraph() {
   labels_coords_dict = {};
     for (let i = 0; i < graph_labels.length; i++) {
       labels_coords_dict[graph_labels[i]] = [];
-      for (let j = 0; j < graph_settings.xMax; j++) {
-        labels_coords_dict[graph_labels[i]].push({x: j, y: 0, threshold: 50});
+      for (let j = 0; j < config.xMax; j++) {
+        labels_coords_dict[graph_labels[i]].push(
+          { 
+            yConfig: {yMin:0, yMax:100},
+            data: {x: j, y: 0, threshold: 50}
+          }
+        );
       }
     }
     return labels_coords_dict;
 }
 
 function M2F_connectionHandler(client){
-  client.emit("config");
-
-  client.on("config_response", (info) => {
-    console.log("connected to frontend");
-    graph_settings = info;
-  })
   
   client.on("addon_selection", (pid) => {
-    console.log(pid);
-    active_pid = pid;
+    active_pid = pid.toString();
   })
+  setInterval(() => {
+    M2F_socket.emit("graph_update", coordinates[active_pid]);
+    M2F_socket.emit("updateAddons", addons.map(a => a.id));
+
+    if (oldConfig != yConfig) client.emit("y_axes_config", yConfig);
+    
+  }, 50);
+  /*setInterval(() => {
+    M2F_socket.emit("updateAddons", addons.map(a => a.id));
+  }, 50);*/
 }
 
 /*
@@ -88,33 +96,30 @@ function C2M_connectionHandler(conn){
   conn.on('error', (err) => {console.log('Connection %s error: %s', remoteAddress, err.message)});
 
   conn.on('data', (recv_d) => {
-    parseData(recv_d, data)     // parse buffer stream into individual packets of data and place into data array
+    parseData(recv_d, data)    // parse buffer stream into individual packets of data and place into data array
     for (let pkt of data) { 
-      // update local addon array if new addon detected and write back to addon to start sending sensor data
       if (!addons.some(addon => addon.id === pkt.id)) {
-        pkt["data"] = conn.remotePort;
+        pkt["remotePort"] = conn.remotePort;
         addons.push(pkt);
-        coordinates[pkt.id] = createEmptyGraph(graph_settings);
-        conn.write(Buffer.from([0x01]));
-        M2F_socket.emit("updateAddons", addons.map(a => a.id));
-        console.log(addons.map(a => a.id));
+        console.log(addons);
+
+        coordinates[pkt.id] = createEmptyGraph(); // init coords matrix for addon
+        conn.write(Buffer.from([0x01]));  // send ACK byte
       } 
-      
-      if (Object.keys(pkt).length > 1) {
+      if (("data" in pkt) && (pkt.id in coordinates)) {
         for (let i = 0; i < graph_labels.length; i++) {
-          for (let j = 0; j < graph_settings.xMax - 1; j++) {
-            coordinates[pkt.id][graph_labels[i]][j].y = coordinates[pkt.id][graph_labels[i]][j+1].y;
+          for (let j = 0; j < config.xMax - 1; j++) {
+            coordinates[pkt.id][graph_labels[i]].data[j].y = coordinates[pkt.id][graph_labels[i]].data[j+1].y;
           }
-          coordinates[pkt.id][graph_labels[i]][graph_settings.xMax - 1].y = pkt.data[graph_labels[i]];
-        }
-        if (pkt.id === active_pid) {
-          current_coords = coordinates[active_pid];
-          sending_coords_array = [];
-          for (let i = 0; i < graph_labels.length; i++) {
-            sending_coords_array.push(current_coords[graph_labels[i]]);
+          coordinates[pkt.id][graph_labels[i]][data][config.xMax - 1].y = pkt.data[graph_labels[i]];
+
+          if (active_pid === pkt.id) {
+            coordinates[pkt.id][graph_labels[i]][yConfig].yMin = min(pkt.data[graph_labels[i]],coordinates[pkt.id][graph_labels[i]][yConfig].yMin);
+            coordinates[pkt.id][graph_labels[i]][yConfig].yMax = max(pkt.data[graph_labels[i]],coordinates[pkt.id][graph_labels[i]][yConfig].yMax); 
+            yConfig = coordinates[pkt.id][graph_labels[i]][yConfig];
           }
-          M2F_socket.emit("graph_update", sending_coords_array);
         }
+        //M2F_socket.emit("graph_update", coordinates[active_pid]);
       }
     }
   });
@@ -122,15 +127,14 @@ function C2M_connectionHandler(conn){
   conn.on('close', () => {
     // remove connection from addon array
     console.log('connection from %s closed', conn.remotePort);
-    addon_index = addons.findIndex(addon => addon.data == conn.remotePort);
+    addon_index = addons.findIndex(addon => addon.remotePort == conn.remotePort);
     addon_id = addons[addon_index].id;
     addons.splice(addon_index, 1);
-    delete coordinates[addon_id];
-    M2F_socket.emit("updateAddons", addons.map(a => a.id));
     console.log(addons.map(a => a.id));
+    // remove coordinate matrix for addon
+    delete coordinates[addon_id];
   });
 }
-
 
 // See the description for C2M_connectionHandler()
 function parseData(recv_data, pkts_array){
@@ -141,9 +145,9 @@ function parseData(recv_data, pkts_array){
   let status = 0;
 
   try {
-    pkt = JSON.parse(recv_data);
+    pkt = JSON.parse(recv_data.toString('utf-8'));
     pkts_array.push(pkt);
-      console.log(pkt);
+    //console.log(pkt);
   }
   catch (err) {
     // handles stream buffer concatenation
