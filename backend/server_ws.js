@@ -119,7 +119,13 @@ function C2M_connectionHandler(conn){
             newVal = pkt.data[graph_labels[i]];
             if (newVal > curMax) yConfig[graph_labels[i]].yMax = newVal * 1.2;
             if (newVal < curMin) yConfig[graph_labels[i]].yMin = newVal * 0.8;
-            //console.log(curMin, curMax);
+
+            console.log(yConfig[graph_labels[i]].yMax, yConfig[graph_labels[i]].yMin);
+
+            if ((yConfig[graph_labels[i]].yMax - yConfig[graph_labels[i]].yMin) < 1) {
+              yConfig[graph_labels[i]].yMin = Math.floor(yConfig[graph_labels[i]].yMin);
+              yConfig[graph_labels[i]].yMax = Math.ceil(yConfig[graph_labels[i]].yMax);
+            }
           }
         }
       }
