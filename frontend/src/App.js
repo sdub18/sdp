@@ -28,6 +28,7 @@ let yConfig = {};
 let healthy = true;
 let healthText = "HEALTHY";
 const units = {"current": "A", "power": "W", "temp": "F", "rpm": "RPM"};
+let processDict = {};
 
 socket.on("y_axes_config", (recv_config) => {
   yConfig = recv_config;
@@ -41,11 +42,18 @@ socket.on("updateAddons", (recv_addons) => {
   if (!(JSON.stringify(recv_addons) === JSON.stringify(local_addons))) local_addons = recv_addons;
 });
 
+socket.on("health_status", (health_status) => {
+  processDict = health_status;
+  console.log(health_status);
+});
+
 
 function App() {
   const [coords, setCoords] = React.useState([]);
   const [addons, setAddons] = React.useState([]);
   const [selectedAddon, setSelectedAddon] = React.useState(-1);
+  const [processDict_App, setProcessDict] = React.useState({});
+  
 
 
   React.useEffect(() => {
@@ -53,6 +61,7 @@ function App() {
     const timer = setInterval(() => {
       setAddons(local_addons);
       setCoords(coordinates);
+      setProcessDict(processDict);
 
     }, RENDER_PERIOD);
     return () => clearInterval(timer);
@@ -74,6 +83,8 @@ function App() {
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
+        <HealthMonitor processDict={processDict_App}></HealthMonitor>
+        <br/>
         <AddonDropdownMemo labels={addons} value={selectedAddon} onChangeHandler={chooseAddon}/>
         <br/>
         {selectedAddon !== -1 &&
