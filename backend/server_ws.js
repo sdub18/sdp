@@ -17,6 +17,7 @@ let config = {"xMax" : 300,
   "height" : 400};
 
 const graph_labels = ["current", "power", "temp"];
+const thresholds = {"current": 100, "power": 60, "temp": 80};
 
 let yConfig = {};
 graph_labels.map((type) => {yConfig[type] = {yMin: 10000, yMax:-10000}});
@@ -58,6 +59,7 @@ function M2F_connectionHandler(client){
 
     //if (oldConfig != yConfig) 
     M2F_socket.emit("y_axes_config", yConfig);
+    M2F_socket.emit("health_status", computeHealthStatuses(coordinates, thresholds));
     
   }, 50);
   /*setInterval(() => {
@@ -182,4 +184,47 @@ function parseData(recv_data, pkts_array){
     }
   }
   return status;
+}
+
+/*
+coordinates: coordinates array being stored in program.
+thresholds: Takes the format {current: <some number>, voltage: <some number>, power: <some number>}
+*/
+function computeHealthStatuses(coordinates, thresholds) {
+  let output = {};
+  const processes = Object.keys(coordinates);
+  const attributes = Object.keys(thresholds);
+  for (let i = 0; i < processes.length; i++) {
+    const current_process = coordinates[processes[i]];
+    let overall_dangerous = false;
+    for (let j = 0; j < attributes.length; j++) {
+        let current_dangerous = false;
+      if (computeAverage(current_process[attributes[j]].map(point => point.y)) > thresholds[attributes[j]]) {
+          current_dangerous = true;
+          if (!overall_dangerous) {
+            output[processes[i]] = "DANGEROUS (" + attributes[j] + ', ';
+            overall_dangerous = true;
+          } else {
+              if (current_dangerous) {
+                output[processes[i]] += attributes[j] + ', ';
+              }
+          }
+      }
+    }
+    if (overall_dangerous) {
+      output[processes[i]] = output[processes[i]].substring(0, output[processes[i]].length - 2);
+      output[processes[i]] = output[processes[i]] + ')';
+    } else {
+      output[processes[i]] = "HEALTHY";
+    }
+  }
+  return output;
+}
+
+function computeAverage(array) {
+  let sum = 0;
+  for (let i = 0; i < array.length; i++) {
+      sum += array[i];
+  }
+  return sum / array.length;
 }
