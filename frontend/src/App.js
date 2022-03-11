@@ -3,6 +3,7 @@ import logo from './logo.svg';
 import './App.css';
 import DynamicGraph from "./DynamicGraph";
 import HealthMonitor from "./HealthMonitor";
+import ThresholdSelector from "./ThresholdSelector";
 import io from 'socket.io-client';
 import AddonDropdown from "./AddonDropdown";
 
@@ -22,6 +23,10 @@ let config = {"xMax" : 300,
   "width" : 700,
   "height" : 400,
 };
+const attributes = ["current", "power", "temp"];
+const thresholds = {"current": 100, "power": 60, "temp": 80};;
+const threshold_labels = {"current": "current (A)", "power": " power (W)", "temp": " temp (F)"};
+const threshold_string = "Thresholds: " + attributes.map((attribute) => (threshold_labels[attribute] + ": " + thresholds[attribute]))
 
 socket.on("graph_update", (update_data) => {
   if (update_data != null)  coordinates = update_data;
@@ -41,6 +46,7 @@ function App() {
   const [addons, setAddons] = React.useState([]);
   const [selectedAddon, setSelectedAddon] = React.useState("");
   const [processDict_App, setProcessDict] = React.useState({});
+  const [threshold, setThreshold] = React.useState(50);
 
   React.useEffect(() => {
     const timer = setInterval(() => {
@@ -69,9 +75,11 @@ function App() {
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <br/>
+        <div>{threshold_string}</div>
+        <br/>
         <AddonDropdownMemo labels={addons} value={selectedAddon} onChangeHandler={chooseAddon}/>
         <br/>
-        {selectedAddon !== "" && <HealthMonitor processDict={processDict_App}></HealthMonitor>}
+        {addons.length > 0 && <HealthMonitor processDict={processDict_App}></HealthMonitor>}
         <br/>
         {selectedAddon !== "" &&
           chart_types.map((type) => (
