@@ -3,7 +3,7 @@ This is the first thing that runs in the entire project infrastructure. It begin
 being used in the graphs, so the backend can store/modify data correctly and send it to the frontend. Once the response has been
 received, the JSON coordinated object is populated based on the info contained within the response.
 */
-function createEmptyGraph(chart_types) {
+function createEmptyGraph(chart_types, config) {
 	labels_coords_dict = {};
 	  for (let i = 0; i < chart_types.length; i++) {
 		labels_coords_dict[chart_types[i]] = [];
