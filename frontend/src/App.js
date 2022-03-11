@@ -72,6 +72,7 @@ function App() {
         <AddonDropdownMemo labels={addons} value={selectedAddon} onChangeHandler={chooseAddon}/>
         <br/>
         {selectedAddon !== "" && <HealthMonitor processDict={processDict_App}></HealthMonitor>}
+        <br/>
         {selectedAddon !== "" &&
           chart_types.map((type) => (
           <DynamicGraph
