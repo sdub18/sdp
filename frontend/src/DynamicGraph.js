@@ -55,7 +55,7 @@ export default function DynamicGraph(props) {
         <YAxis
             type="number"
             tick={{fontSize: 15}}
-            domain={[props.yMin, props.yMax]}
+            domain={["auto", "auto"]}
         >
             <Label
                 value={props.yAxisLabel}

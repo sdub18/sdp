@@ -16,15 +16,11 @@ let config = {"xMax" : 300,
   "width" : 700,
   "height" : 400};
 
-const graph_labels = ["current", "power", "temp"];
+const chart_type = ["current", "power", "temp"];
 const thresholds = {"current": 100, "power": 60, "temp": 80};
-
-let yConfig = {};
-graph_labels.map((type) => {yConfig[type] = {yMin: 10000, yMax:-10000}});
 
 let active_pid = null;
 let coordinates = {};
-let oldConfig = {};
 
 M2F_socket.on("connection", M2F_connectionHandler);
 M2F_server.listen(MIDDLE_TO_FRONT_PORT, () => {console.log(`C2M_server listening on ${MIDDLE_TO_FRONT_PORT}`)});
@@ -39,10 +35,10 @@ received, the JSON coordinated object is populated based on the info contained w
 */
 function createEmptyGraph() {
   labels_coords_dict = {};
-    for (let i = 0; i < graph_labels.length; i++) {
-      labels_coords_dict[graph_labels[i]] = [];
+    for (let i = 0; i < chart_type.length; i++) {
+      labels_coords_dict[chart_type[i]] = [];
       for (let j = 0; j < config.xMax; j++) {
-        labels_coords_dict[graph_labels[i]].push({x: j, y: 0});
+        labels_coords_dict[chart_type[i]].push({x: j, y: 0});
       }
     }
     return labels_coords_dict;
@@ -53,18 +49,13 @@ function M2F_connectionHandler(client){
   client.on("addon_selection", (pid) => {
     active_pid = pid.toString();
   })
+
   setInterval(() => {
     M2F_socket.emit("graph_update", coordinates[active_pid]);
     M2F_socket.emit("updateAddons", addons.map(a => a.id));
-
-    //if (oldConfig != yConfig) 
-    M2F_socket.emit("y_axes_config", yConfig);
-    M2F_socket.emit("health_status", computeHealthStatuses(coordinates, thresholds));
-    
+    M2F_socket.emit("health_status", computeHealthStatuses(coordinates, thresholds));  
   }, 50);
-  /*setInterval(() => {
-    M2F_socket.emit("updateAddons", addons.map(a => a.id));
-  }, 50);*/
+
 }
 
 /*
@@ -106,27 +97,11 @@ function C2M_connectionHandler(conn){
         conn.write(Buffer.from([0x01]));  // send ACK byte
       } 
       if (("data" in pkt) && (pkt.id in coordinates)) {
-        for (let i = 0; i < graph_labels.length; i++) {
+        for (let i = 0; i < chart_type.length; i++) {
           for (let j = 0; j < config.xMax - 1; j++) {
-            coordinates[pkt.id][graph_labels[i]][j].y = coordinates[pkt.id][graph_labels[i]][j+1].y;
+            coordinates[pkt.id][chart_type[i]][j].y = coordinates[pkt.id][chart_type[i]][j+1].y;
           }
-          coordinates[pkt.id][graph_labels[i]][config.xMax - 1].y = pkt.data[graph_labels[i]];
-          
-          if (active_pid == pkt.id) {
-            if (yConfig[graph_labels[i]].yMax < -999) yConfig[graph_labels[i]].yMax = pkt.data[graph_labels[i]];
-            if (yConfig[graph_labels[i]].yMin > 999) yConfig[graph_labels[i]].yMin = pkt.data[graph_labels[i]];
-            //oldConfig = yConfig;
-            curMax = Math.max.apply(Math, coordinates[pkt.id][graph_labels[i]].map((point) => { return point.y; }));
-            curMin = Math.min.apply(Math, coordinates[pkt.id][graph_labels[i]].map((point) => { return point.y; }))
-            newVal = pkt.data[graph_labels[i]];
-            if (newVal > curMax) yConfig[graph_labels[i]].yMax = newVal * 1.2;
-            if (newVal < curMin) yConfig[graph_labels[i]].yMin = newVal * 0.8;
-
-            if ((yConfig[graph_labels[i]].yMax - yConfig[graph_labels[i]].yMin) < 1) {
-              yConfig[graph_labels[i]].yMin = Math.floor(yConfig[graph_labels[i]].yMin);
-              yConfig[graph_labels[i]].yMax = Math.ceil(yConfig[graph_labels[i]].yMax);
-            }
-          }
+          coordinates[pkt.id][chart_type[i]][config.xMax - 1].y = pkt.data[chart_type[i]];
         }
       }
     }
@@ -134,11 +109,12 @@ function C2M_connectionHandler(conn){
 
   conn.on('close', () => {
     // remove connection from addon array
-    console.log('connection from %s closed', conn.remotePort);
     addon_index = addons.findIndex(addon => addon.remotePort == conn.remotePort);
     addon_id = addons[addon_index].id;
     addons.splice(addon_index, 1);
+    
     console.log(addons.map(a => a.id));
+    console.log('connection from %s closed', conn.remotePort);
     // remove coordinate matrix for addon
     delete coordinates[addon_id];
   });

@@ -4,11 +4,8 @@ import './App.css';
 import DynamicGraph from "./DynamicGraph";
 import HealthMonitor from "./HealthMonitor";
 import io from 'socket.io-client';
-import ChartButtons from "./ChartButtons";
 import AddonDropdown from "./AddonDropdown";
-import { Box } from "@mui/system";
 
-const ChartButtonsMemo = React.memo(ChartButtons);
 const AddonDropdownMemo = React.memo(AddonDropdown);
 
 let local_addons = [];          // frontend local copy of connected addons
@@ -16,23 +13,15 @@ const RENDER_PERIOD = 50;       // rerender period in milliseconds
 const socket_options = {'reconnection': true, 'reconnectionAttempts': Infinity} // options to have frontend continuously try to reconnect to backend
 const socket = io('http://localhost:3001', socket_options);       // frontend websocket - connects to backend server's websocket
 const chart_types = ["current", "power", "temp"];   // all chart types --> HARDCODED AND KEPT IN FRONTEND; NOT STORED IN BACKEND
+const units = {"current": "A", "power": "W", "temp": "F", "rpm": "RPM"};
+
 let coordinates = [];               // frontend local copy of coordinates, used to set "coords" state variable
+let processDict = {};
 let config = {"xMax" : 300,         
   "xIncrement" : 100,
   "width" : 700,
   "height" : 400,
-  "yMin": 75,
-  "yMax": 85
 };
-let yConfig = {};
-let healthy = true;
-let healthText = "HEALTHY";
-const units = {"current": "A", "power": "W", "temp": "F", "rpm": "RPM"};
-let processDict = {};
-
-socket.on("y_axes_config", (recv_config) => {
-  yConfig = recv_config;
-});
 
 socket.on("graph_update", (update_data) => {
   if (update_data != null)  coordinates = update_data;
@@ -44,20 +33,16 @@ socket.on("updateAddons", (recv_addons) => {
 
 socket.on("health_status", (health_status) => {
   processDict = health_status;
-  console.log(health_status);
 });
 
 
 function App() {
   const [coords, setCoords] = React.useState([]);
   const [addons, setAddons] = React.useState([]);
-  const [selectedAddon, setSelectedAddon] = React.useState(-1);
+  const [selectedAddon, setSelectedAddon] = React.useState("");
   const [processDict_App, setProcessDict] = React.useState({});
-  
-
 
   React.useEffect(() => {
-
     const timer = setInterval(() => {
       setAddons(local_addons);
       setCoords(coordinates);
@@ -69,7 +54,7 @@ function App() {
 
   React.useEffect(() => {
     if (!(addons.includes(selectedAddon))){
-      setSelectedAddon(-1);
+      setSelectedAddon("");
     }
   }, [addons])
 
@@ -83,21 +68,16 @@ function App() {
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <HealthMonitor processDict={processDict_App}></HealthMonitor>
         <br/>
         <AddonDropdownMemo labels={addons} value={selectedAddon} onChangeHandler={chooseAddon}/>
         <br/>
-        {selectedAddon !== -1 &&
-          <Box style={{ color: healthy ? 'green' : 'red' }}>{healthText}</Box>
-        }
-        {selectedAddon !== -1 &&
+        {selectedAddon !== "" && <HealthMonitor processDict={processDict_App}></HealthMonitor>}
+        {selectedAddon !== "" &&
           chart_types.map((type) => (
           <DynamicGraph
                 key={type}
                 title={type}
                 data={coords[type]}
-                yMin={yConfig[type].yMin}
-                yMax={yConfig[type].yMax}
                 yAxisLabel={type + " (" + units[type] + ")"}
                 xMax={config.xMax}
                 xIncrement={config.xIncrement}
@@ -108,33 +88,6 @@ function App() {
         }
       </header>
     </div>
-    /*
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <AddonDropdownMemo labels={addons} value={selectedAddon} onChangeHandler={chooseAddon}/>
-        <br/>
-        {selectedAddon !== "" &&
-          <Box style={{ color: healthy ? 'green' : 'red' }}>{healthText}</Box>
-        }
-        {selectedAddon !== "" &&
-          chart_types.map((type) => (
-          <DynamicGraph
-                title={type}
-                data={coords[chart_types_index_map[type]]}
-                yMin={config.yMin}
-                yMax={config.yMax}
-                yAxisLabel={type + " (" + units[type] + ")"}
-                xMax={config.xMax}
-                xIncrement={config.xIncrement}
-                width={config.width}
-                height={config.height}>
-          </DynamicGraph>
-          ))
-        }
-      </header>
-    </div>
-    */
   );
 }
 
