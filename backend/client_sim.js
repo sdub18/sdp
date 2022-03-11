@@ -93,7 +93,7 @@ async function sendData(port) {
             let y = 0;
             let z = 9.8;
             type = "data";
-            data = `{"current": ${I}, "power": ${P}, "temperature": ${T}, "accelereation": {"x": ${x}, "y": ${y}, "z": ${z}}, "rpm": ${A}}`;
+            data = `{"current": ${I}, "power": ${P}, "temp": ${T}, "accelereation": {"x": ${x}, "y": ${y}, "z": ${z}}, "rpm": ${A}}`;
         }
 
         data_pkt = `{"id": ${UID}, "data":${data}}`;  

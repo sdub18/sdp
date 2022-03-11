@@ -60,7 +60,7 @@ function C2M_connectionHandler(conn){
         addons.push(pkt);
         console.log(addons);
 
-        coordinates[pkt.id] = createEmptyGraph(chart_types, config); // init coords matrix for addon
+        coordinates[pkt.id] = createEmptyGraph(chart_types, config, thresholds); // init coords matrix for addon
         conn.write(Buffer.from([0x01]));  // send ACK byte
       } 
       if (("data" in pkt) && (pkt.id in coordinates)) {
