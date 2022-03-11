@@ -45,13 +45,12 @@ socket.on("updateAddons", (recv_addons) => {
 function App() {
   const [coords, setCoords] = React.useState([]);
   const [addons, setAddons] = React.useState([]);
-  const [selectedAddon, setSelectedAddon] = React.useState("");
+  const [selectedAddon, setSelectedAddon] = React.useState(-1);
 
 
   React.useEffect(() => {
 
     const timer = setInterval(() => {
-      //console.log(coordinates);
       setAddons(local_addons);
       setCoords(coordinates);
 
@@ -60,15 +59,15 @@ function App() {
   }, []);
 
   React.useEffect(() => {
-    if (!(selectedAddon in addons)){
-      setSelectedAddon("");
+    if (!(addons.includes(selectedAddon))){
+      setSelectedAddon(-1);
     }
   }, [addons])
 
   const chooseAddon = React.useCallback((event) => {
     const addon = event.target.value
     socket.emit("addon_selection", addon);
-    setSelectedAddon(addon);
+    setSelectedAddon(Number(addon));
   }, []);
 
   return (
@@ -77,10 +76,10 @@ function App() {
         <img src={logo} className="App-logo" alt="logo" />
         <AddonDropdownMemo labels={addons} value={selectedAddon} onChangeHandler={chooseAddon}/>
         <br/>
-        {selectedAddon !== "" &&
+        {selectedAddon !== -1 &&
           <Box style={{ color: healthy ? 'green' : 'red' }}>{healthText}</Box>
         }
-        {selectedAddon !== "" &&
+        {selectedAddon !== -1 &&
           chart_types.map((type) => (
           <DynamicGraph
                 key={type}
