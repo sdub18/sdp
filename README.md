@@ -1,5 +1,6 @@
-# sdp
+# Senior Design Project UMass Electrical and Computer Engineering - Team 23
 Motor Health Analytics and Feedback Dashboard
+Sam DuBois, Andres Gutierrez, Andrew Tran, and Michael Brauninger
 
 Packages Necessary to Download to Run Arduino Code
 - Adafruit MCP9808
