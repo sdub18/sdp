@@ -104,7 +104,7 @@
 
   (footprint "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" (layer "F.Cu")
     (tedit 5F68FEEE) (tstamp 592f25e6-a01b-47fd-8172-3da01117d00a)
-    (at 173.5328 95.4005 90)
+    (at 145.97436 96.29336 90)
     (descr "Resistor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
     (tags "resistor handsolder")
     (property "Sheetfile" "Woodstock.kicad_sch")
@@ -146,7 +146,7 @@
 
   (footprint "5014610491:Molex-501461-0491-Manufacturer_Recommended" (layer "F.Cu")
     (tedit 5EF1DF61) (tstamp 639c0e59-e95c-4114-bccd-2e7277505454)
-    (at 178.5874 103.9011 180)
+    (at 151.00356 103.98116 180)
     (property "Circuits Loaded" "4")
     (property "Component Link 1 Description" "Manufacturer URL")
     (property "Component Link 1 URL" "http://www.molex.com/molex/index.jsp")
@@ -185,11 +185,11 @@
     (property "vault revision" "5F166C2B-E9D9-4135-9ADB-F1D93D2D935E")
     (path "/7813914e-b620-4aec-b413-d4610daa8307")
     (attr through_hole)
-    (fp_text reference "J1" (at -2.849999 -2.457502) (layer "F.SilkS")
+    (fp_text reference "J1" (at -3.5814 -1.6105) (layer "F.SilkS")
       (effects (font (size 1 1) (thickness 0.15)) (justify right))
       (tstamp f3628265-0155-43e2-a467-c40ff783e265)
     )
-    (fp_text value "501461-0491" (at 0 0) (layer "F.SilkS")
+    (fp_text value "501461-0491" (at -0.127 0.8279 180) (layer "F.SilkS")
       (effects (font (size 1.27 1.27) (thickness 0.15)))
       (tstamp 6595b9c7-02ee-4647-bde5-6b566e35163e)
     )
@@ -262,7 +262,7 @@
 
   (footprint "Package_LGA:LGA-16_3x3mm_P0.5mm_LayoutBorder3x5y" (layer "F.Cu")
     (tedit 5D9F7937) (tstamp 79e31048-072a-4a40-a625-26bb0b5f046b)
-    (at 178.6128 95.3008 -90)
+    (at 151.05436 96.19366 -90)
     (descr "LGA, 16 Pin (http://www.st.com/resource/en/datasheet/lis331hh.pdf), generated with kicad-footprint-generator ipc_noLead_generator.py")
     (tags "LGA NoLead")
     (property "Sheetfile" "Woodstock.kicad_sch")
@@ -338,7 +338,7 @@
 
   (footprint "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" (layer "F.Cu")
     (tedit 5F68FEEE) (tstamp 7b044939-8c4d-444f-b9e0-a15fcdeb5a86)
-    (at 180.9496 91.3384 180)
+    (at 153.39116 92.23126 180)
     (descr "Resistor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
     (tags "resistor handsolder")
     (property "Sheetfile" "Woodstock.kicad_sch")
@@ -380,7 +380,7 @@
 
   (footprint "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" (layer "F.Cu")
     (tedit 5F68FEEE) (tstamp b0906e10-2fbc-4309-a8b4-6fc4cd1a5490)
-    (at 175.9966 91.3892)
+    (at 148.43816 92.28206)
     (descr "Resistor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
     (tags "resistor handsolder")
     (property "Sheetfile" "Woodstock.kicad_sch")
@@ -422,7 +422,7 @@
 
   (footprint "Package_SO:MSOP-8_3x3mm_P0.65mm" (layer "B.Cu")
     (tedit 5E509FDD) (tstamp 009a4fb4-fcc0-4623-ae5d-c1bae3219583)
-    (at 178.5874 95.5802 180)
+    (at 151.02896 96.47306 180)
     (descr "MSOP, 8 Pin (https://www.jedec.org/system/files/docs/mo-187F.pdf variant AA), generated with kicad-footprint-generator ipc_gullwing_generator.py")
     (tags "MSOP SO")
     (property "Sheetfile" "Woodstock.kicad_sch")
@@ -479,7 +479,7 @@
 
   (footprint "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" (layer "B.Cu")
     (tedit 5F68FEEE) (tstamp 14c51520-6d91-4098-a59a-5121f2a898f7)
-    (at 181.7624 89.7382 180)
+    (at 151.00356 92.23126 180)
     (descr "Resistor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
     (tags "resistor handsolder")
     (property "Sheetfile" "Woodstock.kicad_sch")
@@ -521,7 +521,7 @@
 
   (footprint "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" (layer "B.Cu")
     (tedit 5F68FEEE) (tstamp 82be7aae-5d06-4178-8c3e-98760c41b054)
-    (at 177.1923 99.5426)
+    (at 148.48896 100.30846)
     (descr "Resistor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
     (tags "resistor handsolder")
     (property "Sheetfile" "Woodstock.kicad_sch")
@@ -563,7 +563,7 @@
 
   (footprint "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" (layer "B.Cu")
     (tedit 5F68FEEE) (tstamp c7e7067c-5f5e-48d8-ab59-df26f9b35863)
-    (at 173.0756 95.4043 -90)
+    (at 145.51716 96.29716 -90)
     (descr "Resistor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
     (tags "resistor handsolder")
     (property "Sheetfile" "Woodstock.kicad_sch")
@@ -605,7 +605,7 @@
 
   (footprint "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" (layer "B.Cu")
     (tedit 5F68FEEE) (tstamp db36f6e3-e72a-487f-bda9-88cc84536f62)
-    (at 184.0992 95.5821 90)
+    (at 156.54076 96.47496 90)
     (descr "Resistor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
     (tags "resistor handsolder")
     (property "Sheetfile" "Woodstock.kicad_sch")
@@ -647,7 +647,7 @@
 
   (footprint "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" (layer "B.Cu")
     (tedit 5F68FEEE) (tstamp f4eb0267-179f-46c9-b516-9bfb06bac1ba)
-    (at 181.8913 99.5426 180)
+    (at 153.56896 100.30846 180)
     (descr "Resistor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
     (tags "resistor handsolder")
     (property "Sheetfile" "Woodstock.kicad_sch")
@@ -687,6 +687,13 @@
     )
   )
 
-  (gr_rect (start 166.9796 84.9122) (end 189.7888 105.7148) (layer "Edge.Cuts") (width 0.1) (fill none) (tstamp 35b931a8-5fac-491e-8d64-9b8011418d15))
+  (gr_line (start 157.389938 87.301761) (end 144.752701 87.30366) (layer "Edge.Cuts") (width 0.1) (tstamp 68f5eccf-11d0-49d9-8915-c1c4095c40f1))
+  (gr_arc (start 144.88216 106.42986) (mid 143.525398 105.894001) (end 142.90096 104.57566) (layer "Edge.Cuts") (width 0.1) (tstamp 80ffd389-819c-4909-bdfd-368e74418af9))
+  (gr_line (start 142.90096 104.57566) (end 142.898501 89.295422) (layer "Edge.Cuts") (width 0.1) (tstamp 8e4fc648-773c-480f-8d42-94251b09ad03))
+  (gr_line (start 144.88216 106.42986) (end 157.58216 106.426) (layer "Edge.Cuts") (width 0.1) (tstamp 9b4e2610-a197-4092-9cf2-3e310ae652ed))
+  (gr_arc (start 157.389938 87.301761) (mid 158.75056 87.83706) (end 159.3817 89.155961) (layer "Edge.Cuts") (width 0.1) (tstamp c7877d81-b625-4862-931f-255ef997cebc))
+  (gr_line (start 159.387459 104.434238) (end 159.3817 89.155961) (layer "Edge.Cuts") (width 0.1) (tstamp ce150803-5ba5-42d2-85f0-b3231c5229d2))
+  (gr_arc (start 142.898501 89.295422) (mid 143.4338 87.9348) (end 144.752701 87.30366) (layer "Edge.Cuts") (width 0.1) (tstamp f5d4e6c9-f015-4b97-9e1c-74578dd1b310))
+  (gr_arc (start 159.387459 104.434238) (mid 158.85216 105.79486) (end 157.533259 106.426) (layer "Edge.Cuts") (width 0.1) (tstamp f79241e0-1058-447a-ae3c-d77c9b671a18))
 
 )
