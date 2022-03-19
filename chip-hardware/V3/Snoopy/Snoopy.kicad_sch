@@ -1535,7 +1535,7 @@
     (property "Value" "Conn_01x02" (id 1) (at 267.335 55.8799 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "Connector_Wago:Wago_734-162_1x02_P3.50mm_Horizontal" (id 2) (at 264.16 53.34 0)
+    (property "Footprint" "Connector_Wire:SolderWire-0.1sqmm_1x02_P3.6mm_D0.4mm_OD1mm" (id 2) (at 264.16 53.34 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (id 3) (at 264.16 53.34 0)
@@ -2218,7 +2218,7 @@
       (reference "J3") (unit 1) (value "501461-0491") (footprint "5014610491:Molex-501461-0491-Manufacturer_Recommended")
     )
     (path "/0153a7f3-f3ea-4b25-a0c4-092faa2372f5"
-      (reference "J4") (unit 1) (value "Conn_01x02") (footprint "Connector_Wago:Wago_734-162_1x02_P3.50mm_Horizontal")
+      (reference "J4") (unit 1) (value "Conn_01x02") (footprint "Connector_Wire:SolderWire-0.1sqmm_1x02_P3.6mm_D0.4mm_OD1mm")
     )
     (path "/10477cb7-baf7-4ecc-b98f-6ce44d7a2159"
       (reference "R1") (unit 1) (value "10k") (footprint "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder")
