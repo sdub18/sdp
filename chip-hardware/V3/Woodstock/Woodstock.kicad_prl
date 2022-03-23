@@ -40,6 +40,7 @@
       12,
       13,
       14,
+      15,
       16,
       17,
       18,
@@ -61,7 +62,7 @@
       35,
       36
     ],
-    "visible_layers": "7ffffff_80000000",
+    "visible_layers": "7ffffff_80000001",
     "zone_display_mode": 0
   },
   "meta": {
