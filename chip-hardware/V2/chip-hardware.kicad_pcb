@@ -365,7 +365,7 @@
   )
 
   (footprint "eec:Kycon-KLDX-0202-B-MFG" (layer "F.Cu")
-    (tedit 617127D7) (tstamp 2f3deced-880d-4075-a81b-95c62da5b94d)
+    (tedit 623B38AE) (tstamp 2f3deced-880d-4075-a81b-95c62da5b94d)
     (at 174.8863 94.482 180)
     (property "Sheetfile" "chip-hardware.kicad_sch")
     (property "Sheetname" "")
@@ -417,11 +417,11 @@
     (fp_line (start -7.4 -4.65) (end 7.4 -4.65) (layer "F.Fab") (width 0.15) (tstamp 7e08f2a4-63d6-468b-bd8b-ec607077e023))
     (fp_line (start -7.4 4.65) (end -7.4 -4.65) (layer "F.Fab") (width 0.15) (tstamp b60c50d1-225e-415c-8712-7acb5e3dc8ea))
     (fp_line (start 7.4 -4.65) (end 7.4 4.65) (layer "F.Fab") (width 0.15) (tstamp b6bcc3cf-50de-4a33-bc41-678825c1ecf2))
-    (pad "1" thru_hole rect locked (at 6.65 0 180) (size 1.4 4.899999) (drill oval 4.3) (layers *.Cu)
+    (pad "1" thru_hole rect locked (at 6.65 0 180) (size 1.4 4.899999) (drill oval 0.998 4.3) (layers *.Cu)
       (net 1 "Net-(C1-Pad1)") (pinfunction "1") (pintype "power_in") (tstamp 786b6072-5772-4bc1-8eeb-6c4e19f2a91b))
-    (pad "2" thru_hole roundrect locked (at 0.45 0 180) (size 1.4 4.4) (drill oval 3.8) (layers *.Cu) (roundrect_rratio 0.5)
+    (pad "2" thru_hole roundrect locked (at 0.45 0 180) (size 1.4 4.4) (drill oval 0.888 3.8) (layers *.Cu) (roundrect_rratio 0.5)
       (net 2 "GND") (pinfunction "2") (pintype "power_in") (tstamp 4d609e7c-74c9-4ae9-a26d-946ff00c167d))
-    (pad "3" thru_hole roundrect locked (at 3.45 4.7 180) (size 4.4 1.4) (drill oval 0.8) (layers *.Cu) (roundrect_rratio 0.5)
+    (pad "3" thru_hole roundrect locked (at 3.45 4.7 180) (size 4.4 1.4) (drill oval 3.594 0.8) (layers *.Cu) (roundrect_rratio 0.5)
       (net 2 "GND") (pinfunction "3") (pintype "power_in") (tstamp 9a9f2d82-f64d-4264-8bec-c182528fc4de))
     (model "eec.models/Kycon_-_KLDX-0202-B.step"
       (offset (xyz -184.1499972 0 0))
