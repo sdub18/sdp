@@ -1,0 +1,25 @@
+version: '3.8'
+
+# Setting up the PostgreSQL DB Container
+services:
+  db:
+    image: 'postgres:latest'
+    restart: always
+    env_file: # The location we use to share all of our secrets
+      - .env
+    volumes:
+      - ./db-data/:/var/lib/postgresql/data/
+    ports:
+      - 5432:5432
+  
+  server:
+    image: 'docker.pkg.github.com/sdub18/sdp-backend/backend:latest'
+    depends_on:
+      - db
+    volumes:
+      - ./be-data/:/backend/
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    env_file:
+      - .env
+    ports:
+      - 8000:8000

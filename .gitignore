@@ -2,3 +2,8 @@
 .vscode
 .DS_Store
 frontend/package-lock.json
+__pycache__
+venv
+.env
+db-data/
+be-data/
