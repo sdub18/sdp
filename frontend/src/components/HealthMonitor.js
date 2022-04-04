@@ -11,8 +11,8 @@ import ListItemText from '@mui/material/ListItemText';
 
 export default function HealthMonitor(props) {
   const keys = Object.keys(props.processDict);
-  const listItems = keys.map((process) =>
-    <ListItem disablePadding>
+  const listItems = keys.map((process, idx) =>
+    <ListItem disablePadding key={{idx}}>
       <ListItemButton style={{cursor: 'auto'}}>
         <ListItemText
           primary={process + ": "}
