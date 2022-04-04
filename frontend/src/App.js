@@ -8,7 +8,7 @@ import ThresholdSelector from "./components/ThresholdSelector";
 import AddonDropdown from "./components/AddonDropdown";
 import Header from "./components/Header"
 
-import { Divider, Grid } from "@material-ui/core";
+import { Box, Divider, Grid } from "@material-ui/core";
 
 const AddonDropdownMemo = React.memo(AddonDropdown);
 
@@ -87,32 +87,32 @@ function App() {
               direction = "column"
               justifyContent="space-between"
               alignItems="center"
-              zeroMinWidth={true}
               spacing={3}
               xs={8}
+              style={{maxHeight: '85vh', overflow: 'auto', marginTop:10}}
             >
               <Grid item>
                 {selectedAddon !== "" && <h3>{threshold_string}</h3> }
-                
-                {selectedAddon !== "" && chart_types.map((type) => (
-                  <DynamicGraph
-                        key={type}
-                        title={type}
-                        data={coords[type]}
-                        yAxisLabel={type + " (" + units[type] + ")"}
-                        xMax={config.xMax}
-                        xIncrement={config.xIncrement}
-                        width={config.width}
-                        height={config.height}>
-                  </DynamicGraph>
-                ))}
+                  {selectedAddon !== "" && chart_types.map((type) => (
+                    <DynamicGraph
+                          key={type}
+                          title={type}
+                          data={coords[type]}
+                          yAxisLabel={type + " (" + units[type] + ")"}
+                          xMax={config.xMax}
+                          xIncrement={config.xIncrement}
+                          width={config.width}
+                          height={config.height}>
+                    </DynamicGraph>
+                  ))}
               </Grid>
 
             </Grid>
             
-            <div class="content-divider" style={{display: "flex", minHeight: "100vh", height: "100%"}}>
+            {selectedAddon == "" && 
+            <div class="content-divider" style={{display: "flex", minHeight: "85vh", height: "100%"}}>
               <Divider orientation="vertical" flexItem style={{width: 5}}/>
-            </div>
+            </div>}
             
             <Grid container item
               direction="column"
