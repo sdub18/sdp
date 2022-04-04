@@ -1,6 +1,9 @@
 .App {
   background-color: #282c34;
   overflow: hidden;
+  min-height: 100vh;
+  height: 100%;
+  color: white
 }
 
 .App-body {

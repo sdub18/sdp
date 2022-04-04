@@ -3,7 +3,7 @@ import { Box } from '@material-ui/core';
 import logo from './logo.svg';
 import './Header.css';
 
-export default function AttributeList(props) {
+export default function Header() {
     return (
         <Box
             sx={{

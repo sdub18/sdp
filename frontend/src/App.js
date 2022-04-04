@@ -7,6 +7,11 @@ import ThresholdSelector from "./ThresholdSelector";
 import io from 'socket.io-client';
 import AddonDropdown from "./AddonDropdown";
 import Header from "./Header"
+import { borders } from '@mui/system';
+
+
+import Grid from "@mui/material/Grid";
+import { Box } from "@material-ui/core";
 
 const AddonDropdownMemo = React.memo(AddonDropdown);
 
@@ -73,30 +78,53 @@ function App() {
 
   return (
     <div className="App">
+        <Box sx={{borderColor: '#454a52', borderBottom: 1, width: '20', height: '20' }}>
+          <Header/>
+        </Box>
+
+        <Grid container
+          direction="row"
+          justifyContent="flex-start"
+          alignItems="flex-start"
+        >
+          <Grid container item
+            direction = "column"
+            justifyContent="flex-start"
+            alignItems="center"
+            xs={6}
+          >
+            <Grid item>
+              {selectedAddon !== "" && <h3>{threshold_string}</h3> }
+              
+              {selectedAddon !== "" && chart_types.map((type) => (
+                <DynamicGraph
+                      key={type}
+                      title={type}
+                      data={coords[type]}
+                      yAxisLabel={type + " (" + units[type] + ")"}
+                      xMax={config.xMax}
+                      xIncrement={config.xIncrement}
+                      width={config.width}
+                      height={config.height}>
+                </DynamicGraph>
+              ))}
+            </Grid>
+
+          </Grid>
+
+          <Grid container item
+            direction="column"
+            justifyContent="flex-start"
+            alignItems="flex-start"
+            xs={6}
+          >
+            <h1>Select addon</h1>
+            <AddonDropdownMemo labels={addons} value={selectedAddon} onChangeHandler={chooseAddon}/>
+            {addons.length > 0 && <HealthMonitor processDict={processDict_App}></HealthMonitor>}
+          </Grid>
+
+        </Grid>
         
-        <Header/>
-
-        <div className="App-body">
-          {selectedAddon !== "" && <h3>{threshold_string}</h3> }
-          <AddonDropdownMemo labels={addons} value={selectedAddon} onChangeHandler={chooseAddon}/>
-          {addons.length > 0 && <HealthMonitor processDict={processDict_App}></HealthMonitor>}
-          <br/>
-          
-          {selectedAddon !== "" &&
-            chart_types.map((type) => (
-            <DynamicGraph
-                  key={type}
-                  title={type}
-                  data={coords[type]}
-                  yAxisLabel={type + " (" + units[type] + ")"}
-                  xMax={config.xMax}
-                  xIncrement={config.xIncrement}
-                  width={config.width}
-                  height={config.height}>
-            </DynamicGraph>
-            ))}
-
-        </div>
     </div>
   );
 }
