@@ -76,7 +76,7 @@ function App() {
   return (
     <div className="App">
         <Header/>
-        <Divider/>
+        <Divider style={{height: 5}}/>
         <div className="App-body">
           <Grid container
             direction="row"
@@ -111,7 +111,7 @@ function App() {
             </Grid>
             
             <div class="content-divider" style={{display: "flex", minHeight: "100vh", height: "100%"}}>
-              <Divider orientation="vertical" flexItem/>
+              <Divider orientation="vertical" flexItem style={{width: 5}}/>
             </div>
             
             <Grid container item
