@@ -8,7 +8,8 @@ import ThresholdSelector from "./components/ThresholdSelector";
 import AddonDropdown from "./components/AddonDropdown";
 import Header from "./components/Header"
 
-import { Box, Divider, Grid } from "@material-ui/core";
+import { Divider, Grid } from "@material-ui/core";
+import { Stack } from "@mui/material";
 
 const AddonDropdownMemo = React.memo(AddonDropdown);
 
@@ -123,9 +124,12 @@ function App() {
               xs={4}
             >
               <Grid item>
-                <h1>Select addon</h1>
-                <AddonDropdownMemo labels={addons} value={selectedAddon} onChangeHandler={chooseAddon}/>
+                <Stack direction='row' spacing={3} alignItems='center' justifyContent='center'>
+                  <h2>Select addon</h2>
+                  <AddonDropdownMemo labels={addons} value={selectedAddon} onChangeHandler={chooseAddon}/>  
+                </Stack>
               </Grid>
+              
               <Grid item>
                 {addons.length > 0 && <HealthMonitor processDict={processDict_App}></HealthMonitor>}
               </Grid>
