@@ -8,8 +8,7 @@ import ThresholdSelector from "./components/ThresholdSelector";
 import AddonDropdown from "./components/AddonDropdown";
 import Header from "./components/Header"
 
-import { borders } from '@mui/system';
-import { Box, Grid } from "@material-ui/core";
+import { Divider, Grid } from "@material-ui/core";
 
 const AddonDropdownMemo = React.memo(AddonDropdown);
 
@@ -76,53 +75,66 @@ function App() {
 
   return (
     <div className="App">
-        <Box sx={{borderColor: '#454a52', borderBottom: 1, width: '20', height: '20' }}>
-          <Header/>
-        </Box>
-
-        <Grid container
-          direction="row"
-          justifyContent="flex-start"
-          alignItems="flex-start"
-        >
-          <Grid container item
-            direction = "column"
-            justifyContent="flex-start"
-            alignItems="center"
-            xs={8}
+        <Header/>
+        <Divider/>
+        <div className="App-body">
+          <Grid container
+            direction="row"
+            justifyContent="center"
+            alignItems="flex-start"
           >
-            <Grid item>
-              {selectedAddon !== "" && <h3>{threshold_string}</h3> }
-              
-              {selectedAddon !== "" && chart_types.map((type) => (
-                <DynamicGraph
-                      key={type}
-                      title={type}
-                      data={coords[type]}
-                      yAxisLabel={type + " (" + units[type] + ")"}
-                      xMax={config.xMax}
-                      xIncrement={config.xIncrement}
-                      width={config.width}
-                      height={config.height}>
-                </DynamicGraph>
-              ))}
+            <Grid container item
+              direction = "column"
+              justifyContent="space-between"
+              alignItems="center"
+              zeroMinWidth={true}
+              spacing={3}
+              xs={8}
+            >
+              <Grid item>
+                {selectedAddon !== "" && <h3>{threshold_string}</h3> }
+                
+                {selectedAddon !== "" && chart_types.map((type) => (
+                  <DynamicGraph
+                        key={type}
+                        title={type}
+                        data={coords[type]}
+                        yAxisLabel={type + " (" + units[type] + ")"}
+                        xMax={config.xMax}
+                        xIncrement={config.xIncrement}
+                        width={config.width}
+                        height={config.height}>
+                  </DynamicGraph>
+                ))}
+              </Grid>
+
+            </Grid>
+            
+            <div class="content-divider" style={{display: "flex", minHeight: "100vh", height: "100%"}}>
+              <Divider orientation="vertical" flexItem/>
+            </div>
+            
+            <Grid container item
+              direction="column"
+              justifyContent="flex-start"
+              alignItems="center"
+              zeroMinWidth={true}
+              spacing={3}
+              xs={4}
+            >
+              <Grid item>
+                <h1>Select addon</h1>
+                <AddonDropdownMemo labels={addons} value={selectedAddon} onChangeHandler={chooseAddon}/>
+              </Grid>
+              <Grid item>
+                {addons.length > 0 && <HealthMonitor processDict={processDict_App}></HealthMonitor>}
+              </Grid>
+
             </Grid>
 
           </Grid>
 
-          <Grid container item
-            direction="column"
-            justifyContent="flex-start"
-            alignItems="flex-start"
-            xs={4}
-          >
-            <h1>Select addon</h1>
-            <AddonDropdownMemo labels={addons} value={selectedAddon} onChangeHandler={chooseAddon}/>
-            {addons.length > 0 && <HealthMonitor processDict={processDict_App}></HealthMonitor>}
-          </Grid>
-
-        </Grid>
-        
+        </div>
     </div>
   );
 }
