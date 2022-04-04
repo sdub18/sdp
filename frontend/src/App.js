@@ -6,6 +6,7 @@ import HealthMonitor from "./HealthMonitor";
 import ThresholdSelector from "./ThresholdSelector";
 import io from 'socket.io-client';
 import AddonDropdown from "./AddonDropdown";
+import Header from "./Header"
 
 const AddonDropdownMemo = React.memo(AddonDropdown);
 
@@ -72,30 +73,30 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <br/>
-        <div>{threshold_string}</div>
-        <br/>
-        <AddonDropdownMemo labels={addons} value={selectedAddon} onChangeHandler={chooseAddon}/>
-        <br/>
-        {addons.length > 0 && <HealthMonitor processDict={processDict_App}></HealthMonitor>}
-        <br/>
-        {selectedAddon !== "" &&
-          chart_types.map((type) => (
-          <DynamicGraph
-                key={type}
-                title={type}
-                data={coords[type]}
-                yAxisLabel={type + " (" + units[type] + ")"}
-                xMax={config.xMax}
-                xIncrement={config.xIncrement}
-                width={config.width}
-                height={config.height}>
-          </DynamicGraph>
-          ))
-        }
-      </header>
+        
+        <Header/>
+
+        <div className="App-body">
+          {selectedAddon !== "" && <h3>{threshold_string}</h3> }
+          <AddonDropdownMemo labels={addons} value={selectedAddon} onChangeHandler={chooseAddon}/>
+          {addons.length > 0 && <HealthMonitor processDict={processDict_App}></HealthMonitor>}
+          <br/>
+          
+          {selectedAddon !== "" &&
+            chart_types.map((type) => (
+            <DynamicGraph
+                  key={type}
+                  title={type}
+                  data={coords[type]}
+                  yAxisLabel={type + " (" + units[type] + ")"}
+                  xMax={config.xMax}
+                  xIncrement={config.xIncrement}
+                  width={config.width}
+                  height={config.height}>
+            </DynamicGraph>
+            ))}
+
+        </div>
     </div>
   );
 }
