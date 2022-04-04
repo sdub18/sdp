@@ -9,8 +9,7 @@ import {
   Legend,
   Label
 } from "recharts";
-import { makeStyles } from '@material-ui/core/styles'
-import Box from '@mui/material/Box';
+import { Box, makeStyles } from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
     containter: {

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -11,8 +11,8 @@ import ListItemText from '@mui/material/ListItemText';
 
 export default function HealthMonitor(props) {
   const keys = Object.keys(props.processDict);
-  const listItems = keys.map((process) =>
-    <ListItem disablePadding>
+  const listItems = keys.map((process, idx) =>
+    <ListItem disablePadding key={{idx}}>
       <ListItemButton style={{cursor: 'auto'}}>
         <ListItemText
           primary={process + ": "}
