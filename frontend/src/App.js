@@ -1,17 +1,15 @@
 import React from "react";
-import logo from './logo.svg';
 import './App.css';
-import DynamicGraph from "./DynamicGraph";
-import HealthMonitor from "./HealthMonitor";
-import ThresholdSelector from "./ThresholdSelector";
 import io from 'socket.io-client';
-import AddonDropdown from "./AddonDropdown";
-import Header from "./Header"
+
+import DynamicGraph from "./components/DynamicGraph";
+import HealthMonitor from "./components/HealthMonitor";
+import ThresholdSelector from "./components/ThresholdSelector";
+import AddonDropdown from "./components/AddonDropdown";
+import Header from "./components/Header"
+
 import { borders } from '@mui/system';
-
-
-import Grid from "@mui/material/Grid";
-import { Box } from "@material-ui/core";
+import { Box, Grid } from "@material-ui/core";
 
 const AddonDropdownMemo = React.memo(AddonDropdown);
 
@@ -91,7 +89,7 @@ function App() {
             direction = "column"
             justifyContent="flex-start"
             alignItems="center"
-            xs={6}
+            xs={8}
           >
             <Grid item>
               {selectedAddon !== "" && <h3>{threshold_string}</h3> }
@@ -116,7 +114,7 @@ function App() {
             direction="column"
             justifyContent="flex-start"
             alignItems="flex-start"
-            xs={6}
+            xs={4}
           >
             <h1>Select addon</h1>
             <AddonDropdownMemo labels={addons} value={selectedAddon} onChangeHandler={chooseAddon}/>
