@@ -6,26 +6,11 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 
-
-const useStyles = makeStyles(theme => ({
-    containter: {
-        backgroundColor: "#000000"
-    },
-    marginAutoItem: {
-      display: "inline",
-      textAlign: "center"
-    },
-    graph: {
-        margin: "auto"
-    }
-  }));
-
-  export default function AddonDropdown(props) {
-    const classes = useStyles();
+export default function AddonDropdown(props) {
     
-	let drop_options = props.labels.map((label, index) => {
-        return <MenuItem key={index} value={label}>{label}</MenuItem>;
-	});
+    let drop_options = props.labels.map((label, index) => {
+          return <MenuItem key={index} value={label}>{label}</MenuItem>;
+    });
 
     return(
         <Box sx={{ minWidth: props.minWidth }}>
@@ -43,7 +28,7 @@ const useStyles = makeStyles(theme => ({
 				</Select>
 			</FormControl>
 		</Box>
-    );
+  );
 }
 
 // TODO: Style component
