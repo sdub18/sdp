@@ -2,11 +2,11 @@ import React from "react";
 import './App.css';
 import io from 'socket.io-client';
 
-import DynamicGraph from "./components/DynamicGraph";
 import HealthMonitor from "./components/HealthMonitor";
 import ThresholdSelector from "./components/ThresholdSelector";
 import AddonDropdown from "./components/AddonDropdown";
 import Header from "./components/Header"
+import ChartsViewer from "./components/ChartsViewer";
 
 import { Divider, Grid } from "@material-ui/core";
 import { Stack } from "@mui/material";
@@ -18,8 +18,6 @@ const RENDER_PERIOD = 50;       // rerender period in milliseconds
 const socket_options = {'reconnection': true, 'reconnectionAttempts': Infinity} // options to have frontend continuously try to reconnect to backend
 const socket = io('http://localhost:3001', socket_options);       // frontend websocket - connects to backend server's websocket
 const chart_types = ["current", "power", "temp"];   // all chart types --> HARDCODED AND KEPT IN FRONTEND; NOT STORED IN BACKEND
-const units = {"current": "A", "power": "W", "temp": "F", "rpm": "RPM"};
-
 let coordinates = [];               // frontend local copy of coordinates, used to set "coords" state variable
 let processDict = {};
 let globalConfig = {"xMax" : 300,         
@@ -115,18 +113,7 @@ function App() {
             >
               <Grid item>
                 {selectedAddon !== "" && <h3>{threshold_string}</h3> }
-                  {selectedAddon !== "" && chart_types.map((type) => (
-                    <DynamicGraph
-                          key={type}
-                          title={type}
-                          data={coords[type]}
-                          yAxisLabel={type + " (" + units[type] + ")"}
-                          xMax={config.xMax}
-                          xIncrement={config.xIncrement}
-                          width={config.width}
-                          height={config.height}>
-                    </DynamicGraph>
-                  ))}
+                {selectedAddon !== "" && <ChartsViewer chart_types={chart_types} coords={coords}/>}
               </Grid>
 
             </Grid>
