@@ -7,8 +7,9 @@ import ThresholdSelector from "./components/ThresholdSelector";
 import Dropdown from "./components/Dropdown";
 import Header from "./components/Header"
 import ChartsViewer from "./components/ChartsViewer";
+import PolicyViewer from "./components/PolicyViewer";
 
-import { Divider, Grid } from "@material-ui/core";
+import { Box, Button, Divider, Grid } from "@material-ui/core";
 import { Stack } from "@mui/material";
 
 const DropdownMemo = React.memo(Dropdown);
@@ -55,6 +56,7 @@ function App() {
   const [coords, setCoords] = React.useState([]);
   const [addons, setAddons] = React.useState([]);
   const [selectedAddon, setSelectedAddon] = React.useState("");
+  const [viewPolicy, setViewPolicy] = React.useState(false); 
   const [selectedPeriod, setSelectedPeriod] = React.useState("");
   const [config, setConfig] = React.useState({"xMax" : 300,         
     "xIncrement" : 100,
@@ -80,6 +82,15 @@ function App() {
     }
   }, [addons])
 
+  const handleViewPolicies = (() => {
+    if ( viewPolicy ) {
+      setViewPolicy(false);
+    }
+    else {
+      setViewPolicy(true);
+    }
+  })
+
   const chooseAddon = React.useCallback((event) => {
     const addon = event.target.value
     socket.emit("addon_selection", addon);
@@ -101,57 +112,67 @@ function App() {
         <Header/>
         <Divider style={{height: 5}}/>
         <div className="App-body">
-          <Grid container
-            direction="row"
-            justifyContent="center"
-            alignItems="flex-start"
-          >
-            <Grid container item
-              direction = "column"
-              justifyContent="space-between"
-              alignItems="center"
-              spacing={3}
-              xs={8}
-              style={{maxHeight: '85vh', overflow: 'auto', marginTop:10}}
+            <Grid container
+              direction="row"
+              justifyContent="center"
+              alignItems="flex-start"
             >
-              <Grid item>
-                {selectedAddon !== "" && <h3>{threshold_string}</h3> }
-                {selectedAddon !== "" && <ChartsViewer config={config} chart_types={chart_types} coords={coords}/>}
-              </Grid>
+              <Grid container item
+                direction = "column"
+                justifyContent="space-between"
+                alignItems="center"
+                spacing={3}
+                xs={8}
+                style={{maxHeight: '85vh', overflow: 'auto', marginTop:10}}
+              >
+                <Grid item>
+                  {(selectedAddon !== "" && !viewPolicy) && 
+                  <ChartsViewer config={config} chart_types={chart_types} coords={coords} />}
+                  
+                  {viewPolicy && 
+                  <PolicyViewer/>}
 
-            </Grid>
-            
-            {selectedAddon == "" && 
-            <div class="content-divider" style={{display: "flex", minHeight: "85vh", height: "100%"}}>
-              <Divider orientation="vertical" flexItem style={{width: 5}}/>
-            </div>}
-            
-            <Grid container item
-              direction="column"
-              justifyContent="flex-start"
-              alignItems="center"
-              zeroMinWidth={true}
-              spacing={3}
-              xs={4}
-            >
-              <Grid item>
-                <Stack direction='row' spacing={3} alignItems='center' justifyContent='flex-start'>
-                  <h2 style={{marginLeft: 20}}>Select addon</h2>
-                  <DropdownMemo minWidth={120} text="ID" labels={addons} value={selectedAddon} onChangeHandler={chooseAddon}/>  
-                </Stack>
-                <Stack direction='row' spacing={3} alignItems='center' justifyContent='flex-start'>
-                  <h2 style={{marginLeft: 20}}>Select graph period</h2>
-                  <DropdownMemo minWidth={130} text="Period" labels={periods} value={selectedPeriod} onChangeHandler={choosePeriod}/>  
-                </Stack>
+                </Grid>
+
               </Grid>
               
-              <Grid item>
-                {addons.length > 0 && <HealthMonitor processDict={processDict_App}></HealthMonitor>}
+              {(selectedAddon == "" || viewPolicy) && 
+              <div class="content-divider" style={{display: "flex", minHeight: "85vh", height: "100%"}}>
+                <Divider orientation="vertical" flexItem style={{width: 5}}/>
+              </div>}
+              
+              <Grid container item
+                direction="column"
+                justifyContent="flex-start"
+                alignItems="center"
+                zeroMinWidth={true}
+                spacing={3}
+                xs={4}
+              >
+                <Grid item>
+                  <Box sx={{mt: 3, mb: 2}}>
+                    <Button fullWidth onClick={handleViewPolicies} size='large' variant='contained'>{viewPolicy ? "Charts Viewer": "Policy List"}</Button> 
+                  </Box>
+                  
+                  <Stack direction='row' spacing={3} alignItems='center' justifyContent='flex-start'>
+                    <h4 style={{marginLeft: 20}}>Select addon</h4>
+                    <DropdownMemo minWidth={120} text="ID" labels={addons} value={selectedAddon} onChangeHandler={chooseAddon}/>  
+                  </Stack>
+                  
+                  <Stack direction='row' spacing={3} alignItems='center' justifyContent='flex-start'>
+                    <h4 style={{marginLeft: 20}}>Select graph period</h4>
+                    <DropdownMemo minWidth={130} text="Period" labels={periods} value={selectedPeriod} onChangeHandler={choosePeriod}/>  
+                  </Stack>
+                </Grid>
+                
+                <Grid item>
+                  {addons.length > 0 && 
+                  <HealthMonitor processDict={processDict_App}></HealthMonitor>}
+                </Grid>
+
               </Grid>
 
             </Grid>
-
-          </Grid>
 
         </div>
     </div>
