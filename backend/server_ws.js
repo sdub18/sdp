@@ -34,6 +34,14 @@ function M2F_connectionHandler(client){
     active_pid = pid.toString();
   })
 
+  client.on("period_selection", (periodAndFrequency) => {
+    // Receives label for x axis period as well as the polling frequency associated with it.
+    // This will allow us to query the database for the appropriate info, as well as change
+    // the frequency at which we poll the incoming data, so we can modify our coordinates array
+    // and send it back to the frontend.
+    console.log("To be used once we have connected the database:", periodAndFrequency);
+  })
+
   setInterval(() => {
     M2F_socket.emit("graph_update", coordinates[active_pid]);
     M2F_socket.emit("updateAddons", addons.map(a => a.id));
