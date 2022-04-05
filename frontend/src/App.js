@@ -4,20 +4,20 @@ import io from 'socket.io-client';
 
 import HealthMonitor from "./components/HealthMonitor";
 import ThresholdSelector from "./components/ThresholdSelector";
-import AddonDropdown from "./components/AddonDropdown";
+import Dropdown from "./components/Dropdown";
 import Header from "./components/Header"
 import ChartsViewer from "./components/ChartsViewer";
 
 import { Divider, Grid } from "@material-ui/core";
 import { Stack } from "@mui/material";
 
-const AddonDropdownMemo = React.memo(AddonDropdown);
+const DropdownMemo = React.memo(Dropdown);
 
 let local_addons = [];          // frontend local copy of connected addons
 const RENDER_PERIOD = 50;       // rerender period in milliseconds
 const socket_options = {'reconnection': true, 'reconnectionAttempts': Infinity} // options to have frontend continuously try to reconnect to backend
 const socket = io('http://localhost:3001', socket_options);       // frontend websocket - connects to backend server's websocket
-const chart_types = ["current", "power", "temp"];   // all chart types --> HARDCODED AND KEPT IN FRONTEND; NOT STORED IN BACKEND
+
 let coordinates = [];               // frontend local copy of coordinates, used to set "coords" state variable
 let processDict = {};
 let globalConfig = {"xMax" : 300,         
@@ -25,10 +25,13 @@ let globalConfig = {"xMax" : 300,
   "width" : 700,
   "height" : 400,
 };
+
+const chart_types = ["current", "power", "temp"];   // all chart types --> HARDCODED AND KEPT IN FRONTEND; NOT STORED IN BACKEND
 const attributes = ["current", "power", "temp"];
 const thresholds = {"current": 100, "power": 60, "temp": 80};;
 const threshold_labels = {"current": "current (A)", "power": " power (W)", "temp": " temp (F)"};
 const threshold_string = "Thresholds: " + attributes.map((attribute) => (threshold_labels[attribute] + ": " + thresholds[attribute]))
+
 const periods = ["100 ms", "500 ms", "1 s", "10 s", "1 min"];
 const period_to_frequency = {"100 ms": 1, "500 ms": 5, "1 s": 10, "10 s": 100, "1 min": 600};
 // The below are to be used once we have connected the database. They are for updating the x axis and ticks.
@@ -54,10 +57,10 @@ function App() {
   const [selectedAddon, setSelectedAddon] = React.useState("");
   const [selectedPeriod, setSelectedPeriod] = React.useState("");
   const [config, setConfig] = React.useState({"xMax" : 300,         
-  "xIncrement" : 100,
-  "width" : 700,
-  "height" : 400,
-});
+    "xIncrement" : 100,
+    "width" : 700,
+    "height" : 400,
+  });
   const [processDict_App, setProcessDict] = React.useState({});
   const [threshold, setThreshold] = React.useState(50);
 
@@ -113,7 +116,7 @@ function App() {
             >
               <Grid item>
                 {selectedAddon !== "" && <h3>{threshold_string}</h3> }
-                {selectedAddon !== "" && <ChartsViewer chart_types={chart_types} coords={coords}/>}
+                {selectedAddon !== "" && <ChartsViewer config={config} chart_types={chart_types} coords={coords}/>}
               </Grid>
 
             </Grid>
@@ -134,11 +137,11 @@ function App() {
               <Grid item>
                 <Stack direction='row' spacing={3} alignItems='center' justifyContent='flex-start'>
                   <h2 style={{marginLeft: 20}}>Select addon</h2>
-                  <AddonDropdownMemo minWidth={120} text="ID" labels={addons} value={selectedAddon} onChangeHandler={chooseAddon}/>  
+                  <DropdownMemo minWidth={120} text="ID" labels={addons} value={selectedAddon} onChangeHandler={chooseAddon}/>  
                 </Stack>
                 <Stack direction='row' spacing={3} alignItems='center' justifyContent='flex-start'>
                   <h2 style={{marginLeft: 20}}>Select graph period</h2>
-                  <AddonDropdownMemo minWidth={130} text="Period" labels={periods} value={selectedPeriod} onChangeHandler={choosePeriod}/>  
+                  <DropdownMemo minWidth={130} text="Period" labels={periods} value={selectedPeriod} onChangeHandler={choosePeriod}/>  
                 </Stack>
               </Grid>
               
