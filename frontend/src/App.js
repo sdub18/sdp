@@ -22,7 +22,7 @@ const units = {"current": "A", "power": "W", "temp": "F", "rpm": "RPM"};
 
 let coordinates = [];               // frontend local copy of coordinates, used to set "coords" state variable
 let processDict = {};
-let config = {"xMax" : 300,         
+let globalConfig = {"xMax" : 300,         
   "xIncrement" : 100,
   "width" : 700,
   "height" : 400,
@@ -31,6 +31,11 @@ const attributes = ["current", "power", "temp"];
 const thresholds = {"current": 100, "power": 60, "temp": 80};;
 const threshold_labels = {"current": "current (A)", "power": " power (W)", "temp": " temp (F)"};
 const threshold_string = "Thresholds: " + attributes.map((attribute) => (threshold_labels[attribute] + ": " + thresholds[attribute]))
+const periods = ["100 ms", "500 ms", "1 s", "10 s", "1 min"];
+const period_to_frequency = {"100 ms": 1, "500 ms": 5, "1 s": 10, "10 s": 100, "1 min": 600};
+// The below are to be used once we have connected the database. They are for updating the x axis and ticks.
+const period_to_xMax = {"100 ms": 100, "500 ms": 500, "1 s": 1000, "10 s": 10, "1 min": 60};
+const period_to_xIncrement = {"100 ms": 20, "500 ms": 100, "1 s": 200, "10 s": 1, "1 min": 10}
 
 socket.on("graph_update", (update_data) => {
   if (update_data != null)  coordinates = update_data;
@@ -49,6 +54,12 @@ function App() {
   const [coords, setCoords] = React.useState([]);
   const [addons, setAddons] = React.useState([]);
   const [selectedAddon, setSelectedAddon] = React.useState("");
+  const [selectedPeriod, setSelectedPeriod] = React.useState("");
+  const [config, setConfig] = React.useState({"xMax" : 300,         
+  "xIncrement" : 100,
+  "width" : 700,
+  "height" : 400,
+});
   const [processDict_App, setProcessDict] = React.useState({});
   const [threshold, setThreshold] = React.useState(50);
 
@@ -72,6 +83,16 @@ function App() {
     const addon = event.target.value
     socket.emit("addon_selection", addon);
     setSelectedAddon(Number(addon));
+  }, []);
+
+  const choosePeriod = React.useCallback((event) => {
+    const period = event.target.value
+    let periodAndFrequency = {};
+    periodAndFrequency[period] = period_to_frequency[period];
+    socket.emit("period_selection", periodAndFrequency);
+    setSelectedPeriod(period);
+    let tempConfig = globalConfig;
+    tempConfig.xMax = period;
   }, []);
 
   return (
@@ -124,9 +145,13 @@ function App() {
               xs={4}
             >
               <Grid item>
-                <Stack direction='row' spacing={3} alignItems='center' justifyContent='center'>
-                  <h2>Select addon</h2>
-                  <AddonDropdownMemo labels={addons} value={selectedAddon} onChangeHandler={chooseAddon}/>  
+                <Stack direction='row' spacing={3} alignItems='center' justifyContent='flex-start'>
+                  <h2 style={{marginLeft: 20}}>Select addon</h2>
+                  <AddonDropdownMemo minWidth={120} text="ID" labels={addons} value={selectedAddon} onChangeHandler={chooseAddon}/>  
+                </Stack>
+                <Stack direction='row' spacing={3} alignItems='center' justifyContent='flex-start'>
+                  <h2 style={{marginLeft: 20}}>Select graph period</h2>
+                  <AddonDropdownMemo minWidth={130} text="Period" labels={periods} value={selectedPeriod} onChangeHandler={choosePeriod}/>  
                 </Stack>
               </Grid>
               
