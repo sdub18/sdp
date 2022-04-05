@@ -92,7 +92,8 @@ function App() {
     socket.emit("period_selection", periodAndFrequency);
     setSelectedPeriod(period);
     let tempConfig = globalConfig;
-    tempConfig.xMax = period;
+    tempConfig.xMax = period_to_xMax[period];
+    tempConfig.xIncrement = period_to_xIncrement[period];
   }, []);
 
   return (
