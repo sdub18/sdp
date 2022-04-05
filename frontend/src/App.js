@@ -151,7 +151,7 @@ function App() {
               >
                 <Grid item>
                   <Box sx={{mt: 3, mb: 2}}>
-                    <Button fullWidth onClick={handleViewPolicies} size='large' variant='contained'>{viewPolicy ? "Charts Viewer": "Policy List"}</Button> 
+                    <Button style={{ fontSize: '18px', fontWeight: 'bold'}} color='primary' fullWidth onClick={handleViewPolicies} size='large' variant='contained'>{viewPolicy ? "Charts Viewer": "Policy List"}</Button> 
                   </Box>
                   
                   <Stack direction='row' spacing={3} alignItems='center' justifyContent='flex-start'>
