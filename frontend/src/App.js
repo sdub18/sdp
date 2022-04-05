@@ -117,22 +117,18 @@ function App() {
               justifyContent="center"
               alignItems="flex-start"
             >
-              <Grid container item
-                direction = "column"
-                justifyContent="space-between"
-                alignItems="center"
+              <Grid item
+                alignItems='center'
                 spacing={3}
                 xs={8}
                 style={{maxHeight: '85vh', overflow: 'auto', marginTop:10}}
               >
-                <Grid item>
                   {(selectedAddon !== "" && !viewPolicy) && 
                   <ChartsViewer config={config} chart_types={chart_types} coords={coords} />}
                   
                   {viewPolicy && 
                   <PolicyViewer/>}
 
-                </Grid>
 
               </Grid>
               
