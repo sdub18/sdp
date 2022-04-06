@@ -12,12 +12,13 @@ function insertData(pkt) {
 
 	const timestamp = Date.now();
 	
-	const sql = 'INSERT INTO data VALUES (?, ?, ?, ?, ?)';
+	const sqlCmd = 'INSERT INTO data VALUES (?, ?, ?, ?, ?)';
 	
-	db.insert(sql, [id, timestamp, current, temp, power]);
+	db.insert(sqlCmd, [id, timestamp, current, temp, power]);
 };
 
+function getData(){
+	
+}
 
-module.exports = {
-	insertData
-};
+module.exports = { insertData, getData };
