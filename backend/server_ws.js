@@ -1,5 +1,5 @@
 const net = require("net");
-const crud = require("./services/crud");
+const FFT = require('fft.js');
 
 const CLIENT_TO_MIDDLE_PORT = process.env.PORT || 49160;
 const MIDDLE_TO_FRONT_PORT = process.env.PORT || 3001;
@@ -8,9 +8,13 @@ const C2M_server = net.createServer();
 const M2F_server = require('http').createServer({MIDDLE_TO_FRONT_PORT});
 const M2F_socket = require('socket.io')(M2F_server,{cors:{origin: true, credentials: true}});
 
+const crud = require("./services/crud");
 const parseData = require('./utils/parseData');
 const createEmptyGraph = require('./utils/createEmptyGraph');
 const computeHealthStatuses = require('./utils/computeHealthStatuses');
+
+const fft = new FFT(512);
+const out = fft.createComplexArray();
 
 let addons = [];      // backend local array to manage addon ids
 let config = {"xMax" : 300,         
@@ -27,7 +31,25 @@ let coordinates = {};
 M2F_socket.on("connection", M2F_connectionHandler);
 M2F_server.listen(MIDDLE_TO_FRONT_PORT, () => {console.log(`M2F_server listening on ${MIDDLE_TO_FRONT_PORT}`)});
 C2M_server.on('connection', C2M_connectionHandler);
-C2M_server.listen({host: "0.0.0.0", port:CLIENT_TO_MIDDLE_PORT}, () => console.log(`C2M_server listening on ${CLIENT_TO_MIDDLE_PORT}`));
+C2M_server.listen({host: "0.0.0.0", port:CLIENT_TO_MIDDLE_PORT}, C2M_server_handler);
+
+function C2M_server_handler() {
+  console.log(`C2M_server listening on ${CLIENT_TO_MIDDLE_PORT}`);
+
+  setInterval(() => {
+    prevTime = Date.now()-5000;
+    curTime = Date.now();
+    input = crud.getAccelData('z', prevTime, curTime).map((row) => (row['z']) );
+
+    console.log(input.length);
+    if (input.length == fft.size) {
+      fft.realTransform(out, input);
+
+    }  
+
+  }, 500);
+
+}
 
 function M2F_connectionHandler(client){
   
@@ -58,6 +80,16 @@ function C2M_connectionHandler(conn){
   conn.setTimeout(5000, function(){
     conn.destroy();
   });
+
+  setInterval(() => {
+    prevTime = Date.now()-2500;
+    curTime = Date.now();
+    input = crud.getAccelData('z', prevTime, curTime).map((row) => (row['z']) );
+
+    console.log(input.length);
+    if (input.length == fft.size) fft.realTransform(out, input);
+
+  }, 1000);
 
   conn.on('error', (err) => {console.log('Connection %s error: %s', remoteAddress, err.message)});
 
