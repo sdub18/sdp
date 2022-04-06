@@ -24,11 +24,10 @@ StaticJsonDocument<1024> id_pkt;
 StaticJsonDocument<1024> data_pkt;
 JsonObject stamp = data_pkt.createNestedObject("data"); 
 JsonObject acceleration = stamp.createNestedObject("acceleration");
-JsonObject temp = stamp.createNestedObject("temp");
 
 // Connected Devices
-Adafruit_LIS3DH lis = Adafruit_LIS3DH();            // Accelerometer sensor
-Adafruit_MCP9808 tempsensor = Adafruit_MCP9808();   // Temperature Sensor
+Adafruit_LIS3DH lis3dh = Adafruit_LIS3DH();            // Accelerometer sensor
+Adafruit_MCP9808 mcp9808 = Adafruit_MCP9808();   // Temperature Sensor
 Adafruit_INA260 ina260 = Adafruit_INA260();         // Current Sensor
 
 // WiFi Client to communicate with
@@ -44,15 +43,14 @@ void create_packet() {
   data_pkt["id"] = UID;
   
   // ---------- ACCELEROMETER ------------
-  lis.read();
-  acceleration["x"] = lis.x;
-  acceleration["y"] = lis.y;
-  acceleration["z"] = lis.z;
+  lis3dh.read();
+  acceleration["x"] = lis3dh.x;
+  acceleration["y"] = lis3dh.y;
+  acceleration["z"] = lis3dh.z;
 
 
   // ----------- TEMPERATURE --------------
-  temp["c"] = tempsensor.readTempC();
-  temp["f"] = tempsensor.readTempF();
+  stamp["temp"] = mcp9808.readTempF();
   
   // ------------- CURRENT ----------------
   stamp["current"] = ina260.readCurrent();
@@ -86,7 +84,7 @@ void setup() {
 
   // ------------------------ ACCELEROMETER -------------------------
 
-  if (! lis.begin(0x19)) {   // change this to 0x19 for alternative i2c address
+  if (! lis3dh.begin(0x19)) {   // change this to 0x19 for alternative i2c address
     Serial.println("Could not start LIS3DH");
     while (1) yield();
   } else {
@@ -94,12 +92,12 @@ void setup() {
   }
 
   // Print Range
-  Serial.print("Range = "); Serial.print(2 << lis.getRange());
+  Serial.print("Range = "); Serial.print(2 << lis3dh.getRange());
   Serial.println("G");
 
-  // lis.setDataRate(LIS3DH_DATARATE_50_HZ);
+  // lis3dh.setDataRate(LIS3DH_DATARATE_50_HZ);
   Serial.print("Data rate set to: ");
-  switch (lis.getDataRate()) {
+  switch (lis3dh.getDataRate()) {
     case LIS3DH_DATARATE_1_HZ: Serial.println("1 Hz"); break;
     case LIS3DH_DATARATE_10_HZ: Serial.println("10 Hz"); break;
     case LIS3DH_DATARATE_25_HZ: Serial.println("25 Hz"); break;
@@ -115,14 +113,14 @@ void setup() {
 
   // ------------------------ TEMPERATURE ------------------------------
   
-  if (!tempsensor.begin(0x1A)) {
+  if (!mcp9808.begin(0x1A)) {
     Serial.println("Could not start MCP9808");
     while (1);
   } else {
     Serial.println("MCP9808 started");
   }
-  tempsensor.wake();
-  tempsensor.setResolution(3); // sets the resolution mode of reading, the modes are defined in the table bellow:
+  mcp9808.wake();
+  mcp9808.setResolution(3); // sets the resolution mode of reading, the modes are defined in the table bellow:
   // Mode Resolution SampleTime
   //  0    0.5°C       30 ms
   //  1    0.25°C      65 ms
