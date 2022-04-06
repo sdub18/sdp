@@ -4,8 +4,10 @@ const fs = require('fs');
 
 if (fs.existsSync(DBSOURCE)) fs.unlinkSync(DBSOURCE);
 
-const db = new Database(DBSOURCE, { verbose: console.log });
-db.exec("CREATE TABLE data (timestamp DATE NOT NULL, id INTEGER NOT NULL, current REAL, temp REAL, power REAL)");
+const options = { verbose: console.log };
+const db = new Database(DBSOURCE);
+db.exec("CREATE TABLE data (timestamp DATE NOT NULL, id INTEGER NOT NULL, current REAL, voltage REAL, power REAL, temp REAL, x REAL, y REAL, z REAL)");
+db.exec("CREATE TABLE freq (fx REAL, fy REAL, fz REAL)");
 
 function query(sql, params) {
 	return db.prepare(sql).all(params);
