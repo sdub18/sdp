@@ -6,6 +6,6 @@
   },
   "scripts": {
     "start-server": "nodemon server_ws.js",
-    "start-client": "nodemon client_demo_sin.js"
+    "start-client": "nodemon ./sims/client_demo_sin.js"
   }
 }
