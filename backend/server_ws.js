@@ -63,7 +63,6 @@ function C2M_connectionHandler(conn){
 
   conn.on('data', (recv_d) => {
     let data = parseData(recv_d)    // parse buffer stream into individual packets of data and place into data array
-    crud(data);
     for (let pkt of data) { 
       if (!addons.some(addon => addon.id === pkt.id)) {
         pkt["remotePort"] = conn.remotePort;
@@ -74,6 +73,7 @@ function C2M_connectionHandler(conn){
         conn.write(Buffer.from([0x01]));  // send ACK byte
       } 
       if (("data" in pkt) && (pkt.id in coordinates)) {
+        crud.insertData(pkt);
         for (let i = 0; i < chart_types.length; i++) {
           for (let j = 0; j < config.xMax - 1; j++) {
             coordinates[pkt.id][chart_types[i]][j].y = coordinates[pkt.id][chart_types[i]][j+1].y;
