@@ -12,7 +12,7 @@ export default function PolicyViewer() {
 				alignItems='center'
 				justifyContent='center'
 			>
-				<Typography style={{marginBottom: 15, fontWeight: 'bold', fontSize: 40}} variant='h1'>POLICY LIST</Typography>
+				<Typography style={{margin: 8, fontWeight: 'bold', fontSize: 40}} variant='h1'>POLICY LIST</Typography>
 				<Stack 
 					alignItems='stretch'
 					justifyContent='flex-start'
