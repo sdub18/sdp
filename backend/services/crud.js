@@ -16,8 +16,15 @@ function insertData(pkt) {
 	db.insert(sqlCmd, [timestamp, id, current, voltage, power, temp, a['x'], a['y'], a['z']]);
 };
 
-function getData(){
-	
+function getAccelData(type, low, high){
+	try {
+		const sqlCmd = `SELECT ${type} FROM data WHERE timestamp BETWEEN ? AND ? ORDER BY timestamp DESC LIMIT 512`;
+		return db.query(sqlCmd, [low, high]);
+			
+
+	} catch (error) {
+		console.log(error.message);
+	}
 }
 
-module.exports = { insertData, getData };
+module.exports = { insertData, getAccelData };
