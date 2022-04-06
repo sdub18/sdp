@@ -95,7 +95,7 @@ async function sendData(port) {
             let x = 0;
             let y = 0;
             let z = 9.8;
-            let data = `{"current": ${I}, "voltage": ${V},"power": ${P}, "temp": ${Tf}, "accelereation": {"x": ${x}, "y": ${y}, "z": ${z}}}`;
+            let data = `{"current": ${I}, "voltage": ${V},"power": ${P}, "temp": ${Tf}, "acceleration": {"x": ${x}, "y": ${y}, "z": ${z}}}`;
             let data_pkt = `{"id": ${UID}, "data":${data}}`;  
             client.write(data_pkt);
             console.log(data_pkt);
