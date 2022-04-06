@@ -1,5 +1,6 @@
 const net = require("net");
 const appConfig = require("./config");
+const crud = require("./services/crud");
 
 const CLIENT_TO_MIDDLE_PORT = 49160;
 const MIDDLE_TO_FRONT_PORT = 3001;
@@ -64,6 +65,7 @@ function C2M_connectionHandler(conn){
 
   conn.on('data', (recv_d) => {
     let data = parseData(recv_d)    // parse buffer stream into individual packets of data and place into data array
+    crud(data);
     for (let pkt of data) { 
       if (!addons.some(addon => addon.id === pkt.id)) {
         pkt["remotePort"] = conn.remotePort;
