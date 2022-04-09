@@ -148,41 +148,47 @@ function App() {
                 spacing={3}
                 xs={4}
               >
-                <Grid item>
-                  <Box sx={{mt: 3, mb: 2}}>
-                    <Button style={{ fontSize: '18px', fontWeight: 'bold'}} color='primary' fullWidth onClick={handleViewPolicies} size='large' variant='contained'>{viewPolicy ? "Charts Viewer": "Policy List"}</Button> 
-                  </Box>
+                <Grid container item
+                  direction="column"
+                  justifyContent="flex-start"
+                  alignItems="center"
+                >
+                  <Grid item>
+                    <Box sx={{mt: 3, mb: 2}}>
+                      <Button style={{ fontSize: '18px', fontWeight: 'bold'}} color='primary' fullWidth onClick={handleViewPolicies} size='large' variant='contained'>{viewPolicy ? "Charts Viewer": "Policy List"}</Button> 
+                    </Box>
                     <Stack direction='row' spacing={3} alignItems='center' justifyContent='flex-start'>
                       <h4 style={{ marginLeft: 20 }}>Select addon</h4>
                       <DropdownMemo minWidth={120} text="ID" labels={addons} value={selectedAddon} onChangeHandler={chooseAddon} />
                     </Stack>
-
+                  </Grid>
+                    <Divider flexItem style={{height: 5, width: '100%'}}/>
+                  <Grid item>
                     {!viewPolicy &&
-                      <>
-                      <Stack direction='row' spacing={3} alignItems='center' justifyContent='flex-start'>
-                        <h4 style={{ marginLeft: 20 }}>Select graph period</h4>
-                        <DropdownMemo minWidth={130} text="Period" labels={periods} value={selectedPeriod} onChangeHandler={chooseGraphPeriod} />
-                      </Stack>
-                      </>
-                    }
-                    {viewPolicy &&
-                      <>
-                        <Stack alignItems='center' spacing={3} justifyContent='flex-start'>
-                          <h3>Add New Policy</h3>
-                          <Stack direction='row' spacing={3} alignItems='center' justifyContent='flex-start'>
-                            <DropdownMemo minWidth={300} text="Policy Type" labels={periods} value={selectedPeriod} onChangeHandler={chooseGraphPeriod} />
-                          </Stack>
-                          <Stack direction='row' spacing={3} alignItems='center' justifyContent='flex-start'>
-                            <DropdownMemo minWidth={300} text="Data Type" labels={periods} value={selectedPeriod} onChangeHandler={chooseGraphPeriod} />
-                          </Stack>
-                          <Stack direction='row' spacing={3} alignItems='center' justifyContent='flex-start'>
-                            <DropdownMemo minWidth={300} text="Period" labels={periods} value={selectedPeriod} onChangeHandler={chooseGraphPeriod} />
-                          </Stack>
-                          <Button style={{ fontSize: '18px', fontWeight: 'bold'}} color='primary' fullWidth size='large' variant='contained'> Add </Button>
+                        <>
+                        <Stack direction='row' spacing={3} alignItems='center' justifyContent='flex-start'>
+                          <h4 style={{ marginLeft: 20 }}>Select graph period</h4>
+                          <DropdownMemo minWidth={130} text="Period" labels={periods} value={selectedPeriod} onChangeHandler={chooseGraphPeriod} />
                         </Stack>
-                      </>
-                    }
+                        </>
+                      }
+                      {viewPolicy &&
+                        <>
+                          <Stack alignItems='center' spacing={3} justifyContent='flex-start'>
+                            <h3>Add New Policy</h3>
+                            <DropdownMemo minWidth={300} text="Policy Type" labels={periods} value={selectedPeriod} onChangeHandler={chooseGraphPeriod} />
+                            <DropdownMemo minWidth={300} text="Data Type" labels={periods} value={selectedPeriod} onChangeHandler={chooseGraphPeriod} />
+                            <DropdownMemo minWidth={300} text="Period" labels={periods} value={selectedPeriod} onChangeHandler={chooseGraphPeriod} />
+                            <Stack direction='row' spacing={3} alignItems='center' justifyContent='flex-start'>
+                              <DropdownMemo minWidth={300} text="Comparison" labels={periods} value={selectedPeriod} onChangeHandler={chooseGraphPeriod} />
+                              <h5> THRESHOLD VALUE </h5>
+                            </Stack>
+                            <Button style={{ fontSize: '18px', fontWeight: 'bold'}} color='primary' fullWidth size='large' variant='contained'> Add </Button>
+                          </Stack>
+                        </>
+                      }
 
+                  </Grid>
 
                 </Grid>
                 
