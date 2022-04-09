@@ -6,9 +6,6 @@ import { InputLabel } from '@mui/material';
 import { Input } from '@mui/material';
 
 const DropdownMemo = React.memo(Dropdown);
-const policies = ["Simple", "Average"];
-const data_types = ["current", "voltage", "power", "temperature"];
-const periods = ["100 ms", "500 ms", "1 s", "10 s", "1 min"];
 const comparisons = [">", "<"]
 
 export default function PolicyModal(props) {
@@ -83,11 +80,11 @@ export default function PolicyModal(props) {
         <DialogContent sx={{bgcolor: '#32363d'}}>
           <Stack sx={{mt:3}} alignItems='center' spacing={3} justifyContent='flex-start'>
             <Stack direction='row' spacing={2}>
-              <DropdownMemo minWidth={250} text="Policy Type" labels={policies} value={policy} onChangeHandler={choosePolicy} />
-              <DropdownMemo minWidth={250} text="Data Type" labels={data_types} value={dataType} onChangeHandler={chooseDataType} />
+              <DropdownMemo minWidth={250} text="Policy Type" labels={props.policyTypes} value={policy} onChangeHandler={choosePolicy} />
+              <DropdownMemo minWidth={250} text="Data Type" labels={props.dataTypes} value={dataType} onChangeHandler={chooseDataType} />
             </Stack>
             <Stack direction='row' spacing={2}>
-              <DropdownMemo minWidth={250} text="Period" labels={periods} value={period} onChangeHandler={choosePolicyPeriod} />
+              <DropdownMemo minWidth={250} text="Period" labels={props.policyPeriods} value={period} onChangeHandler={choosePolicyPeriod} />
               <DropdownMemo minWidth={250} text="Comparison" labels={comparisons} value={comparison} onChangeHandler={chooseComparison} />
             </Stack>
             <Stack direction='row' spacing={3} alignItems='center' justifyContent='flex-start'>

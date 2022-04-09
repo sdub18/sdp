@@ -29,13 +29,17 @@ let globalConfig = {"xMax" : 300,
   "height" : 400,
 };
 
-const chart_types = ["current", "power", "temp"];   // all chart types --> HARDCODED AND KEPT IN FRONTEND; NOT STORED IN BACKEND
+const dataTypes = ["current", "power", "temp"];   // all chart types --> HARDCODED AND KEPT IN FRONTEND; NOT STORED IN BACKEND
 
 const periods = ["100 ms", "500 ms", "1 s", "10 s", "1 min"];
 const period_to_frequency = {"100 ms": 1, "500 ms": 5, "1 s": 10, "10 s": 100, "1 min": 600};
 // The below are to be used once we have connected the database. They are for updating the x axis and ticks.
 const period_to_xMax = {"100 ms": 100, "500 ms": 500, "1 s": 1000, "10 s": 10, "1 min": 60};
 const period_to_xIncrement = {"100 ms": 20, "500 ms": 100, "1 s": 200, "10 s": 1, "1 min": 10}
+
+const policyTypes = ["Simple", "Average"];
+const policyPeriods = ["100 ms", "500 ms", "1 s", "10 s", "1 min"];
+
 
 socket.on("graph_update", (update_data) => {
   if (update_data != null)  coordinates = update_data;
@@ -130,7 +134,7 @@ function App() {
                 style={{maxHeight: '85vh', overflow: 'auto', marginTop:10}}
               >
                   {(selectedAddon !== "" && !viewPolicy) && 
-                  <ChartsViewer config={config} chart_types={chart_types} coords={coords} />}
+                  <ChartsViewer config={config} dataTypes={dataTypes} coords={coords} />}
                   
                   {viewPolicy && 
                   <PolicyViewerMemo delete={deletePolicy}/>}
@@ -180,7 +184,7 @@ function App() {
                         </>
                       }
                       {viewPolicy &&
-                        <PolicyModalMemo addPolicy={addPolicy} />}
+                        <PolicyModalMemo policyTypes={policyTypes} dataTypes={dataTypes} policyPeriods={policyPeriods} addPolicy={addPolicy} />}
                     
                   </Grid>
                   
