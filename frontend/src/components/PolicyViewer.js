@@ -1,9 +1,7 @@
 import { React, useState, useCallback } from "react";
+import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import { Stack } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
 import CloseIcon from '@mui/icons-material/Close';
-import IconButton from '@mui/material/IconButton';
-import { GridActionsCellItem } from "@mui/x-data-grid";
 
 const init_rows = [
 	{ id: 1, type: "Averaging", data: "Current", period: "5 min", description: "Current > 300 mA"},

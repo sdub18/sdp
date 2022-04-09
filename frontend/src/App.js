@@ -3,7 +3,6 @@ import './App.css';
 import io from 'socket.io-client';
 
 import HealthMonitor from "./components/HealthMonitor";
-import ThresholdSelector from "./components/ThresholdSelector";
 import Dropdown from "./components/Dropdown";
 import Header from "./components/Header"
 import ChartsViewer from "./components/ChartsViewer";
@@ -13,9 +12,10 @@ import { Box, Button, Divider, Grid } from "@material-ui/core";
 import { Stack } from "@mui/material";
 
 const DropdownMemo = React.memo(Dropdown);
+const PolicyViewerMemo = React.memo(PolicyViewer);
 
 let local_addons = [];          // frontend local copy of connected addons
-const RENDER_PERIOD = 50;       // rerender period in milliseconds
+const RENDER_PERIOD = 100;       // rerender period in milliseconds
 const socket_options = {'reconnection': true, 'reconnectionAttempts': Infinity} // options to have frontend continuously try to reconnect to backend
 const socket = io('http://localhost:3001', socket_options);       // frontend websocket - connects to backend server's websocket
 
@@ -28,10 +28,6 @@ let globalConfig = {"xMax" : 300,
 };
 
 const chart_types = ["current", "power", "temp"];   // all chart types --> HARDCODED AND KEPT IN FRONTEND; NOT STORED IN BACKEND
-const attributes = ["current", "power", "temp"];
-const thresholds = {"current": 100, "power": 60, "temp": 80};;
-const threshold_labels = {"current": "current (A)", "power": " power (W)", "temp": " temp (F)"};
-const threshold_string = "Thresholds: " + attributes.map((attribute) => (threshold_labels[attribute] + ": " + thresholds[attribute]))
 
 const periods = ["100 ms", "500 ms", "1 s", "10 s", "1 min"];
 const period_to_frequency = {"100 ms": 1, "500 ms": 5, "1 s": 10, "10 s": 100, "1 min": 600};
@@ -65,7 +61,6 @@ function App() {
     "height" : 400,
   });
   const [processDict_App, setProcessDict] = React.useState({});
-  const [threshold, setThreshold] = React.useState(50);
 
   React.useEffect(() => {
     const timer = setInterval(() => {
@@ -93,13 +88,13 @@ function App() {
     }
   })
 
-  const addPolicy = () => {
+  const addPolicy = React.useCallback(() => {
 
-  };
+  },[]);
 
-  const deletePolicy = (id) => {
+  const deletePolicy = React.useCallback((id) => {
     console.log(id);
-  };
+  }, []);
 
   const chooseAddon = React.useCallback((event) => {
     const addon = event.target.value
@@ -135,7 +130,7 @@ function App() {
                   <ChartsViewer config={config} chart_types={chart_types} coords={coords} />}
                   
                   {viewPolicy && 
-                  <PolicyViewer policies={policies} add={addPolicy} delete={deletePolicy}/>}
+                  <PolicyViewerMemo policies={policies} add={addPolicy} delete={deletePolicy}/>}
 
 
               </Grid>
@@ -194,9 +189,9 @@ function App() {
                 <Grid item>
                   {addons.length > 0 && 
                   <HealthMonitor processDict={processDict_App}></HealthMonitor>}
-                </Grid>
+                  </Grid>
 
-              </Grid>
+                  </Grid>
 
             </Grid>
 
