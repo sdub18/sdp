@@ -22,7 +22,7 @@ export default function PolicyViewer(props) {
 	[],);
 
 	const columns = [
-		{field: 'id', headerName:'id', width: 60},
+		{field: 'id', headerName:'id', width: 80},
 		{field: 'type', headerName: 'Policy Type', width: 200},
 		{field: 'data', headerName: 'Data Type', width: 200},
 		{field: 'period', headerName: 'Period', width: 200},
