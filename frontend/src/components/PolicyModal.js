@@ -65,7 +65,7 @@ export default function PolicyModal(props) {
 
   return (
     <div>
-      <Box sx={{mt:1.5,mb:2}}>
+      <Box sx={{mt:1.5,mb:3}}>
         <Button 
           style={{ fontSize: '18px', fontWeight: 'bold', backgroundColor: '#3F51B5' }} 
           fullWidth 

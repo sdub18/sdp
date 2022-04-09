@@ -26,7 +26,7 @@ export default function HealthMonitor(props) {
     </ListItem>
   );
   return (
-    <Box sx={{ m: 3, width: '100%', minWidth: 360, bgcolor: 'background.paper', maxHeight: 450}} style={{overflow: 'auto'}}>
+    <Box sx={{ mx: 3, mt: 5, width: '100%', minWidth: 360, bgcolor: 'background.paper', maxHeight: 450}} style={{overflow: 'auto'}}>
       <List>
         {listItems}
       </List>
