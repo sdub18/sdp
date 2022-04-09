@@ -183,7 +183,7 @@ function App() {
                               <DropdownMemo minWidth={300} text="Comparison" labels={periods} value={selectedPeriod} onChangeHandler={chooseGraphPeriod} />
                               <h5> THRESHOLD VALUE </h5>
                             </Stack>
-                            <Button style={{ fontSize: '18px', fontWeight: 'bold'}} color='primary' fullWidth size='large' variant='contained'> Add </Button>
+                            <Button style={{ fontSize: '18px', fontWeight: 'bold'}} color='primary' size='large' variant='contained'> Add </Button>
                           </Stack>
                         </>
                       }
