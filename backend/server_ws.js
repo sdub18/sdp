@@ -1,10 +1,11 @@
 const net = require("net");
+const appConfig = require("./config");
 
-const CLIENT_TO_MIDDLE_PORT = process.env.PORT || 49160;
-const MIDDLE_TO_FRONT_PORT = process.env.PORT || 3001;
+const CLIENT_TO_MIDDLE_PORT = 49160;
+const MIDDLE_TO_FRONT_PORT = 3001;
 
 const C2M_server = net.createServer();
-const M2F_server = require('http').createServer({MIDDLE_TO_FRONT_PORT});
+const M2F_server = require('http').createServer();
 const M2F_socket = require('socket.io')(M2F_server,{cors:{origin: true, credentials: true}});
 
 const parseData = require('./utils/parseData');
@@ -24,9 +25,10 @@ let active_pid = null;
 let coordinates = {};
 
 M2F_socket.on("connection", M2F_connectionHandler);
-M2F_server.listen(MIDDLE_TO_FRONT_PORT, () => {console.log(`M2F_server listening on ${MIDDLE_TO_FRONT_PORT}`)});
+M2F_server.listen(appConfig.M2F_PORT, () => {console.log(`M2F_server listening on ${MIDDLE_TO_FRONT_PORT}`)});
+
 C2M_server.on('connection', C2M_connectionHandler);
-C2M_server.listen({host: "0.0.0.0", port:CLIENT_TO_MIDDLE_PORT}, () => console.log(`C2M_server listening on ${CLIENT_TO_MIDDLE_PORT}`));
+C2M_server.listen(appConfig.C2M_PORT, () => console.log(`C2M_server listening on ${CLIENT_TO_MIDDLE_PORT}`));
 
 function M2F_connectionHandler(client){
   
