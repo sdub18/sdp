@@ -29,7 +29,7 @@ let globalConfig = {"xMax" : 300,
   "height" : 400,
 };
 
-const dataTypes = ["current", "power", "temp"];   // all chart types --> HARDCODED AND KEPT IN FRONTEND; NOT STORED IN BACKEND
+const dataTypes = ["current", "power", "temp"];   // should be grabbed from coordinates array -> make dynamic
 
 const periods = ["100 ms", "500 ms", "1 s", "10 s", "1 min"];
 const period_to_frequency = {"100 ms": 1, "500 ms": 5, "1 s": 10, "10 s": 100, "1 min": 600};
@@ -37,6 +37,7 @@ const period_to_frequency = {"100 ms": 1, "500 ms": 5, "1 s": 10, "10 s": 100, "
 const period_to_xMax = {"100 ms": 100, "500 ms": 500, "1 s": 1000, "10 s": 10, "1 min": 60};
 const period_to_xIncrement = {"100 ms": 20, "500 ms": 100, "1 s": 200, "10 s": 1, "1 min": 10}
 
+// should be sent from backend in initialization, config?
 const policyTypes = ["Simple", "Average"];
 const policyPeriods = ["100 ms", "500 ms", "1 s", "10 s", "1 min"];
 
@@ -95,6 +96,7 @@ function App() {
   })
 
   const deletePolicy = React.useCallback((id) => {
+    // shall send id of policy back to backend to delete from table
     console.log(id);
   }, []);
 
