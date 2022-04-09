@@ -1,14 +1,43 @@
 import React from 'react';
-import { Box, Stack, Button, Dialog, DialogTitle, DialogContent } from '@mui/material';
+import { Box, Stack, Button, Dialog, DialogTitle, DialogContent, TextField } from '@mui/material';
 import { DialogActions } from '@mui/material';
 import Dropdown from './Dropdown';
+import { InputLabel } from '@mui/material';
+import { Input } from '@mui/material';
 
 const DropdownMemo = React.memo(Dropdown);
+const policies = ["Simple", "Average"];
+const data_types = ["current", "voltage", "power", "temperature"];
 const periods = ["100 ms", "500 ms", "1 s", "10 s", "1 min"];
+const comparisons = [">", "<"]
 
 export default function PolicyModal(props) {
   const [open, setOpen] = React.useState(false);
-  const [selectedPeriod, setSelectedPeriod] = React.useState("");
+
+  const [policy, setPolicy] = React.useState("");
+  const [dataType, setDataType] = React.useState("");
+  const [period, setSelectedPeriod] = React.useState("");
+  const [comparison, setComparison] = React.useState("");
+  const [threshold, setThreshold] = React.useState("");
+
+  const handleAdd = () => {
+    const newPolicy = {
+      policy: policy,
+      data_type: dataType,
+      period: period,
+      comparison: comparison,
+      threshold: threshold
+    };
+    props.callback(newPolicy);
+
+    setPolicy("");
+    setDataType("");
+    setSelectedPeriod("");
+    setComparison("");
+    setThreshold("");
+    handleClose();
+  }
+
   const handleOpen = () => {
     setOpen(true);
   }
@@ -17,14 +46,24 @@ export default function PolicyModal(props) {
     setOpen(false);
   }
 
-  const chooseGraphPeriod = React.useCallback((event) => {
-    const period = event.target.value
-    let periodAndFrequency = {};
-    periodAndFrequency[period] = period_to_frequency[period];
-    socket.emit("period_selection", periodAndFrequency);
-    setSelectedPeriod(period);
-    let tempConfig = globalConfig;
-    tempConfig.xMax = period;
+  const handleChange = (event) => {
+    setThreshold(event.target.value);
+  };
+
+  const choosePolicy = React.useCallback((event) => {
+    setPolicy(event.target.value);
+  },[]);
+
+  const chooseDataType = React.useCallback((event) => {
+    setDataType(event.target.value);
+  }, []);
+
+  const choosePolicyPeriod = React.useCallback((event) => {
+    setSelectedPeriod(event.target.value);
+  }, []);
+
+  const chooseComparison = React.useCallback((event) => {
+    setComparison(event.target.value);
   }, []);
 
   return (
@@ -40,25 +79,26 @@ export default function PolicyModal(props) {
         </Button> 
       </Box>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle sx={{fontSize: 36, fontWeight: 'bold', color:'white', bgcolor: '#32363d'}}>Policy Creation</DialogTitle>
+        <DialogTitle sx={{fontSize: 30, fontWeight: 'bold', color:'white', bgcolor: '#32363d'}}>Policy Creation</DialogTitle>
         <DialogContent sx={{bgcolor: '#32363d'}}>
-          <Stack alignItems='center' spacing={3} justifyContent='flex-start'>
+          <Stack sx={{mt:3}} alignItems='center' spacing={3} justifyContent='flex-start'>
             <Stack direction='row' spacing={2}>
-              <DropdownMemo minWidth={250} text="Policy Type" labels={periods} value={selectedPeriod} onChangeHandler={chooseGraphPeriod} />
-              <DropdownMemo minWidth={250} text="Data Type" labels={periods} value={selectedPeriod} onChangeHandler={chooseGraphPeriod} />
+              <DropdownMemo minWidth={250} text="Policy Type" labels={policies} value={policy} onChangeHandler={choosePolicy} />
+              <DropdownMemo minWidth={250} text="Data Type" labels={data_types} value={dataType} onChangeHandler={chooseDataType} />
             </Stack>
             <Stack direction='row' spacing={2}>
-              <DropdownMemo minWidth={250} text="Period" labels={periods} value={selectedPeriod} onChangeHandler={chooseGraphPeriod} />
-              <DropdownMemo minWidth={250} text="Comparison" labels={periods} value={selectedPeriod} onChangeHandler={chooseGraphPeriod} />
+              <DropdownMemo minWidth={250} text="Period" labels={periods} value={period} onChangeHandler={choosePolicyPeriod} />
+              <DropdownMemo minWidth={250} text="Comparison" labels={comparisons} value={comparison} onChangeHandler={chooseComparison} />
             </Stack>
             <Stack direction='row' spacing={3} alignItems='center' justifyContent='flex-start'>
-              <h5> THRESHOLD VALUE </h5>
-              </Stack>
+              <InputLabel style={{color: "white", fontSize: 23}}>Threshold Value</InputLabel>
+              <TextField sx={{ input: { color: 'white' } }} type='number' size='large' value={threshold} onChange={handleChange}/>
+            </Stack>
           </Stack>
         </DialogContent>
         <DialogActions sx={{bgcolor: '#32363d'}}>
           <Button variant='contained' onClick={handleClose}>Cancel</Button>
-          <Button variant='contained' onClick={handleClose}>Add</Button>
+          <Button variant='contained' onClick={handleAdd}>Add</Button>
         </DialogActions>
       </Dialog>
     </div>

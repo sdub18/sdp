@@ -14,6 +14,7 @@ import { Stack } from "@mui/material";
 
 const DropdownMemo = React.memo(Dropdown);
 const PolicyViewerMemo = React.memo(PolicyViewer);
+const PolicyModalMemo = React.memo(PolicyModal);
 
 let local_addons = [];          // frontend local copy of connected addons
 const RENDER_PERIOD = 100;       // rerender period in milliseconds
@@ -89,10 +90,6 @@ function App() {
     }
   })
 
-  const addPolicy = React.useCallback(() => {
-
-  },[]);
-
   const deletePolicy = React.useCallback((id) => {
     console.log(id);
   }, []);
@@ -112,6 +109,11 @@ function App() {
     let tempConfig = globalConfig;
     tempConfig.xMax = period;
   }, []);
+
+  const addPolicy = React.useCallback((policy) => {
+    console.log(policy);
+    //socket.emit("addPolicy", policy)
+  })
 
   return (
     <div className="App">
@@ -178,7 +180,7 @@ function App() {
                         </>
                       }
                       {viewPolicy &&
-                        <PolicyModal />}
+                        <PolicyModalMemo callback={addPolicy} />}
                     
                   </Grid>
                   
