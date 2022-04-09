@@ -133,7 +133,7 @@ function App() {
                   <ChartsViewer config={config} chart_types={chart_types} coords={coords} />}
                   
                   {viewPolicy && 
-                  <PolicyViewerMemo policies={policies} add={addPolicy} delete={deletePolicy}/>}
+                  <PolicyViewerMemo delete={deletePolicy}/>}
               </Grid>
               
               {(selectedAddon == "" || viewPolicy) && 
@@ -180,7 +180,7 @@ function App() {
                         </>
                       }
                       {viewPolicy &&
-                        <PolicyModalMemo callback={addPolicy} />}
+                        <PolicyModalMemo addPolicy={addPolicy} />}
                     
                   </Grid>
                   

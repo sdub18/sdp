@@ -28,7 +28,7 @@ export default function PolicyModal(props) {
       comparison: comparison,
       threshold: threshold
     };
-    props.callback(newPolicy);
+    props.addPolicy(newPolicy);
 
     setPolicy("");
     setDataType("");
