@@ -17,12 +17,12 @@ export default function AddonDropdown(props) {
 			<FormControl style={{color: "white"}} fullWidth>
 				<InputLabel style={{color: "white", fontSize: 23}}>{props.text}</InputLabel>
 				<Select
-        style={{margin: "white", color: "white", fontSize: 23}}
-				labelId="chart-select-label"
-				id="chart-select"
-				value={props.value}
-				label="Chart"
-				onChange={props.onChangeHandler}
+					style={{margin: "white", color: "white", fontSize: 23}}
+					labelId="chart-select-label"
+					id="chart-select"
+					value={props.value}
+					label="Chart"
+					onChange={props.onChangeHandler}
 				>
 				{drop_options}
 				</Select>
