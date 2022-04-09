@@ -55,6 +55,7 @@ socket.on("health_status", (health_status) => {
 function App() {
   const [coords, setCoords] = React.useState([]);
   const [addons, setAddons] = React.useState([]);
+  const [policies, setPolicies] = React.useState(['apple','pen','cake']);
   const [selectedAddon, setSelectedAddon] = React.useState("");
   const [viewPolicy, setViewPolicy] = React.useState(false); 
   const [selectedPeriod, setSelectedPeriod] = React.useState("");
@@ -70,6 +71,7 @@ function App() {
     const timer = setInterval(() => {
       setAddons(local_addons);
       setCoords(coordinates);
+      setPolicies(policies);
       setProcessDict(processDict);
 
     }, RENDER_PERIOD);
@@ -91,13 +93,21 @@ function App() {
     }
   })
 
+  const addPolicy = () => {
+
+  };
+
+  const deletePolicy = (id) => {
+    console.log(id);
+  };
+
   const chooseAddon = React.useCallback((event) => {
     const addon = event.target.value
     socket.emit("addon_selection", addon);
     setSelectedAddon(Number(addon));
   }, []);
 
-  const choosePeriod = React.useCallback((event) => {
+  const chooseGraphPeriod = React.useCallback((event) => {
     const period = event.target.value
     let periodAndFrequency = {};
     periodAndFrequency[period] = period_to_frequency[period];
@@ -118,8 +128,6 @@ function App() {
               alignItems="flex-start"
             >
               <Grid item
-                alignItems='center'
-                spacing={3}
                 xs={8}
                 style={{maxHeight: '85vh', overflow: 'auto', marginTop:10}}
               >
@@ -127,13 +135,13 @@ function App() {
                   <ChartsViewer config={config} chart_types={chart_types} coords={coords} />}
                   
                   {viewPolicy && 
-                  <PolicyViewer/>}
+                  <PolicyViewer policies={policies} add={addPolicy} delete={deletePolicy}/>}
 
 
               </Grid>
               
               {(selectedAddon == "" || viewPolicy) && 
-              <div class="content-divider" style={{display: "flex", minHeight: "85vh", height: "100%"}}>
+              <div className="content-divider" style={{display: "flex", minHeight: "85vh", height: "100%"}}>
                 <Divider orientation="vertical" flexItem style={{width: 5}}/>
               </div>}
               
@@ -149,16 +157,38 @@ function App() {
                   <Box sx={{mt: 3, mb: 2}}>
                     <Button style={{ fontSize: '18px', fontWeight: 'bold'}} color='primary' fullWidth onClick={handleViewPolicies} size='large' variant='contained'>{viewPolicy ? "Charts Viewer": "Policy List"}</Button> 
                   </Box>
-                  
-                  <Stack direction='row' spacing={3} alignItems='center' justifyContent='flex-start'>
-                    <h4 style={{marginLeft: 20}}>Select addon</h4>
-                    <DropdownMemo minWidth={120} text="ID" labels={addons} value={selectedAddon} onChangeHandler={chooseAddon}/>  
-                  </Stack>
-                  
-                  <Stack direction='row' spacing={3} alignItems='center' justifyContent='flex-start'>
-                    <h4 style={{marginLeft: 20}}>Select graph period</h4>
-                    <DropdownMemo minWidth={130} text="Period" labels={periods} value={selectedPeriod} onChangeHandler={choosePeriod}/>  
-                  </Stack>
+                    <Stack direction='row' spacing={3} alignItems='center' justifyContent='flex-start'>
+                      <h4 style={{ marginLeft: 20 }}>Select addon</h4>
+                      <DropdownMemo minWidth={120} text="ID" labels={addons} value={selectedAddon} onChangeHandler={chooseAddon} />
+                    </Stack>
+
+                    {!viewPolicy &&
+                      <>
+                      <Stack direction='row' spacing={3} alignItems='center' justifyContent='flex-start'>
+                        <h4 style={{ marginLeft: 20 }}>Select graph period</h4>
+                        <DropdownMemo minWidth={130} text="Period" labels={periods} value={selectedPeriod} onChangeHandler={chooseGraphPeriod} />
+                      </Stack>
+                      </>
+                    }
+                    {viewPolicy &&
+                      <>
+                        <Stack alignItems='center' spacing={3} justifyContent='flex-start'>
+                          <h3>Add New Policy</h3>
+                          <Stack direction='row' spacing={3} alignItems='center' justifyContent='flex-start'>
+                            <DropdownMemo minWidth={300} text="Policy Type" labels={periods} value={selectedPeriod} onChangeHandler={chooseGraphPeriod} />
+                          </Stack>
+                          <Stack direction='row' spacing={3} alignItems='center' justifyContent='flex-start'>
+                            <DropdownMemo minWidth={300} text="Data Type" labels={periods} value={selectedPeriod} onChangeHandler={chooseGraphPeriod} />
+                          </Stack>
+                          <Stack direction='row' spacing={3} alignItems='center' justifyContent='flex-start'>
+                            <DropdownMemo minWidth={300} text="Period" labels={periods} value={selectedPeriod} onChangeHandler={chooseGraphPeriod} />
+                          </Stack>
+                          <Button style={{ fontSize: '18px', fontWeight: 'bold'}} color='primary' fullWidth size='large' variant='contained'> Add </Button>
+                        </Stack>
+                      </>
+                    }
+
+
                 </Grid>
                 
                 <Grid item>
