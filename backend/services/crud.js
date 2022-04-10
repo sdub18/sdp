@@ -27,4 +27,23 @@ function getAccelData(type, low, high){
 	}
 }
 
-module.exports = { insertData, getAccelData };
+function getPolicies(active_module) {
+	const sqlCmd = `SELECT * FROM policy WHERE moduleID=?`;
+	return db.query(sqlCmd, [active_module]);
+}
+
+function insertNewPolicy(active_module, policy) {
+	const highest_id = db.query('SELECT MAX(policyID) FROM policy WHERE moduleID=?', [active_module])['MAX(policyID)'];
+
+	(highest_id == null) ? new_id = 1 : new_id = highest_id+1; 
+
+	const sqlCmd = `INSERT INTO policy VALUES (?, ?, ?, ?, ?, ?, ?)`;
+	db.insert(sqlCmd, [active_module, new_id, policy.policyType, policy.dataType, policy.period, policy.comparison, policy.threshold]);
+}
+
+function deletePolicy(active_module, id) {
+	const sqlCmd = `DELETE FROM policy WHERE moduleID=? AND policyID=?`;
+	db.del(sqlCmd, [active_module, id])
+}
+
+module.exports = { insertData, insertNewPolicy, getAccelData, getPolicies, deletePolicy };
