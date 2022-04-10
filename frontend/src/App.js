@@ -15,6 +15,7 @@ import { Stack } from "@mui/material";
 const DropdownMemo = React.memo(Dropdown);
 const PolicyViewerMemo = React.memo(PolicyViewer);
 const PolicyModalMemo = React.memo(PolicyModal);
+const HealthMonitorMemo = React.memo(HealthMonitor);
 
 let local_addons = [];          // frontend local copy of connected addons
 const RENDER_PERIOD = 100;       // rerender period in milliseconds
@@ -178,15 +179,20 @@ function App() {
                       <DropdownMemo minWidth={120} text="ID" labels={addons} value={selectedAddon} onChangeHandler={chooseAddon} />
                     </Stack>
                     {!viewPolicy &&
-                        <>
-                        <Stack direction='row' spacing={3} alignItems='center' justifyContent='flex-start'>
-                          <h4 style={{ marginLeft: 20 }}>Select graph period</h4>
-                          <DropdownMemo minWidth={130} text="Period" labels={periods} value={selectedPeriod} onChangeHandler={chooseGraphPeriod} />
-                        </Stack>
-                        </>
-                      }
-                      {viewPolicy &&
-                        <PolicyModalMemo policyTypes={policyTypes} dataTypes={dataTypes} policyPeriods={policyPeriods} addPolicy={addPolicy} />}
+                      <>
+                      <Stack direction='row' spacing={3} alignItems='center' justifyContent='flex-start'>
+                        <h4 style={{ marginLeft: 20 }}>Select graph period</h4>
+                        <DropdownMemo minWidth={130} text="Period" labels={periods} value={selectedPeriod} onChangeHandler={chooseGraphPeriod} />
+                      </Stack>
+                      </>
+                    }
+                    {viewPolicy &&
+                    <PolicyModalMemo 
+                      policyTypes={policyTypes} 
+                      dataTypes={dataTypes} 
+                      policyPeriods={policyPeriods} 
+                      addPolicy={addPolicy} />
+                    }
                     
                   </Grid>
                   
@@ -194,7 +200,7 @@ function App() {
                   
                   <Grid item>
                     {addons.length > 0 && 
-                      <HealthMonitor processDict={processDict_App} />}
+                      <HealthMonitorMemo processDict={processDict_App} />}
 
                   </Grid>
 
