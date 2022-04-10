@@ -6,7 +6,7 @@ const units = {"current": "A", "power": "W", "temp": "F", "rpm": "RPM"};
 export default function ChartsViewer(props) {
 	return (
 		<React.Fragment>
-			{props.chart_types.map((type) => (
+			{props.dataTypes.map((type) => (
 				<DynamicGraph
 					key={type}
 					title={type}

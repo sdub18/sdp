@@ -11,7 +11,7 @@ const comparisons = [">", "<"]
 export default function PolicyModal(props) {
   const [open, setOpen] = React.useState(false);
 
-  const [policy, setPolicy] = React.useState("");
+  const [policy, setPolicyType] = React.useState("");
   const [dataType, setDataType] = React.useState("");
   const [period, setSelectedPeriod] = React.useState("");
   const [comparison, setComparison] = React.useState("");
@@ -19,15 +19,15 @@ export default function PolicyModal(props) {
 
   const handleAdd = () => {
     const newPolicy = {
-      policy: policy,
-      data_type: dataType,
+      policyType: policy,
+      dataType: dataType,
       period: period,
       comparison: comparison,
       threshold: threshold
     };
     props.addPolicy(newPolicy);
 
-    setPolicy("");
+    setPolicyType("");
     setDataType("");
     setSelectedPeriod("");
     setComparison("");
@@ -48,7 +48,7 @@ export default function PolicyModal(props) {
   };
 
   const choosePolicy = React.useCallback((event) => {
-    setPolicy(event.target.value);
+    setPolicyType(event.target.value);
   },[]);
 
   const chooseDataType = React.useCallback((event) => {

@@ -18,13 +18,14 @@ const PolicyModalMemo = React.memo(PolicyModal);
 const HealthMonitorMemo = React.memo(HealthMonitor);
 
 let local_addons = [];          // frontend local copy of connected addons
+let local_policies = [];
 const RENDER_PERIOD = 100;       // rerender period in milliseconds
 const socket_options = {'reconnection': true, 'reconnectionAttempts': Infinity} // options to have frontend continuously try to reconnect to backend
 const socket = io('http://localhost:3001', socket_options);       // frontend websocket - connects to backend server's websocket
 
 let coordinates = [];               // frontend local copy of coordinates, used to set "coords" state variable
 let processDict = {};
-let globalConfig = {"xMax" : 300,         
+let globalConfig = {"xMax" : 1000,         
   "xIncrement" : 100,
   "width" : 700,
   "height" : 400,
@@ -32,7 +33,7 @@ let globalConfig = {"xMax" : 300,
 
 const dataTypes = ["current", "power", "temp"];   // should be grabbed from coordinates array -> make dynamic
 
-const periods = ["100 ms", "500 ms", "1 s", "10 s", "1 min"];
+  const periods = ["100 ms", "500 ms", "1 s", "10 s", "1 min"];
 const period_to_frequency = {"100 ms": 1, "500 ms": 5, "1 s": 10, "10 s": 100, "1 min": 600};
 // The below are to be used once we have connected the database. They are for updating the x axis and ticks.
 const period_to_xMax = {"100 ms": 100, "500 ms": 500, "1 s": 1000, "10 s": 10, "1 min": 60};
@@ -55,11 +56,15 @@ socket.on("health_status", (health_status) => {
   processDict = health_status;
 });
 
+socket.on("updatePolicies", (recv_policies) => {
+  console.log(recv_policies);
+  if (!(JSON.stringify(local_policies) === JSON.stringify(recv_policies))) local_policies = recv_policies;
+});
 
 function App() {
   const [coords, setCoords] = React.useState([]);
   const [addons, setAddons] = React.useState([]);
-  const [policies, setPolicies] = React.useState(['apple','pen','cake']);
+  const [policies, setPolicies] = React.useState([]);
   const [selectedAddon, setSelectedAddon] = React.useState("");
   const [viewPolicy, setViewPolicy] = React.useState(false); 
   const [selectedPeriod, setSelectedPeriod] = React.useState("");
@@ -74,7 +79,7 @@ function App() {
     const timer = setInterval(() => {
       setAddons(local_addons);
       setCoords(coordinates);
-      setPolicies(policies);
+      setPolicies(local_policies);
       setProcessDict(processDict);
 
     }, RENDER_PERIOD);
@@ -96,11 +101,6 @@ function App() {
     }
   })
 
-  const deletePolicy = React.useCallback((id) => {
-    // shall send id of policy back to backend to delete from table
-    console.log(id);
-  }, []);
-
   const chooseAddon = React.useCallback((event) => {
     const addon = event.target.value
     socket.emit("addon_selection", addon);
@@ -119,8 +119,15 @@ function App() {
 
   const addPolicy = React.useCallback((policy) => {
     console.log(policy);
-    //socket.emit("addPolicy", policy)
+    socket.emit("add_policy", policy);
+    console.log("sent");
   })
+
+  const deletePolicy = React.useCallback((id) => {
+    // shall send id of policy back to backend to delete from table
+    console.log(id);
+    socket.emit("delete_policy", id)
+  });
 
   return (
     <div className="App">
@@ -140,7 +147,7 @@ function App() {
                   <ChartsViewer config={config} dataTypes={dataTypes} coords={coords} />}
                   
                   {viewPolicy && 
-                  <PolicyViewerMemo delete={deletePolicy}/>}
+                  <PolicyViewerMemo policies={policies} deletePolicy={deletePolicy}/>}
               </Grid>
               
               {(selectedAddon == "" || viewPolicy) && 
@@ -186,12 +193,13 @@ function App() {
                       </Stack>
                       </>
                     }
-                    {viewPolicy &&
+                    {viewPolicy && selectedAddon &&
                     <PolicyModalMemo 
                       policyTypes={policyTypes} 
                       dataTypes={dataTypes} 
                       policyPeriods={policyPeriods} 
-                      addPolicy={addPolicy} />
+                      addPolicy={addPolicy} 
+                      delPolicy={deletePolicy}/>
                     }
                     
                   </Grid>

@@ -3,18 +3,13 @@ import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import { Stack } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 
-const init_rows = [
-	{ id: 1, type: "Averaging", data: "Current", period: "5 min", description: "Current > 300 mA"},
-	{ id: 2, type: "Simple", data: "Current", period: "3 min", description: "Current < 200 mA"},
-	{ id: 3, type: "Simple", data: "Voltage", period: "2 min", description: "Voltage < 12 V"}
-]
 
 export default function PolicyViewer(props) {
-	const [rows, setRows] = useState(init_rows);
+	const [rows, setRows] = useState([]);
 
 
 	const handleDelete = useCallback((id) => () => {
-		props.delete(id);	
+		props.deletePolicy(id);	
 		setTimeout(() => {
 		setRows((prevRows) => prevRows.filter((row) => row.id !== id));
 		});
@@ -23,8 +18,8 @@ export default function PolicyViewer(props) {
 
 	const columns = [
 		{field: 'id', headerName:'id', width: 80},
-		{field: 'type', headerName: 'Policy Type', width: 200},
-		{field: 'data', headerName: 'Data Type', width: 200},
+		{field: 'policyType', headerName: 'Policy Type', width: 200},
+		{field: 'dataType', headerName: 'Data Type', width: 200},
 		{field: 'period', headerName: 'Period', width: 200},
 		{field: 'description', headerName: 'Description', sortable: false, width: 400},	
 		{
@@ -49,7 +44,7 @@ export default function PolicyViewer(props) {
 				alignItems='center'
 				justifyContent='center'
 			>
-				<DataGrid rows={rows} columns={columns}
+				<DataGrid rows={props.policies} columns={columns}
 					sx={{ 
 						width: '95%',
 						fontSize: 18,
