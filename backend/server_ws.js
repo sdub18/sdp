@@ -34,10 +34,8 @@ M2F_socket.on("connection", M2F_connectionHandler);
 M2F_server.listen(appConfig.M2F_PORT, () => {console.log(`M2F_server listening on ${MIDDLE_TO_FRONT_PORT}`)});
 
 C2M_server.on('connection', C2M_connectionHandler);
-<<<<<<< HEAD
 C2M_server.listen(appConfig.C2M_PORT, () => console.log(`C2M_server listening on ${CLIENT_TO_MIDDLE_PORT}`));
-=======
-C2M_server.listen({host: "0.0.0.0", port:CLIENT_TO_MIDDLE_PORT}, C2M_server_handler);
+
 
 function C2M_server_handler() {
   console.log(`C2M_server listening on ${CLIENT_TO_MIDDLE_PORT}`);
@@ -56,7 +54,6 @@ function C2M_server_handler() {
   }, 500);
 
 }
->>>>>>> 3f7d208 (implement fft to view frequency domain)
 
 function M2F_connectionHandler(client){
   
