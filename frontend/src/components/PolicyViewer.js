@@ -4,12 +4,12 @@ import { Stack } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 
 
-export default function PolicyViewer(props) {
+export default function PolicyViewer({policies, deletePolicy}) {
 	const [rows, setRows] = useState([]);
 
 
 	const handleDelete = useCallback((id) => () => {
-		props.deletePolicy(id);	
+		deletePolicy(id);	
 		setTimeout(() => {
 		setRows((prevRows) => prevRows.filter((row) => row.id !== id));
 		});
@@ -44,7 +44,7 @@ export default function PolicyViewer(props) {
 				alignItems='center'
 				justifyContent='center'
 			>
-				<DataGrid rows={props.policies} columns={columns}
+				<DataGrid rows={policies} columns={columns}
 					sx={{ 
 						width: '95%',
 						fontSize: 18,

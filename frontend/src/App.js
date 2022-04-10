@@ -199,8 +199,7 @@ function App() {
                       dataTypes={dataTypes} 
                       policyPeriods={policyPeriods} 
                       addPolicy={addPolicy} 
-                      delPolicy={deletePolicy}/>
-                    }
+                    />}
                     
                   </Grid>
                   
