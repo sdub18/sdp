@@ -51,9 +51,6 @@ function C2M_server_handler() {
 }
 
 function M2F_connectionHandler(client){
-  M2F_socket.emit("init_configs", )
-  
-  
   client.on("addon_selection", (pid) => {
     active_pid = pid.toString();
   })
@@ -79,10 +76,14 @@ function M2F_connectionHandler(client){
   });
 
   setInterval(() => {
-    M2F_socket.emit("graph_update", coordinates[active_pid]);
-    M2F_socket.emit("updateAddons", addons.map(a => a.id));
-    M2F_socket.emit("health_status", computeHealthStatuses(coordinates, thresholds)); 
-  }, 50);
+    console.log(addons);
+    if (active_pid != "") {
+      M2F_socket.emit("chart_config", config.chartConfig);
+      M2F_socket.emit("graph_update", coordinates[active_pid]);
+      M2F_socket.emit("updateAddons", addons.map(a => a.id));
+      M2F_socket.emit("health_status", [{id:'123', status:'healthy'}]); 
+    }
+  }, 100);
 
 }
 
