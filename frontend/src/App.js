@@ -141,7 +141,7 @@ function App() {
             >
               <Grid item
                 xs={8}
-                style={{maxHeight: '85vh', overflow: 'auto', marginTop:10}}
+                style={{maxHeight: '83vh', overflow: 'auto', marginTop:10}}
               >
                   {(selectedAddon !== "" && !viewPolicy) && 
                   <ChartsViewer config={config} dataTypes={dataTypes} coords={coords} />}
