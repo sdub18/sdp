@@ -35,7 +35,7 @@ export default function AddonSelector() {
 
 	return (
 		<Stack direction='row' spacing={3} alignItems='center' justifyContent='flex-start'>
-			<h4 style={{ marginLeft: 20 }}>Select addon</h4>
+			<h2 style={{ marginLeft: 20 }}>Select addon</h2>
 			<DropdownMemo minWidth={120} text="ID" labels={availableAddons} value={addon} onChangeHandler={chooseAddon} />
 		</Stack>
 	)
