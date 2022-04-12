@@ -7,29 +7,19 @@ import ListItemText from '@mui/material/ListItemText';
 
 
 export default function HealthMonitor() {
-  const socket = useContext(SocketContext);
+  const { holderHealthStatuses } = useContext(SocketContext);
 
   const [healthStatus, setHealthStatus] = useState([]);
-  const holderStatus = useRef([]);
-
-  const handleUpdateHealth = useCallback((updatedHealthStatus) => {
-    holderStatus.current = updatedHealthStatus;
-	  }, []);
 
   useEffect(() =>{
     const interval = setInterval(()=>{
-      setHealthStatus(holderStatus.current);
+      if (!(JSON.stringify(healthStatus) === JSON.stringify(holderHealthStatuses.current))){
+        setHealthStatus(holderHealthStatuses.current);
+      }
     }, 100);
     return () => clearInterval(interval);
   })
-	
 
-	useEffect(()=>{
-		socket.on("health_status", handleUpdateHealth);
-		return () => {
-			socket.off("health_status", handleUpdateHealth);
-		}
-	},[]);
 
   return (
       <List

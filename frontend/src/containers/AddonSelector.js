@@ -7,26 +7,10 @@ import Dropdown from '../components/Dropdown';
 const DropdownMemo = React.memo(Dropdown);
 
 export default function AddonSelector() {
-	const socket = useContext(SocketContext);
+	const {socket, holderAddons} = useContext(SocketContext);
 	const [addon, setAddon] = useContext(AddonContext);
 
-	const [availableAddons, setAvailableAddons] = useState([]);
-	const holderAddons = useRef([]);
-
-	const handleUpdateAddons = useCallback((updatedAddons) => {
-		//console.log(updatedAddons, availableAddons, !(JSON.stringify(updatedAddons) === JSON.stringify(availableAddons)));
-		if (!(JSON.stringify(updatedAddons) === JSON.stringify(availableAddons))){
-			holderAddons.current = updatedAddons;
-		}
-	  },[]);
-	
-
-	useEffect(()=>{
-		socket.on("updateAddons", handleUpdateAddons);
-		return () => {
-			socket.off("updateAddons", handleUpdateAddons);
-		}
-	},[]);
+	const [availableAddons, setAvailableAddons] = useState([]);	
 
 	useEffect(() => {
 		if (!(holderAddons.current.includes(addon)) && !(addon === "")){
@@ -36,7 +20,9 @@ export default function AddonSelector() {
 
 	useEffect(() =>{
 		const interval = setInterval(()=>{
-		  	setAvailableAddons(holderAddons.current);
+			if (!(JSON.stringify(holderAddons.current) === JSON.stringify(availableAddons))) {
+				setAvailableAddons(holderAddons.current);
+			}
 		}, 100);
 		return () => clearInterval(interval);
 	})
