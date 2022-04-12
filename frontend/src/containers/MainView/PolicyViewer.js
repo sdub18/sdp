@@ -1,20 +1,29 @@
-import { React, useState, useCallback } from "react";
+import { React, useState, useEffect, useCallback, useContext } from "react";
 import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import { Stack } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 
-
-export default function PolicyViewer({policies, deletePolicy}) {
-	const [rows, setRows] = useState([]);
+import { SocketContext } from '../../contexts/SocketContext'; 
 
 
+export default function PolicyViewer() {
+	const { socket, holderPolicies } = useContext(SocketContext);
+	const [rows, setRows] = useState(holderPolicies.current);
+	
 	const handleDelete = useCallback((id) => () => {
-		deletePolicy(id);	
+		socket.emit("delete_policy", id)
 		setTimeout(() => {
 		setRows((prevRows) => prevRows.filter((row) => row.id !== id));
 		});
-	},
-	[],);
+	},[]);
+
+	useEffect(() =>{
+		const interval = setInterval(()=>{
+			setRows(holderPolicies.current);
+		}, 100);
+		return () => clearInterval(interval);
+	},[]);
+	
 
 	const columns = [
 		{field: 'id', headerName:'id', width: 80},
@@ -44,7 +53,7 @@ export default function PolicyViewer({policies, deletePolicy}) {
 				alignItems='center'
 				justifyContent='center'
 			>
-				<DataGrid rows={policies} columns={columns}
+				<DataGrid rows={rows} columns={columns}
 					sx={{ 
 						width: '95%',
 						fontSize: 18,

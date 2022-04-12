@@ -1,10 +1,9 @@
 import React from 'react';
-
 import { Stack } from '@mui/material';
 import { Divider } from '@material-ui/core';
 
-import UserInput from './UserInput';
-import HealthMonitor from './HealthMonitor';
+import UserInput from './SecondaryView/UserInput';
+import HealthMonitor from './SecondaryView/HealthMonitor';
 
 const HealthMonitorMemo = React.memo(HealthMonitor);
 

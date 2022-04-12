@@ -1,14 +1,12 @@
 import React, { useContext } from 'react';
 import { Stack } from '@mui/material';
 
-import { ViewContext } from '../contexts/ViewContext';
-import { AddonContext } from '../contexts/AddonContext';
-
+import { ViewContext } from '../../contexts/ViewContext';
+import { AddonContext } from '../../contexts/AddonContext';
 import PolicyModal from './PolicyModal';
 import AddonSelector from './AddonSelector';
-import MainButton from '../components/MainButton';
+import MainButton from '../../components/MainButton';
 
-const PolicyModalMemo = React.memo(PolicyModal);
 
 export default function UserInput() {
 	const [views, setViews] = useContext(ViewContext);

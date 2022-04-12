@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState, useCallback, useRef  } from 'react';
-import { SocketContext } from '../contexts/SocketContext';
-import DynamicGraph from '../components/DynamicGraph';
+
+import { SocketContext } from '../../contexts/SocketContext';
+import DynamicGraph from '../../components/DynamicGraph';
 
 export default function ChartsViewer() {
 	const units = {"current": "A", "power": "W", "temp": "F"};

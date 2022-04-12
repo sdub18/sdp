@@ -1,8 +1,9 @@
 import React, { useState, useCallback, useContext, useEffect, useRef } from 'react'
-import { SocketContext } from '../contexts/SocketContext';
-import { AddonContext } from '../contexts/AddonContext';
 import { Stack } from '@mui/material'
-import Dropdown from '../components/Dropdown';
+
+import { SocketContext } from '../../contexts/SocketContext';
+import { AddonContext } from '../../contexts/AddonContext';
+import Dropdown from '../../components/Dropdown';
 
 const DropdownMemo = React.memo(Dropdown);
 
