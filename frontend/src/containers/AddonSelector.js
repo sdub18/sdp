@@ -7,11 +7,12 @@ import Dropdown from '../components/Dropdown';
 const DropdownMemo = React.memo(Dropdown);
 
 export default function AddonSelector() {
+	const [availableAddons, setAvailableAddons] = useState([]);
 	const socket = useContext(SocketContext);
 	const [addon, setAddon] = useContext(AddonContext);
-	const [availableAddons, setAvailableAddons] = useState([]);
 
 	const handleUpdateAddons = useCallback((updatedAddons) => {
+		//console.log(updatedAddons, availableAddons, !(JSON.stringify(updatedAddons) === JSON.stringify(availableAddons)));
 		if (!(JSON.stringify(updatedAddons) === JSON.stringify(availableAddons))){
 			setAvailableAddons(updatedAddons);
 		}
@@ -26,7 +27,6 @@ export default function AddonSelector() {
 	},[]);
 
 	useEffect(() => {
-		console.log("HIT USE EFFECT");
 		if (!(availableAddons.includes(addon))){
 		  setAddon("");
 		}

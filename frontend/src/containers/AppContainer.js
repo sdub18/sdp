@@ -17,7 +17,7 @@ export default function AppContainer() {
 					alignItems="flex-start"
 					wrap={"nowrap"}
 				>
-					<Grid item xs={8} style={{maxHeight: '85vh', overflow: 'auto', marginTop:30}}>
+					<Grid item xs={8} style={{maxHeight: '80vh', overflow: 'auto', marginTop:30}}>
 						<MainView />
 					</Grid>
 				

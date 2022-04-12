@@ -27,6 +27,9 @@ export default function ChartsViewer() {
 
 	useEffect(()=>{
 		socket.on("graph_update", handleGraphUpdate);
+		return () => {
+			socket.off("graph_update", handleGraphUpdate);
+		}
 	},[]);
 
 	useEffect(()=>{

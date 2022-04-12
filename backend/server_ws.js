@@ -76,7 +76,6 @@ function M2F_connectionHandler(client){
   });
 
   setInterval(() => {
-    console.log(addons);
     if (active_pid != "") {
       M2F_socket.emit("chart_config", config.chartConfig);
       M2F_socket.emit("graph_update", coordinates[active_pid]);

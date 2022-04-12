@@ -1,5 +1,4 @@
 import React, { useContext, useState, useCallback, useEffect } from 'react';
-import { AddonContext } from '../contexts/AddonContext';
 import { SocketContext } from '../contexts/SocketContext';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -9,12 +8,15 @@ import ListItemText from '@mui/material/ListItemText';
 
 export default function HealthMonitor() {
   const socket = useContext(SocketContext);
-  const [addon, setAddon] = useContext(AddonContext);
 
   const [healthStatus, setHealthStatus] = useState([]);
+
   const handleUpdateHealth = useCallback((updatedHealthstatus) => {
+    if (!(JSON.stringify(updatedHealthstatus) == JSON.stringify(healthStatus))){
+      console.log("pissant")
       setHealthStatus(updatedHealthstatus);
-	  },[]);
+    }
+	  }, []);
 	
 
 	useEffect(()=>{
@@ -22,7 +24,7 @@ export default function HealthMonitor() {
 		return () => {
 			socket.off("health_status", handleUpdateHealth);
 		}
-	});
+	},[]);
 
   return (
       <List
