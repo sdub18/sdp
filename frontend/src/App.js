@@ -93,12 +93,7 @@ function App() {
   }, [addons])
 
   const handleViewPolicies = (() => {
-    if ( viewPolicy ) {
-      setViewPolicy(false);
-    }
-    else {
-      setViewPolicy(true);
-    }
+    setViewPolicy(!viewPolicy);
   })
 
   const chooseAddon = React.useCallback((event) => {
