@@ -19,6 +19,8 @@ const fft = new FFT(512);
 const out = fft.createComplexArray();
 
 let addons = [];      // backend local array to manage addon ids
+let pkt_buffer = [];
+let cur = Date.now();
 
 const chart_types = ["current", "power", "temp"];
 const thresholds = {"current": 100, "power": 60, "temp": 80};
@@ -28,15 +30,24 @@ let coordinates = {};
 let active_policies = [];
 
 M2F_socket.on("connection", M2F_connectionHandler);
-M2F_server.listen(config.M2F_PORT, () => {console.log(`M2F_server listening on ${MIDDLE_TO_FRONT_PORT}`)});
+M2F_server.listen(MIDDLE_TO_FRONT_PORT, () => {console.log(`M2F_server listening on ${MIDDLE_TO_FRONT_PORT}`)});
 
 C2M_server.on('connection', C2M_connectionHandler);
-C2M_server.listen(config.C2M_PORT, () => console.log(`C2M_server listening on ${CLIENT_TO_MIDDLE_PORT}`));
+C2M_server.listen(CLIENT_TO_MIDDLE_PORT, () => {console.log(`C2M_server listening on ${CLIENT_TO_MIDDLE_PORT}`)});
 
 
-function C2M_server_handler() {
+function C2M_serverHandler() {
   console.log(`C2M_server listening on ${CLIENT_TO_MIDDLE_PORT}`);
 
+  setInterval(()=>{
+    cur = Date.now();
+    crud.insertMany(pkt_buffer);
+    console.log(pkt_buffer.length, Date.now()-cur);
+    cur = Date.now();
+    
+    pkt_buffer.length = 0;
+  }, 1000);
+  /*
   setInterval(() => {
     prevTime = Date.now()-5000;
     curTime = Date.now();
@@ -46,11 +57,13 @@ function C2M_server_handler() {
 
     }  
 
-  }, 500);
+  }, 500);*/
 
 }
 
 function M2F_connectionHandler(client){
+  M2F_socket.emit("initSetup", config);
+
   client.on("addon_selection", (pid) => {
     active_pid = pid.toString();
   })
@@ -79,9 +92,8 @@ function M2F_connectionHandler(client){
     if (active_pid != "") { 
       M2F_socket.emit("updateCoords", coordinates[active_pid]);
       M2F_socket.emit("updateAddons", addons.map(a => a.id));
-      M2F_socket.emit("updateChartConfig", config.chartConfig);
       M2F_socket.emit("updateStatuses", [{id:'123', status:'healthy'}]); 
-      M2F_socket.emit("updatePolicies", [{id: 1, policyType: "simple", dataType: "current", period: "1 min", "description": "current > 200mA"}]);
+      M2F_socket.emit("updatePolicies", formatPolicies(crud.getPolicies(active_pid)));
     }
   }, 100);
 
@@ -89,6 +101,7 @@ function M2F_connectionHandler(client){
 
 // The function should also add something like { id: <some number>, data: <some number> } to the addons array
 function C2M_connectionHandler(conn){
+  conn.setNoDelay(true);
   const remoteAddress = conn.remoteAddress + ':' + conn.remotePort;
   console.log('new client connection from %s', remoteAddress);
   conn.setTimeout(5000, function(){
@@ -100,6 +113,7 @@ function C2M_connectionHandler(conn){
   conn.on('data', (recv_d) => {
     let data = parseData(recv_d)    // parse buffer stream into individual packets of data and place into data array
     for (let pkt of data) { 
+      console.log(pkt.id)
       if (!addons.some(addon => addon.id === pkt.id)) {
         pkt["remotePort"] = conn.remotePort;
         addons.push(pkt);
@@ -109,8 +123,7 @@ function C2M_connectionHandler(conn){
         conn.write(Buffer.from([0x01]));  // send ACK byte
       } 
       if (("data" in pkt) && (pkt.id in coordinates)) {
-        //crud.insertData(pkt);
-        console.log("receiving data")
+        pkt_buffer.push(pkt);
         for (let i = 0; i < chart_types.length; i++) {
           for (let j = 0; j < config.chartConfig.xMax - 1; j++) {
             coordinates[pkt.id][chart_types[i]][j].y = coordinates[pkt.id][chart_types[i]][j+1].y;

@@ -16,6 +16,16 @@ function insertData(pkt) {
 	db.insert(sqlCmd, [timestamp, id, current, voltage, power, temp, a['x'], a['y'], a['z']]);
 };
 
+function insertMany(pkt_buffer) {
+	const insert_transaction = db.create_transaction((pkt_list) => {
+		pkt_list.forEach(pkt => {
+			insertData(pkt);
+		});
+	})
+
+	return insert_transaction(pkt_buffer);
+}
+
 function getAccelData(type, low, high){
 	try {
 		const sqlCmd = `SELECT ${type} FROM data WHERE timestamp BETWEEN ? AND ? ORDER BY timestamp DESC LIMIT 512`;
@@ -46,4 +56,4 @@ function deletePolicy(active_module, id) {
 	db.del(sqlCmd, [active_module, id])
 }
 
-module.exports = { insertData, insertNewPolicy, getAccelData, getPolicies, deletePolicy };
+module.exports = { insertData, insertMany, insertNewPolicy, getAccelData, getPolicies, deletePolicy };
