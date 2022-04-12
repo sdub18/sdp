@@ -29,9 +29,9 @@ export default function AddonSelector() {
 	})
 
 	const chooseAddon = useCallback((event) => {
-		const addon = event.target.value
-		socket.emit("addon_selection", addon);
-		setAddon(Number(addon));
+		const selectedAddon = event.target.value
+		socket.emit("addon_selection", selectedAddon);
+		setAddon(Number(selectedAddon));
 	  }, []);
 
 	return (
