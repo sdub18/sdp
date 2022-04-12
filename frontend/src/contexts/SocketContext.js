@@ -10,10 +10,10 @@ const SocketProvider = ({ children }) => {
 	const holderCoords = useRef([]);
 	const holderAddons = useRef([]);
 	const holderChartConfig = useRef({});
-	const holderHealthStatuses = useRef([]);
+	const holderStatuses = useRef([]);
 	const holderPolicies = useRef([]);
 
-	const handleGraphUpdate = useCallback((updatedCoords) => {
+	const handleCoordsUpdate = useCallback((updatedCoords) => {
 		if (updatedCoords){
 			holderCoords.current = updatedCoords;
 		}
@@ -31,9 +31,9 @@ const SocketProvider = ({ children }) => {
 		}
 	},[]);
 
-	const handleHealthUpdate = useCallback((updatedHealthStatus) => {
-		if (updatedHealthStatus){
-			holderHealthStatuses.current = updatedHealthStatus;
+	const handleHealthUpdate = useCallback((updatedStatuses) => {
+		if (updatedStatuses){
+			holderStatuses.current = updatedStatuses;
 		}
 	}, []);
 
@@ -44,16 +44,16 @@ const SocketProvider = ({ children }) => {
 	},[]);
 
 	useEffect(()=>{
-		socket.on("graph_update", handleGraphUpdate);
-		socket.on("chart_config", handleConfigUpdate);
+		socket.on("updateCoords", handleCoordsUpdate);
+		socket.on("updateChartConfig", handleConfigUpdate);
 		socket.on("updateAddons", handleAddonsUpdate);
-		socket.on("health_status", handleHealthUpdate);
+		socket.on("updateStatuses", handleHealthUpdate);
 		socket.on("updatePolicies", handlePoliciesUpdate);
 		return () => {
-			socket.off("graph_update", handleGraphUpdate);
-			socket.off("chart_config", handleConfigUpdate);
+			socket.off("updateCoords", handleCoordsUpdate);
+			socket.off("updateChartConfig", handleConfigUpdate);
 			socket.off("updateAddons", handleAddonsUpdate);
-			socket.off("health_status", handleHealthUpdate);
+			socket.off("updateStatuses", handleHealthUpdate);
 			socket.off("updatePolicies", handlePoliciesUpdate);
 		}
 	});
@@ -65,9 +65,11 @@ const SocketProvider = ({ children }) => {
 			holderCoords: holderCoords, 
 			holderAddons: holderAddons,
 			holderChartConfig: holderChartConfig,
-			holderHealthStatuses: holderHealthStatuses,
+			holderStatuses: holderStatuses,
 			holderPolicies: holderPolicies
-		}}>{children}</SocketContext.Provider>
+		}}>
+			{children}
+		</SocketContext.Provider>
 	);
 };
 

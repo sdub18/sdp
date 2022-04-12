@@ -76,11 +76,11 @@ function M2F_connectionHandler(client){
   });
 
   setInterval(() => {
-    if (active_pid != "") {
-      M2F_socket.emit("chart_config", config.chartConfig);
-      M2F_socket.emit("graph_update", coordinates[active_pid]);
+    if (active_pid != "") { 
+      M2F_socket.emit("updateCoords", coordinates[active_pid]);
       M2F_socket.emit("updateAddons", addons.map(a => a.id));
-      M2F_socket.emit("health_status", [{id:'123', status:'healthy'}]); 
+      M2F_socket.emit("updateChartConfig", config.chartConfig);
+      M2F_socket.emit("updateStatuses", [{id:'123', status:'healthy'}]); 
       M2F_socket.emit("updatePolicies", [{id: 1, policyType: "simple", dataType: "current", period: "1 min", "description": "current > 200mA"}]);
     }
   }, 100);
