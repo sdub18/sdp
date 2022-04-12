@@ -13,7 +13,7 @@ export default function Dropdown(props) {
 
     return(
         <Box sx={{ minWidth: props.minWidth }}>
-			<FormControl style={{color: "white"}} fullWidth>
+			<FormControl fullWidth>
 				<InputLabel style={{color: "white", fontSize: 23}}>{props.text}</InputLabel>
 				<Select
 					style={{margin: "white", color: "white", fontSize: 23}}
