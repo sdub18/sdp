@@ -1,7 +1,6 @@
-import { Grid } from '@material-ui/core'
 import React from 'react'
 
-import { Divider } from '@material-ui/core';
+import { Grid, Divider } from '@material-ui/core';
 
 import { ViewProvider } from '../contexts/ViewContext'
 import MainView from './MainView'
