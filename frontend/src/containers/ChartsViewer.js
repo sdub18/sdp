@@ -1,8 +1,6 @@
-import React, { useContext, useEffect, useState, useCallback  } from 'react';
+import React, { useContext, useEffect, useState, useCallback, useRef  } from 'react';
 import { SocketContext } from '../contexts/SocketContext';
 import DynamicGraph from '../components/DynamicGraph';
-
-const text = 'wow'
 
 export default function ChartsViewer() {
 	const units = {"current": "A", "power": "W", "temp": "F"};
@@ -12,33 +10,40 @@ export default function ChartsViewer() {
 	const [dataTypes, setDataTypes] = useState([]);
 	const [chartConfig, setChartConfig] = useState({});
 
+	const holderCoords = useRef([]);
+	const holderDataTypes = useRef([]);
+	const holderChartConfig = useRef({});
+
 	const handleGraphUpdate = useCallback((updatedCoords) => {
 		if (updatedCoords){
-			setDataTypes(Object.keys(updatedCoords));
-			setCoords(updatedCoords);
+			holderCoords.current = updatedCoords;
+			holderDataTypes.current = Object.keys(updatedCoords);
 		}
 	});
 
-	const handleConfigUpdate = useCallback((chartConfig) => {
+	const handleConfigUpdate = useCallback((updatedChartConfig) => {
 		if (chartConfig){
-			setChartConfig(chartConfig)
+			holderChartConfig.current = updatedChartConfig
 		}
 	});
+
+	useEffect(() =>{
+		const interval = setInterval(()=>{
+			setCoords(holderCoords.current);
+			setDataTypes(holderDataTypes.current);
+			setChartConfig(holderChartConfig.current);
+		}, 100);
+		return () => clearInterval(interval);
+	})
 
 	useEffect(()=>{
 		socket.on("graph_update", handleGraphUpdate);
-		return () => {
-			socket.off("graph_update", handleGraphUpdate);
-		}
-	},[]);
-
-	useEffect(()=>{
 		socket.on("chart_config", handleConfigUpdate);
 		return () => {
+			socket.off("graph_update", handleGraphUpdate);
 			socket.off("chart_config", handleConfigUpdate);
 		}
 	},[]);
-
 
 	return (
 		<React.Fragment>

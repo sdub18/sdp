@@ -82,7 +82,7 @@ function M2F_connectionHandler(client){
       M2F_socket.emit("updateAddons", addons.map(a => a.id));
       M2F_socket.emit("health_status", [{id:'123', status:'healthy'}]); 
     }
-  }, 100);
+  }, 50);
 
 }
 

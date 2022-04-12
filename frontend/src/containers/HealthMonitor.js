@@ -1,4 +1,4 @@
-import React, { useContext, useState, useCallback, useEffect } from 'react';
+import React, { useContext, useState, useCallback, useEffect, useRef } from 'react';
 import { SocketContext } from '../contexts/SocketContext';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -10,13 +10,18 @@ export default function HealthMonitor() {
   const socket = useContext(SocketContext);
 
   const [healthStatus, setHealthStatus] = useState([]);
+  const holderStatus = useRef([]);
 
-  const handleUpdateHealth = useCallback((updatedHealthstatus) => {
-    if (!(JSON.stringify(updatedHealthstatus) == JSON.stringify(healthStatus))){
-      console.log("pissant")
-      setHealthStatus(updatedHealthstatus);
-    }
+  const handleUpdateHealth = useCallback((updatedHealthStatus) => {
+    holderStatus.current = updatedHealthStatus;
 	  }, []);
+
+  useEffect(() =>{
+    const interval = setInterval(()=>{
+      setHealthStatus(holderStatus.current);
+    }, 100);
+    return () => clearInterval(interval);
+  })
 	
 
 	useEffect(()=>{
