@@ -7,6 +7,7 @@
   },
   "scripts": {
     "start-server": "nodemon server_ws.js",
-    "start-client": "nodemon ./sims/client_demo_sin.js"
+    "start-client": "nodemon ./sims/client_demo_sin.js",
+    "test": "node ./sims/client_demo_sin.js"
   }
 }
