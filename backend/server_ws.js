@@ -82,7 +82,7 @@ function M2F_connectionHandler(client){
       M2F_socket.emit("updateAddons", addons.map(a => a.id));
       M2F_socket.emit("health_status", [{id:'123', status:'healthy'}]); 
     }
-  }, 50);
+  }, 100);
 
 }
 
@@ -108,7 +108,8 @@ function C2M_connectionHandler(conn){
         conn.write(Buffer.from([0x01]));  // send ACK byte
       } 
       if (("data" in pkt) && (pkt.id in coordinates)) {
-        crud.insertData(pkt);
+        //crud.insertData(pkt);
+        console.log("receiving data")
         for (let i = 0; i < chart_types.length; i++) {
           for (let j = 0; j < config.chartConfig.xMax - 1; j++) {
             coordinates[pkt.id][chart_types[i]][j].y = coordinates[pkt.id][chart_types[i]][j+1].y;
@@ -125,7 +126,6 @@ function C2M_connectionHandler(conn){
     addon_id = addons[addon_index].id;
     addons.splice(addon_index, 1);
 
-    console.log(addons.map(a => a.id));
     console.log('connection from %s closed', conn.remotePort);
     // remove coordinate matrix for addon
     delete coordinates[addon_id];
