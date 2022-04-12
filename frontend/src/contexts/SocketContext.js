@@ -37,17 +37,24 @@ const SocketProvider = ({ children }) => {
 		}
 	}, []);
 
+	const handlePoliciesUpdate = useCallback((updatedPolicies) => {
+		if (updatedPolicies){
+			holderPolicies.current = updatedPolicies;
+		}
+	},[]);
+
 	useEffect(()=>{
-		console.log("socket setup");
 		socket.on("graph_update", handleGraphUpdate);
 		socket.on("chart_config", handleConfigUpdate);
 		socket.on("updateAddons", handleAddonsUpdate);
 		socket.on("health_status", handleHealthUpdate);
+		socket.on("updatePolicies", handlePoliciesUpdate);
 		return () => {
 			socket.off("graph_update", handleGraphUpdate);
 			socket.off("chart_config", handleConfigUpdate);
 			socket.off("updateAddons", handleAddonsUpdate);
 			socket.off("health_status", handleHealthUpdate);
+			socket.off("updatePolicies", handlePoliciesUpdate);
 		}
 	});
 	
@@ -58,7 +65,8 @@ const SocketProvider = ({ children }) => {
 			holderCoords: holderCoords, 
 			holderAddons: holderAddons,
 			holderChartConfig: holderChartConfig,
-			holderHealthStatuses: holderHealthStatuses
+			holderHealthStatuses: holderHealthStatuses,
+			holderPolicies: holderPolicies
 		}}>{children}</SocketContext.Provider>
 	);
 };
