@@ -7,14 +7,14 @@ import ListItemButton from '@mui/material/ListItemButton';
 import { SocketContext } from '../../contexts/SocketContext';
 
 export default function HealthMonitor() {
-  const { holderHealthStatuses } = useContext(SocketContext);
+  const { holderStatuses } = useContext(SocketContext);
 
-  const [healthStatus, setHealthStatus] = useState([]);
+  const [statuses, setStatuses] = useState([]);
 
   useEffect(() =>{
     const interval = setInterval(()=>{
-      if (!(JSON.stringify(healthStatus) === JSON.stringify(holderHealthStatuses.current))){
-        setHealthStatus(holderHealthStatuses.current);
+      if (!(JSON.stringify(statuses) === JSON.stringify(holderStatuses.current))){
+        setStatuses(holderStatuses.current);
       }
     }, 100);
     return () => clearInterval(interval);
@@ -32,7 +32,7 @@ export default function HealthMonitor() {
           overflow:'auto'}}
       >
         {
-          healthStatus.map((addon, idx) =>
+          statuses.map((addon, idx) =>
           <ListItem key={idx}>
             <ListItemText primary={`${addon.id}: ${addon.status}`} style={{color: "black"}}/>
           </ListItem>
