@@ -1,11 +1,14 @@
 const net = require("net");
 const FFT = require('fft.js');
+const app = require("express")();
+const cors = require("cors");
+
 
 const CLIENT_TO_MIDDLE_PORT = 49160;
 const MIDDLE_TO_FRONT_PORT = 3001;
 
 const C2M_server = net.createServer();
-const M2F_server = require('http').createServer();
+const M2F_server = require('http').createServer(app);
 const M2F_socket = require('socket.io')(M2F_server,{cors:{origin: true, credentials: true}});
 
 const config = require("./config");
@@ -28,6 +31,34 @@ const thresholds = {"current": 100, "power": 60, "temp": 80};
 let active_pid = null;
 let coordinates = {};
 let active_policies = [];
+
+app.use(cors());
+
+app.get("/chart_periods", (req, res) => {
+  res.send(config.availableGraphPeriods);
+});
+
+app.get("/chart_config", (req,res) => {
+  res.send(config.chartConfig);
+})
+
+app.get("/policy_modal", (req, res) => {
+  let setup = {policyTypes: config.policyTypes, 
+    periods: config.availablePolicyPeriods,
+    comparisons: config.comparisons,
+    dataTypes: Object.keys(coordinates[active_pid])
+  }
+  res.send(setup);
+})
+
+app.get("/data_types", (req,res) => {
+  console.log(coordinates[active_pid]);
+  try {
+    res.send(Object.keys(coordinates[active_pid])) 
+  } catch (error) {
+    res.send([]);
+  }
+}); 
 
 M2F_socket.on("connection", M2F_connectionHandler);
 M2F_server.listen(MIDDLE_TO_FRONT_PORT, () => {console.log(`M2F_server listening on ${MIDDLE_TO_FRONT_PORT}`)});
@@ -63,12 +94,13 @@ function C2M_serverHandler() {
 
 function M2F_connectionHandler(client){
   M2F_socket.emit("initSetup", config);
+  M2F_socket.emit("updateChartConfig", config.chartConfig);
 
   client.on("addon_selection", (pid) => {
     active_pid = pid.toString();
   })
 
-  client.on("period_selection", (periodAndFrequency) => {
+  client.on("chart_period_selection", (periodAndFrequency) => {
     // Receives label for x axis period as well as the polling frequency associated with it.
     // This will allow us to query the database for the appropriate info, as well as change
     // the frequency at which we poll the incoming data, so we can modify our coordinates array

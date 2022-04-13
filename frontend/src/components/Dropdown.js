@@ -6,7 +6,6 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 
 export default function Dropdown(props) {
-    
     let drop_options = props.labels.map((label, index) => {
           return <MenuItem key={index} value={label}>{label}</MenuItem>;
     });

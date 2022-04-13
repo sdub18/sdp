@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState, useCallback, useRef  } from 'react';
+import axios from 'axios';
 
 import { SocketContext } from '../../contexts/SocketContext';
 import DynamicGraph from '../../components/DynamicGraph';
@@ -18,11 +19,11 @@ export default function ChartsViewer() {
 			setCoords(holderCoords.current);
 		}, 100);
 		return () => clearInterval(interval);
-	})
+	},[])
 
-	useEffect(()=>{
-		setDataTypes(Object.keys(holderCoords.current));
-		setChartConfig(holderChartConfig.current);
+	useEffect(() =>{
+		axios.get("https://localhost:3001/data_types").then((res)=>{setDataTypes(res.data)});
+		axios.get("http://localhost:3001/chart_config").then((res)=>{setChartConfig(res.data)});	
 	},[]);
 
 	return (

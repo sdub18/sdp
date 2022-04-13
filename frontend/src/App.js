@@ -9,6 +9,7 @@ import { AddonProvider } from "./contexts/AddonContext";
 import Layout from "./layouts/Layout";
 import AppContainer from "./containers/AppContainer";
 
+
 function App() {
   return (
     <ThemeProvider theme={theme}>
@@ -16,9 +17,9 @@ function App() {
       <SocketProvider>
         <ViewProvider>
           <AddonProvider>
-            <Layout>
-              <AppContainer/>
-            </Layout>
+              <Layout>
+                <AppContainer/>
+              </Layout>
           </AddonProvider>
         </ViewProvider>
       </SocketProvider>

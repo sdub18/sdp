@@ -1,4 +1,5 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
+import axios from 'axios';
 import { Stack, Dialog, DialogTitle, DialogContent, DialogActions, TextField, InputLabel } from '@mui/material';
 
 import { SocketContext } from '../../contexts/SocketContext';
@@ -13,11 +14,28 @@ export default function PolicyModal() {
   const { socket } = useContext(SocketContext);
   const [open, setOpen] = useState(false);
 
-  const [policy, setPolicyType] = React.useState("");
-  const [dataType, setDataType] = React.useState("");
-  const [period, setSelectedPeriod] = React.useState("");
-  const [comparison, setComparison] = React.useState("");
-  const [threshold, setThreshold] = React.useState(0);
+  const policyTypes = useRef([]);
+  const dataTypes = useRef([]);
+  const policyPeriods = useRef([]);
+  const comparisons = useRef([])
+
+  const [policy, setPolicyType] = useState("");
+  const [dataType, setDataType] = useState("");
+  const [period, setSelectedPeriod] = useState("");
+  const [comparison, setComparison] = useState("");
+  const [threshold, setThreshold] = useState(0);
+
+  useEffect(() =>{
+		axios.get("http://localhost:3001/policy_modal")
+    .then((res)=>{
+      let setup = res.data;
+      policyTypes.current = setup.policyTypes;
+      dataTypes.current = setup.dataTypes;
+      policyPeriods.current = setup.periods;
+      comparisons.current = setup.comparisons;
+    })	
+	},[]);
+
 
   const handleAdd = () => {
     const newPolicy = {
@@ -78,14 +96,14 @@ export default function PolicyModal() {
           <Stack alignItems='center' spacing={2} justifyContent='flex-start'>
             
             <Stack direction='row' spacing={2}>
-              <DropdownMemo minWidth={250} text="Policy Type" labels={[]} value={policy} onChangeHandler={choosePolicy} />
-              <DropdownMemo minWidth={250} text="Data Type" labels={[]} value={dataType} onChangeHandler={chooseDataType} />
+              <DropdownMemo minWidth={250} text="Policy Type" labels={policyTypes.current} value={policy} onChangeHandler={choosePolicy} />
+              <DropdownMemo minWidth={250} text="Data Type" labels={dataTypes.current} value={dataType} onChangeHandler={chooseDataType} />
             
             </Stack>
             
             <Stack direction='row' spacing={2}>
-              <DropdownMemo minWidth={250} text="Period" labels={[]} value={period} onChangeHandler={choosePolicyPeriod} />
-              <DropdownMemo minWidth={250} text="Comparison" labels={[]} value={comparison} onChangeHandler={chooseComparison} />
+              <DropdownMemo minWidth={250} text="Period" labels={policyPeriods.current} value={period} onChangeHandler={choosePolicyPeriod} />
+              <DropdownMemo minWidth={250} text="Comparison" labels={comparisons.current} value={comparison} onChangeHandler={chooseComparison} />
             </Stack>
             
             <Stack direction='row' spacing={2} alignItems='center' justifyContent='flex-start'>

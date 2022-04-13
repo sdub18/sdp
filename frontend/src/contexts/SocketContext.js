@@ -12,6 +12,7 @@ const SocketProvider = ({ children }) => {
 	const holderChartConfig = useRef({});
 	const holderStatuses = useRef([]);
 	const holderPolicies = useRef([]);
+	const config = useRef({});
 
 	const handleCoordsUpdate = useCallback((updatedCoords) => {
 		if (updatedCoords){
@@ -43,25 +44,34 @@ const SocketProvider = ({ children }) => {
 		}
 	},[]);
 
+	const handleInitSetup = useCallback((initConfig) => {
+		if (initConfig) {
+			config.current = initConfig;
+		}
+	},[])
+
 	useEffect(()=>{
 		socket.on("updateCoords", handleCoordsUpdate);
 		socket.on("updateChartConfig", handleConfigUpdate);
 		socket.on("updateAddons", handleAddonsUpdate);
 		socket.on("updateStatuses", handleHealthUpdate);
 		socket.on("updatePolicies", handlePoliciesUpdate);
+		socket.on("initSetup", handleInitSetup)
 		return () => {
 			socket.off("updateCoords", handleCoordsUpdate);
 			socket.off("updateChartConfig", handleConfigUpdate);
 			socket.off("updateAddons", handleAddonsUpdate);
 			socket.off("updateStatuses", handleHealthUpdate);
 			socket.off("updatePolicies", handlePoliciesUpdate);
+			socket.off("initSetup", handleInitSetup)
 		}
-	});
+	},[]);
 	
 
 	return(
 		<SocketContext.Provider value={{
 			socket: socket,
+			config: config,
 			holderCoords: holderCoords, 
 			holderAddons: holderAddons,
 			holderChartConfig: holderChartConfig,

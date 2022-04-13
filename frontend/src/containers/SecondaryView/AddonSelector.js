@@ -1,9 +1,7 @@
 import React, { useState, useCallback, useContext, useEffect, useRef } from 'react'
-import { Stack } from '@mui/material'
 
 import { SocketContext } from '../../contexts/SocketContext';
 import { AddonContext } from '../../contexts/AddonContext';
-import Dropdown from '../../components/Dropdown';
 import Selector from '../../components/Selector';
 
 
