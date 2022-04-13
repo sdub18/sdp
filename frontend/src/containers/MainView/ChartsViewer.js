@@ -22,7 +22,7 @@ export default function ChartsViewer() {
 	},[])
 
 	useEffect(() =>{
-		axios.get("https://localhost:3001/data_types").then((res)=>{setDataTypes(res.data)});
+		axios.get("http://localhost:3001/data_types").then((res)=>{setDataTypes(res.data)});
 		axios.get("http://localhost:3001/chart_config").then((res)=>{setChartConfig(res.data)});	
 	},[]);
 

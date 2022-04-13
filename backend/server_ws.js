@@ -52,7 +52,6 @@ app.get("/policy_modal", (req, res) => {
 })
 
 app.get("/data_types", (req,res) => {
-  console.log(coordinates[active_pid]);
   try {
     res.send(Object.keys(coordinates[active_pid])) 
   } catch (error) {
@@ -145,7 +144,6 @@ function C2M_connectionHandler(conn){
   conn.on('data', (recv_d) => {
     let data = parseData(recv_d)    // parse buffer stream into individual packets of data and place into data array
     for (let pkt of data) { 
-      console.log(pkt.id)
       if (!addons.some(addon => addon.id === pkt.id)) {
         pkt["remotePort"] = conn.remotePort;
         addons.push(pkt);
