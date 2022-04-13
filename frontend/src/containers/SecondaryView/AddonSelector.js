@@ -4,8 +4,8 @@ import { Stack } from '@mui/material'
 import { SocketContext } from '../../contexts/SocketContext';
 import { AddonContext } from '../../contexts/AddonContext';
 import Dropdown from '../../components/Dropdown';
+import Selector from '../../components/Selector';
 
-const DropdownMemo = React.memo(Dropdown);
 
 export default function AddonSelector() {
 	const {socket, holderAddons} = useContext(SocketContext);
@@ -35,9 +35,8 @@ export default function AddonSelector() {
 	  }, []);
 
 	return (
-		<Stack direction='row' spacing={3} alignItems='center' justifyContent='flex-start'>
-			<h2 style={{ marginLeft: 20 }}>Select addon</h2>
-			<DropdownMemo minWidth={120} text="ID" labels={availableAddons} value={addon} onChangeHandler={chooseAddon} />
-		</Stack>
+		<Selector text="ID" labels={availableAddons} value={addon} onChangeHandler={chooseAddon}>
+			Select Module ID
+		</Selector>
 	)
 }
