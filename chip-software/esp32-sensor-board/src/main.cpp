@@ -31,7 +31,6 @@ Adafruit_INA260 ina260 = Adafruit_INA260();         // Current Sensor
 
 // WiFi Client to communicate with
 WiFiClient client;
-WriteBufferingStream buffered_client(client, 192);
 /////////////////////////////////////////////////////////////////////////////
 // ------------------------- HELPER FUNCTIONS -----------------------------//
 /////////////////////////////////////////////////////////////////////////////
@@ -152,10 +151,11 @@ void loop() {
     // ------ Check if server sent ACK ------
     if (client.available()) {
       char c = client.read(); 
-      if (c == 0x01) canSend = 1;
+      if (c == 0x01) canSend = true;
     }
 
     // -------- Communicate Results ---------
+    WriteBufferingStream buffered_client(client, 192);
     if (canSend) {
       create_packet();
       serializeJson(data_pkt, Serial);
@@ -163,9 +163,11 @@ void loop() {
     } else {
       serializeJson(id_pkt, Serial);
       serializeJson(id_pkt, buffered_client);
+      delay(1000);
     }
 
   } else {
+    canSend = false;
     client.connect(HOST, PORT); 
   }
 }
