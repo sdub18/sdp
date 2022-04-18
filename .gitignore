@@ -8,3 +8,4 @@ venv
 db-data/
 be-data/
 db.sqlite
+workspace.code-workspace

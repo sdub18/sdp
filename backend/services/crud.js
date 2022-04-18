@@ -3,7 +3,7 @@ const db = require('../db');
 function insertData(pkt) {
 	const data = pkt['data'];
 
-	const timestamp = Date.now();
+	const timestamp = pkt["timestamp"];
 	const id = pkt['id'];
 	const current = data['current'];
 	const voltage = data['voltage'];
