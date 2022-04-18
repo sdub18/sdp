@@ -8,22 +8,21 @@
 #include <ArduinoJson.h>
 #include <StreamUtils.h>
 
-const char* SSID = "Pixel_8846";   
-const char* PASS = "andtran123";
-const char* HOST = "10.0.0.64"; // change to ip address of host computer
+const char* SSID = "CookHouse-2.4";   
+const char* PASS = "Chopper123!";
+const char* HOST = "10.0.0.63"; // change to ip address of host computer
 
-const int PORT = 49160; 
+const uint16_t PORT = 49160;
+const uint16_t UID = 1;
 
-// unique id of this sensing module
-const int UID = 1;
-
-int canSend = 0;
+uint16_t prevDay = 0;
+bool canSend = false;
 
 // Json Document
-StaticJsonDocument<1024> id_pkt;
-StaticJsonDocument<1024> data_pkt;
-JsonObject stamp = data_pkt.createNestedObject("data"); 
-JsonObject acceleration = stamp.createNestedObject("acceleration");
+StaticJsonDocument<16> id_pkt;
+StaticJsonDocument<192> data_pkt;
+JsonObject data = data_pkt.createNestedObject("data"); 
+JsonObject acceleration = data.createNestedObject("acceleration");
 
 // Connected Devices
 Adafruit_LIS3DH lis3dh = Adafruit_LIS3DH();            // Accelerometer sensor
@@ -32,16 +31,38 @@ Adafruit_INA260 ina260 = Adafruit_INA260();         // Current Sensor
 
 // WiFi Client to communicate with
 WiFiClient client;
-
+WriteBufferingStream buffered_client(client, 192);
 /////////////////////////////////////////////////////////////////////////////
 // ------------------------- HELPER FUNCTIONS -----------------------------//
 /////////////////////////////////////////////////////////////////////////////
 
+void fetch_NTP() {
+  configTime(0, 0, "pool.ntp.org");
+}
+
+int64_t get_timestamp() {
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	return (tv.tv_sec * 1000LL + (tv.tv_usec / 1000LL));
+}
+
+bool check_new_day(uint16_t *prev_day) {
+  struct timeval tv;
+	gettimeofday(&tv, NULL);
+  int t = tv.tv_sec / 86400 ;
+  if (t != *prev_day) {
+    *prev_day = t;
+    fetch_NTP();
+    return true;
+  }
+  return false;
+}
 
 void create_packet() {
-  // --------------- ID ------------------
+  // ---------- META DATA ------------------
   data_pkt["id"] = UID;
-  
+  data_pkt["timestamp"] = get_timestamp();
+
   // ---------- ACCELEROMETER ------------
   lis3dh.read();
   acceleration["x"] = lis3dh.x;
@@ -50,12 +71,12 @@ void create_packet() {
 
 
   // ----------- TEMPERATURE --------------
-  stamp["temp"] = mcp9808.readTempF();
+  data["temp"] = mcp9808.readTempF();
   
   // ------------- CURRENT ----------------
-  stamp["current"] = ina260.readCurrent();
-  stamp["voltage"] = ina260.readBusVoltage();
-  stamp["power"] = ina260.readPower();
+  data["current"] = ina260.readCurrent();
+  data["voltage"] = ina260.readBusVoltage();
+  data["power"] = ina260.readPower();
 
 }
 
@@ -67,10 +88,8 @@ void create_packet() {
 
 void setup() {
   // -------------------- SERIAL COMMUNICATIONS -----------------------
-  
-  // Setup Serial Monitor
   Serial.begin(115200);
-  while (!Serial) delay(1); // Wait until ready
+  while (!Serial) delay(1);
 
   id_pkt["id"] = UID;  
 
@@ -82,6 +101,8 @@ void setup() {
   }
   Serial.println("Connected to the WiFi network");
 
+  fetch_NTP(); // initialize time 
+
   // ------------------------ ACCELEROMETER -------------------------
 
   if (! lis3dh.begin(0x19)) {   // change this to 0x19 for alternative i2c address
@@ -89,26 +110,6 @@ void setup() {
     while (1) yield();
   } else {
     Serial.println("LIS3DH started");
-  }
-
-  // Print Range
-  Serial.print("Range = "); Serial.print(2 << lis3dh.getRange());
-  Serial.println("G");
-
-  // lis3dh.setDataRate(LIS3DH_DATARATE_50_HZ);
-  Serial.print("Data rate set to: ");
-  switch (lis3dh.getDataRate()) {
-    case LIS3DH_DATARATE_1_HZ: Serial.println("1 Hz"); break;
-    case LIS3DH_DATARATE_10_HZ: Serial.println("10 Hz"); break;
-    case LIS3DH_DATARATE_25_HZ: Serial.println("25 Hz"); break;
-    case LIS3DH_DATARATE_50_HZ: Serial.println("50 Hz"); break;
-    case LIS3DH_DATARATE_100_HZ: Serial.println("100 Hz"); break;
-    case LIS3DH_DATARATE_200_HZ: Serial.println("200 Hz"); break;
-    case LIS3DH_DATARATE_400_HZ: Serial.println("400 Hz"); break;
-
-    case LIS3DH_DATARATE_POWERDOWN: Serial.println("Powered Down"); break;
-    case LIS3DH_DATARATE_LOWPOWER_5KHZ: Serial.println("5 Khz Low Power"); break;
-    case LIS3DH_DATARATE_LOWPOWER_1K6HZ: Serial.println("16 Khz Low Power"); break;
   }
 
   // ------------------------ TEMPERATURE ------------------------------
@@ -145,6 +146,9 @@ void setup() {
 void loop() {
 
   if (client.connected()){
+    // ------ check if new day -------------
+    check_new_day(&prevDay);
+
     // ------ Check if server sent ACK ------
     if (client.available()) {
       char c = client.read(); 
@@ -152,12 +156,15 @@ void loop() {
     }
 
     // -------- Communicate Results ---------
-    if (canSend) create_packet();
-    
-    WriteBufferingStream buffered_client(client, 1024);
-    serializeJson(canSend ? data_pkt : id_pkt, Serial);
-    Serial.println("");
-    serializeJson(canSend ? data_pkt : id_pkt, buffered_client);
+    if (canSend) {
+      create_packet();
+      serializeJson(data_pkt, Serial);
+      serializeJson(data_pkt, buffered_client);
+    } else {
+      serializeJson(id_pkt, Serial);
+      serializeJson(id_pkt, buffered_client);
+    }
+
   } else {
     client.connect(HOST, PORT); 
   }
