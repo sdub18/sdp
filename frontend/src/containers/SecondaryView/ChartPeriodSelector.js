@@ -7,7 +7,7 @@ import Selector from '../../components/Selector';
 
 export default function ChartPeriodSelector() {
 	const {socket} = useContext(SocketContext);
-	const chartPeriod = useRef("");
+	const [chartPeriod, setChartPeriod] = useState("");
 	const [chartPeriods, setChartPeriods] = useState([]);
 
 
@@ -18,12 +18,12 @@ export default function ChartPeriodSelector() {
 	const chooseChartPeriod = useCallback((event) => {
 		const selectedPeriod = event.target.value
 		socket.emit("chart_period_selection", selectedPeriod);
-		setChartPeriods(selectedPeriod);
+		setChartPeriod(selectedPeriod);
 	  }, []);
 
 	return (
 		<React.Fragment>	
-			<Selector text="Period" labels={chartPeriods} value={chartPeriod.current} onChangeHandler={chooseChartPeriod}>
+			<Selector text="Period" labels={chartPeriods} value={chartPeriod} onChangeHandler={chooseChartPeriod}>
 				Select Chart Period
 			</Selector>
 		</React.Fragment>
