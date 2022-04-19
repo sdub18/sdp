@@ -1,8 +1,8 @@
 var config = {};
-
+config.chartTypes = ["current", "voltage", "power", "temp"];
 config.policyTypes = ["simple", "average"];
 config.availablePolicyPeriods = ["1 min", "5 min", "10 min"];
-config.availableGraphPeriods = ["5 s", "10 s", "30 s", "1 min", "5 min"];
+config.availableGraphPeriods = ["10 s", "30 s", "1 min", "5 min"];
 config.comparisons = [">", "<"]
 config.chartConfig = {"xMax" : 300,         
 	"xIncrement" : 100,
