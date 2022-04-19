@@ -43,7 +43,7 @@ function getPolicies(active_module) {
 }
 
 function insertNewPolicy(active_module, policy) {
-	const highest_id = db.query('SELECT MAX(policyID) FROM policy WHERE moduleID=?', [active_module])['MAX(policyID)'];
+	const highest_id = db.query('SELECT MAX(policyID) FROM policy WHERE moduleID=?', [parseInt(active_module)])[0]['MAX(policyID)'];
 
 	(highest_id == null) ? new_id = 1 : new_id = highest_id+1; 
 
