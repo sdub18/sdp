@@ -8,9 +8,9 @@
 #include <ArduinoJson.h>
 #include <StreamUtils.h>
 
-const char* SSID = "CookHouse-2.4";   
-const char* PASS = "Chopper123!";
-const char* HOST = "10.0.0.63"; // change to ip address of host computer
+const char* SSID = "Anime House";   
+const char* PASS = "gentletrail804";
+const char* HOST = "192.168.1.8"; // change to ip address of host computer
 
 const uint16_t PORT = 49160;
 const uint16_t UID = 1;
@@ -159,12 +159,16 @@ void loop() {
     if (canSend) {
       create_packet();
       serializeJson(data_pkt, Serial);
+      Serial.println("");
       serializeJson(data_pkt, buffered_client);
+      buffered_client.flush();
     } else {
       serializeJson(id_pkt, Serial);
       serializeJson(id_pkt, buffered_client);
+      buffered_client.flush();
       delay(1000);
     }
+    client.write("\n");
 
   } else {
     canSend = false;
