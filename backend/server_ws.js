@@ -1,5 +1,4 @@
 const net = require("net");
-const FFT = require('fft.js');
 const app = require("express")();
 const cors = require("cors");
 
@@ -18,12 +17,9 @@ const createEmptyGraph = require('./utils/createEmptyGraph');
 const computeHealthStatuses = require('./utils/computeHealthStatuses');
 const formatPolicies = require('./utils/formatPolicies');
 
-const fft = new FFT(512);
-const out = fft.createComplexArray();
 
 let addons = [];      // backend local array to manage addon ids
 let pkt_buffer = [];
-let cur = Date.now();
 
 const chart_types = ["current", "power", "temp"];
 const thresholds = {"current": 100, "power": 60, "temp": 80};
@@ -70,24 +66,9 @@ function C2M_serverHandler() {
   console.log(`C2M_server listening on ${CLIENT_TO_MIDDLE_PORT}`);
 
   setInterval(()=>{
-    cur = Date.now();
     crud.insertMany(pkt_buffer);
-    console.log(pkt_buffer.length, Date.now()-cur);
-    cur = Date.now();
-    
     pkt_buffer.length = 0;
   }, 1000);
-  /*
-  setInterval(() => {
-    prevTime = Date.now()-5000;
-    curTime = Date.now();
-    input = crud.getAccelData('z', prevTime, curTime).map((row) => (row['z']) );
-    if (input.length == fft.size) {
-      fft.realTransform(out, input);
-
-    }  
-
-  }, 500);*/
 
 }
 
