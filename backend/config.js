@@ -8,6 +8,6 @@ config.chartConfig = {"xMax" : 300,
 	"xIncrement" : 100,
 	"width" : 700,
 	"height" : 400};
-
+config.period2seconds = {"10 s": 10, "30 s":30, "1 min":60, "5 min":300};
 
 module.exports = config;

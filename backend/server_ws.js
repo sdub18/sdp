@@ -152,14 +152,16 @@ function C2M_connectionHandler(conn){
       } 
       if (("data" in pkt) && (pkt.id in coordinates)) {
         pkt_buffer.push(pkt);
-
+        if (Date.now() - prevTime >= getSampleRate(active_period, config.chartConfig.xMax) * 0.8) {
+          //console.log(Date.now() - prevTime);
           for (let i = 0; i < config.chartTypes.length; i++) {
             for (let j = 0; j < config.chartConfig.xMax - 1; j++) {
               coordinates[pkt.id][config.chartTypes[i]][j].y = coordinates[pkt.id][config.chartTypes[i]][j+1].y;
             }
             coordinates[pkt.id][config.chartTypes[i]][config.chartConfig.xMax - 1].y = pkt.data[config.chartTypes[i]];
           }
-
+          prevTime = Date.now();
+        }
       }
     }
   });
