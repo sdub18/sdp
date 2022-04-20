@@ -12,6 +12,7 @@ const M2F_socket = require('socket.io')(M2F_server,{cors:{origin: true, credenti
 
 const config = require("./config");
 const crud = require("./services/crud");
+const alerts = require("./services/alerts");
 const parseData = require('./utils/parseData');
 const createEmptyGraph = require('./utils/createEmptyGraph');
 const computeHealthStatuses = require('./utils/computeHealthStatuses');
@@ -23,9 +24,14 @@ let addons = [];      // backend local array to manage addon ids
 let pkt_buffer = [];
 
 let coordinates = {};
+let statuses = [];
+
 let active_policies = [];
 let active_pid = null;
 let active_period = null;
+let active_phone = '857-258-3654';
+
+let prevTime = Date.now();
 
 app.use(cors());
 
@@ -72,8 +78,11 @@ function C2M_serverHandler() {
 }
 
 function M2F_connectionHandler(client){
-  M2F_socket.emit("initSetup", config);
-  M2F_socket.emit("updateChartConfig", config.chartConfig);
+  client.on("disconnect", () => {
+    active_pid = null;
+    active_period = null;
+    active_policies = [];
+  });
 
   client.on("addon_selection", (pid) => {
     active_pid = pid.toString();
@@ -83,8 +92,9 @@ function M2F_connectionHandler(client){
     // Receives label for x axis period as well as the polling frequency associated with it.
     // This will allow us to query the database for the appropriate info, as well as change
     // the frequency at which we poll the incoming data, so we can modify our coordinates array
-    // and send it back to the frontend.
-    console.log("To be used once we have connected the database:", period);
+    // and send it back to the frontend.  
+    active_period = config.period2seconds[period];
+  
   });
 
   client.on("add_policy", (policy) => {
@@ -100,12 +110,18 @@ function M2F_connectionHandler(client){
   });
 
   setInterval(() => {
+      statuses = computeHealthStatuses(coordinates, crud.getAllPolicies());
+      statuses.forEach(status_obj => {
+        if (status_obj.status != 'HEALTHY') {
+          message = `WARNING: SENSING MODULE ID ${status_obj.id} - STATUS: ${status_obj.status}`
+          alerts.sendMessage(message, active_phone);
+        }
+      });
+
       M2F_socket.emit("updateAddons", addons.map(a => a.id));
-      M2F_socket.emit("updateStatuses", computeHealthStatuses(coordinates, crud.getAllPolicies()));
+      M2F_socket.emit("updateStatuses", statuses);
     if (active_pid != null) {
       M2F_socket.emit("updateCoords", coordinates[active_pid]);
-      //M2F_socket.emit("updateStatuses", [{id:'123', status:'healthy'}]);
-      //console.log(formatPolicies(crud.getPolicies(active_pid)));
       M2F_socket.emit("updatePolicies", formatPolicies(crud.getPolicies(active_pid)));
     }
   }, 100);
@@ -136,12 +152,14 @@ function C2M_connectionHandler(conn){
       } 
       if (("data" in pkt) && (pkt.id in coordinates)) {
         pkt_buffer.push(pkt);
-        for (let i = 0; i < config.chartTypes.length; i++) {
-          for (let j = 0; j < config.chartConfig.xMax - 1; j++) {
-            coordinates[pkt.id][config.chartTypes[i]][j].y = coordinates[pkt.id][config.chartTypes[i]][j+1].y;
+
+          for (let i = 0; i < config.chartTypes.length; i++) {
+            for (let j = 0; j < config.chartConfig.xMax - 1; j++) {
+              coordinates[pkt.id][config.chartTypes[i]][j].y = coordinates[pkt.id][config.chartTypes[i]][j+1].y;
+            }
+            coordinates[pkt.id][config.chartTypes[i]][config.chartConfig.xMax - 1].y = pkt.data[config.chartTypes[i]];
           }
-          coordinates[pkt.id][config.chartTypes[i]][config.chartConfig.xMax - 1].y = pkt.data[config.chartTypes[i]];
-        }
+
       }
     }
   });
