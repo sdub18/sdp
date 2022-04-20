@@ -42,6 +42,11 @@ function getPolicies(active_module) {
 	return db.query(sqlCmd, [active_module]);
 }
 
+function getAllPolicies() {
+	const sqlCmd = "SELECT * FROM policy";
+	return db.query(sqlCmd, []);
+}
+
 function insertNewPolicy(active_module, policy) {
 	const highest_id = db.query('SELECT MAX(policyID) FROM policy WHERE moduleID=?', [parseInt(active_module)])[0]['MAX(policyID)'];
 
@@ -56,4 +61,9 @@ function deletePolicy(active_module, id) {
 	db.del(sqlCmd, [active_module, id])
 }
 
-module.exports = { insertData, insertMany, insertNewPolicy, getAccelData, getPolicies, deletePolicy };
+function deleteAllPoliciesForModule(active_module) {
+	const sqlCmd = `DELETE FROM policy WHERE moduleID=?`;
+	db.del(sqlCmd, [active_module])
+}
+
+module.exports = { insertData, insertMany, insertNewPolicy, getAccelData, getPolicies, getAllPolicies, deletePolicy, deleteAllPoliciesForModule };

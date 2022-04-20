@@ -100,10 +100,12 @@ function M2F_connectionHandler(client){
   });
 
   setInterval(() => {
-    if (active_pid != "") { 
-      M2F_socket.emit("updateCoords", coordinates[active_pid]);
       M2F_socket.emit("updateAddons", addons.map(a => a.id));
-      M2F_socket.emit("updateStatuses", [{id:'123', status:'healthy'}]); 
+      M2F_socket.emit("updateStatuses", computeHealthStatuses(coordinates, crud.getAllPolicies()));
+    if (active_pid != null) {
+      M2F_socket.emit("updateCoords", coordinates[active_pid]);
+      //M2F_socket.emit("updateStatuses", [{id:'123', status:'healthy'}]);
+      //console.log(formatPolicies(crud.getPolicies(active_pid)));
       M2F_socket.emit("updatePolicies", formatPolicies(crud.getPolicies(active_pid)));
     }
   }, 100);
@@ -148,6 +150,9 @@ function C2M_connectionHandler(conn){
     // remove connection from addon array
     addon_index = addons.findIndex(addon => addon.remotePort == conn.remotePort);
     addon_id = addons[addon_index].id;
+    crud.deleteAllPoliciesForModule(addon_id);
+    active_policies = crud.getPolicies(active_pid);
+    M2F_socket.emit("updatePolicies", formatPolicies(active_policies));
     addons.splice(addon_index, 1);
 
     console.log('connection from %s closed', conn.remotePort);
