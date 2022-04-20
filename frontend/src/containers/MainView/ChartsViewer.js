@@ -7,7 +7,7 @@ import DynamicGraph from '../../components/DynamicGraph';
 export default function ChartsViewer() {
 	const units = {"current": "A", "power": "W", "temp": "F"};
 
-	const {holderCoords, holderChartConfig} = useContext(SocketContext);
+	const {holderCoords} = useContext(SocketContext);
 	
 	const [coords, setCoords] = useState([]);
 	const [dataTypes, setDataTypes] = useState([]);

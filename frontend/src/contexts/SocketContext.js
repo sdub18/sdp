@@ -9,7 +9,6 @@ const SocketContext = createContext(socket);
 const SocketProvider = ({ children }) => {
 	const holderCoords = useRef([]);
 	const holderAddons = useRef([]);
-	const holderChartConfig = useRef({});
 	const holderStatuses = useRef([]);
 	const holderPolicies = useRef([]);
 	const config = useRef({});
@@ -17,12 +16,6 @@ const SocketProvider = ({ children }) => {
 	const handleCoordsUpdate = useCallback((updatedCoords) => {
 		if (updatedCoords){
 			holderCoords.current = updatedCoords;
-		}
-	},[]);
-
-	const handleConfigUpdate = useCallback((updatedChartConfig) => {
-		if (updatedChartConfig){
-			holderChartConfig.current = updatedChartConfig
 		}
 	},[]);
 
@@ -74,7 +67,6 @@ const SocketProvider = ({ children }) => {
 			config: config,
 			holderCoords: holderCoords, 
 			holderAddons: holderAddons,
-			holderChartConfig: holderChartConfig,
 			holderStatuses: holderStatuses,
 			holderPolicies: holderPolicies
 		}}>
