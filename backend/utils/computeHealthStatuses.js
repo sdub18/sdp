@@ -10,13 +10,13 @@ function computeHealthStatuses(coordinates, policies) {
   let output = [];
   let allIds = Object.keys(coordinates);
   for (i = 0; i < policies.length; i++) {
-    let moduleId = policies[i].moduleId.toString();
+    let moduleID = policies[i].moduleID.toString();
     let dataType = policies[i].dataType;
     let threshold = policies[i].threshold;
-    let subsetOfCoords = coordinates[moduleId][dataType];
+    let subsetOfCoords = coordinates[moduleID][dataType];
     let operand;
-    if (dangerousDataTypesById[moduleId] == undefined) {
-      dangerousDataTypesById[moduleId] = [];
+    if (dangerousDataTypesById[moduleID] == undefined) {
+      dangerousDataTypesById[moduleID] = [];
     }
     if (policies[i].policyType == "average") {
       operand = computeAverage(subsetOfCoords.map(coord => coord.y));
@@ -26,31 +26,31 @@ function computeHealthStatuses(coordinates, policies) {
     }
     if (policies[i].comparison == '>') {
       if (operand > threshold) {
-        if (outputTemplate[moduleId] == undefined) {
-          outputTemplate[moduleId] = "DANGEROUS (";
+        if (outputTemplate[moduleID] == undefined) {
+          outputTemplate[moduleID] = "DANGEROUS (";
         }
-        if (!dangerousDataTypesById[moduleId].includes(dataType)) {
-          outputTemplate[moduleId] += dataType + ', ';
+        if (!dangerousDataTypesById[moduleID].includes(dataType)) {
+          outputTemplate[moduleID] += dataType + ', ';
         }
-        dangerousDataTypesById[moduleId].push(dataType);
+        dangerousDataTypesById[moduleID].push(dataType);
       } else {
-        if (outputTemplate[moduleId] == undefined) {
-          outputTemplate[moduleId] = "HEALTHY";
+        if (outputTemplate[moduleID] == undefined) {
+          outputTemplate[moduleID] = "HEALTHY";
         }
       }
     }
     if (policies[i].comparison == '<') {
       if (operand < threshold) {
-        if (outputTemplate[moduleId] == undefined) {
-          outputTemplate[moduleId] = "DANGEROUS (";
+        if (outputTemplate[moduleID] == undefined) {
+          outputTemplate[moduleID] = "DANGEROUS (";
         }
-        if (!dangerousDataTypesById[moduleId].includes(dataType)) {
-          outputTemplate[moduleId] += dataType + ', ';
+        if (!dangerousDataTypesById[moduleID].includes(dataType)) {
+          outputTemplate[moduleID] += dataType + ', ';
         }
-        dangerousDataTypesById[moduleId].push(dataType);
+        dangerousDataTypesById[moduleID].push(dataType);
       } else {
-        if (outputTemplate[moduleId] == undefined) {
-          outputTemplate[moduleId] = "HEALTHY";
+        if (outputTemplate[moduleID] == undefined) {
+          outputTemplate[moduleID] = "HEALTHY";
         }
       }
     }
@@ -83,7 +83,7 @@ function computeHealthStatuses(coordinates, policies) {
 /*
 const policies = [
   {
-    moduleId: 4831,
+    moduleID: 4831,
     policyID: 1,
     policyType: 'average',
     dataType: 'current',
