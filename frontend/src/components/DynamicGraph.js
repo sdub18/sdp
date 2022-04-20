@@ -9,8 +9,7 @@ import {
   Legend,
   Label
 } from "recharts";
-import { makeStyles } from '@material-ui/core/styles'
-import Box from '@mui/material/Box';
+import { Box, makeStyles } from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
     containter: {
@@ -25,68 +24,62 @@ const useStyles = makeStyles(theme => ({
     }
   }))
 
-const test = []
-const testTicks = []
-for (let i = 0; i < 401; i++) {
-    let x = 20 * (i/400);
-    test.push(
-        {
-            x: 20 * (i/400),
-            y: Math.pow(x, 2),
-            z: 20*x
-        }
-    )
-    if (i % 4 == 0) {
-        testTicks.push(i);
+export default function DynamicGraph(props) {
+    const classes = useStyles();
+    let ticks = [];
+    for (let i = 0; i < props.xMax + props.xIncrement; i += props.xIncrement) {
+        ticks.push(i);
     }
-}
-
-export default function StaticGraph() {
-    const classes = useStyles()
   return (
     <Box
         className={classes.marginAutoItem}
         position="relative"
     >
-        <h1 display="inline" textAlign="center">Intersection of two functions</h1>
         <LineChart
         className={classes.graph}
-        width={500}
-        height={400}
-        data={test}
+        width={props.width}
+        height={props.height}
+        data={props.data}
         margin={{
             top: 10
         }}
         >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis
-            label="X Axis"
             dataKey="x"
-            ticks={testTicks}
+            type="number"
+            tick={{fontSize: 15}}
+            ticks={ticks}
         />
-        <YAxis>
+        <YAxis
+            type="number"
+            tick={{fontSize: 15}}
+            domain={["auto", "auto"]}
+        >
             <Label
-                value="Y Axis"
+                value={props.yAxisLabel}
                 position="insideTopLeft"
-                offset={10}
+                angle={-90}
+                dy={230}
+                fill="white"
             />
         </YAxis>
         {/*<Tooltip />*/}
         <Legend />
         <Line
-            name="y = x^2"
+            name={props.title}
             type="linear"
             dataKey="y"
             stroke="#8884d8"
             dot={false}
         />
-        <Line
-            name="z = 20x"
-            type="linear"
-            dataKey="z"
-            stroke="#82ca9d"
-            dot={false}
-        />
+        {/*<Line
+             name={props.threshold}
+             type="linear"
+             dataKey="threshold"
+             stroke="#1884d8"
+             dot={false}
+    />*/}
         </LineChart>
     </Box>
   );
