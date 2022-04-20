@@ -1,5 +1,4 @@
 const net = require("net");
-const FFT = require('fft.js');
 const app = require("express")();
 const cors = require("cors");
 
@@ -17,20 +16,16 @@ const parseData = require('./utils/parseData');
 const createEmptyGraph = require('./utils/createEmptyGraph');
 const computeHealthStatuses = require('./utils/computeHealthStatuses');
 const formatPolicies = require('./utils/formatPolicies');
+const getSampleRate = require("./utils/getSampleRate");
 
-const fft = new FFT(512);
-const out = fft.createComplexArray();
 
 let addons = [];      // backend local array to manage addon ids
 let pkt_buffer = [];
-let cur = Date.now();
 
-const chart_types = ["current", "power", "temp"];
-const thresholds = {"current": 100, "power": 60, "temp": 80};
-
-let active_pid = null;
 let coordinates = {};
 let active_policies = [];
+let active_pid = null;
+let active_period = null;
 
 app.use(cors());
 
@@ -63,31 +58,16 @@ M2F_socket.on("connection", M2F_connectionHandler);
 M2F_server.listen(MIDDLE_TO_FRONT_PORT, () => {console.log(`M2F_server listening on ${MIDDLE_TO_FRONT_PORT}`)});
 
 C2M_server.on('connection', C2M_connectionHandler);
-C2M_server.listen(CLIENT_TO_MIDDLE_PORT, () => {console.log(`C2M_server listening on ${CLIENT_TO_MIDDLE_PORT}`)});
+C2M_server.listen(CLIENT_TO_MIDDLE_PORT, C2M_serverHandler);
 
 
 function C2M_serverHandler() {
   console.log(`C2M_server listening on ${CLIENT_TO_MIDDLE_PORT}`);
 
   setInterval(()=>{
-    cur = Date.now();
     crud.insertMany(pkt_buffer);
-    console.log(pkt_buffer.length, Date.now()-cur);
-    cur = Date.now();
-    
     pkt_buffer.length = 0;
   }, 1000);
-  /*
-  setInterval(() => {
-    prevTime = Date.now()-5000;
-    curTime = Date.now();
-    input = crud.getAccelData('z', prevTime, curTime).map((row) => (row['z']) );
-    if (input.length == fft.size) {
-      fft.realTransform(out, input);
-
-    }  
-
-  }, 500);*/
 
 }
 
@@ -99,12 +79,12 @@ function M2F_connectionHandler(client){
     active_pid = pid.toString();
   })
 
-  client.on("chart_period_selection", (periodAndFrequency) => {
+  client.on("chart_period_selection", (period) => {
     // Receives label for x axis period as well as the polling frequency associated with it.
     // This will allow us to query the database for the appropriate info, as well as change
     // the frequency at which we poll the incoming data, so we can modify our coordinates array
     // and send it back to the frontend.
-    console.log("To be used once we have connected the database:", periodAndFrequency);
+    console.log("To be used once we have connected the database:", period);
   });
 
   client.on("add_policy", (policy) => {
@@ -151,16 +131,16 @@ function C2M_connectionHandler(conn){
         addons.push(pkt);
         console.log(addons);
 
-        coordinates[pkt.id] = createEmptyGraph(chart_types, config.chartConfig, thresholds); // init coords matrix for addon
+        coordinates[pkt.id] = createEmptyGraph(config.chartTypes, config.chartConfig); // init coords matrix for addon
         conn.write(Buffer.from([0x01]));  // send ACK byte
       } 
       if (("data" in pkt) && (pkt.id in coordinates)) {
         pkt_buffer.push(pkt);
-        for (let i = 0; i < chart_types.length; i++) {
+        for (let i = 0; i < config.chartTypes.length; i++) {
           for (let j = 0; j < config.chartConfig.xMax - 1; j++) {
-            coordinates[pkt.id][chart_types[i]][j].y = coordinates[pkt.id][chart_types[i]][j+1].y;
+            coordinates[pkt.id][config.chartTypes[i]][j].y = coordinates[pkt.id][config.chartTypes[i]][j+1].y;
           }
-          coordinates[pkt.id][chart_types[i]][config.chartConfig.xMax - 1].y = pkt.data[chart_types[i]];
+          coordinates[pkt.id][config.chartTypes[i]][config.chartConfig.xMax - 1].y = pkt.data[config.chartTypes[i]];
         }
       }
     }

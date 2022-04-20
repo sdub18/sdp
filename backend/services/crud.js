@@ -3,7 +3,7 @@ const db = require('../db');
 function insertData(pkt) {
 	const data = pkt['data'];
 
-	const timestamp = Date.now();
+	const timestamp = pkt["timestamp"];
 	const id = pkt['id'];
 	const current = data['current'];
 	const voltage = data['voltage'];
@@ -48,10 +48,7 @@ function getAllPolicies() {
 }
 
 function insertNewPolicy(active_module, policy) {
-	console.log(active_module);
-	console.log(active_module.toString());
-	let highest_id = db.query('SELECT MAX(policyID) FROM policy WHERE moduleID=?', [active_module])[0]["MAX(policyID)"];
-	console.log(highest_id);
+	const highest_id = db.query('SELECT MAX(policyID) FROM policy WHERE moduleID=?', [parseInt(active_module)])[0]['MAX(policyID)'];
 
 	(highest_id == null) ? new_id = 1 : new_id = highest_id+1; 
 

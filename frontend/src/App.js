@@ -8,6 +8,7 @@ import { ViewProvider } from "./contexts/ViewContext";
 import { AddonProvider } from "./contexts/AddonContext";
 import Layout from "./layouts/Layout";
 import AppContainer from "./containers/AppContainer";
+import { PeriodProvider } from "./contexts/PeriodContext";
 
 
 function App() {
@@ -17,9 +18,11 @@ function App() {
       <SocketProvider>
         <ViewProvider>
           <AddonProvider>
+            <PeriodProvider>
               <Layout>
                 <AppContainer/>
               </Layout>
+            </PeriodProvider>
           </AddonProvider>
         </ViewProvider>
       </SocketProvider>
