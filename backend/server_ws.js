@@ -1,7 +1,7 @@
 const net = require("net");
 const app = require("express")();
 const cors = require("cors");
-
+require('dotenv').config();
 
 const CLIENT_TO_MIDDLE_PORT = 49160;
 const MIDDLE_TO_FRONT_PORT = 3001;
