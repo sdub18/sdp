@@ -26,7 +26,7 @@ function computeHealthStatuses(coordinates, policies) {
     }
     if (policies[i].comparison == '>') {
       if (operand > threshold) {
-        if (outputTemplate[moduleID] == undefined) {
+        if (outputTemplate[moduleID] == undefined || outputTemplate[moduleID] == "HEALTHY") {
           outputTemplate[moduleID] = "DANGEROUS (";
         }
         if (!dangerousDataTypesById[moduleID].includes(dataType)) {
@@ -41,7 +41,7 @@ function computeHealthStatuses(coordinates, policies) {
     }
     if (policies[i].comparison == '<') {
       if (operand < threshold) {
-        if (outputTemplate[moduleID] == undefined) {
+        if (outputTemplate[moduleID] == undefined || outputTemplate[moduleID] == "HEALTHY") {
           outputTemplate[moduleID] = "DANGEROUS (";
         }
         if (!dangerousDataTypesById[moduleID].includes(dataType)) {
