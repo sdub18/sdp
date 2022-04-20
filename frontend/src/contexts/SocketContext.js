@@ -45,14 +45,12 @@ const SocketProvider = ({ children }) => {
 
 	useEffect(()=>{
 		socket.on("updateCoords", handleCoordsUpdate);
-		socket.on("updateChartConfig", handleConfigUpdate);
 		socket.on("updateAddons", handleAddonsUpdate);
 		socket.on("updateStatuses", handleHealthUpdate);
 		socket.on("updatePolicies", handlePoliciesUpdate);
 		socket.on("initSetup", handleInitSetup)
 		return () => {
 			socket.off("updateCoords", handleCoordsUpdate);
-			socket.off("updateChartConfig", handleConfigUpdate);
 			socket.off("updateAddons", handleAddonsUpdate);
 			socket.off("updateStatuses", handleHealthUpdate);
 			socket.off("updatePolicies", handlePoliciesUpdate);
