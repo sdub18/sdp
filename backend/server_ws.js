@@ -126,13 +126,14 @@ function M2F_connectionHandler(client){
 
   setInterval(() => {
       statuses = computeHealthStatuses(coordinates, crud.getAllPolicies());
+      /*
       statuses.forEach(status_obj => {
         if (status_obj.status != 'HEALTHY') {
           message = `WARNING: SENSING MODULE ID ${status_obj.id} - STATUS: ${status_obj.status}`
           alerts.sendMessage(message, active_phone);
         }
       });
-
+      */
       M2F_socket.emit("updateAddons", addons.map(a => a.id));
       M2F_socket.emit("updateStatuses", formatHealthStatuses(statuses));
     if (active_pid != null) {

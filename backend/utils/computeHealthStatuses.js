@@ -83,11 +83,13 @@ function computeHealthStatuses(coordinates, policies) {
 
 function computeHealthStatuses(coordinates, policies) {
   let output = [];
-  const allIds = Array.from(new Set(policies.map(policy => policy.moduleID)));
-  for (i = 0; i < allIds.length; i++) {
-    let currentId = allIds[i];
+  let policyIds = Array.from(new Set(policies.map(policy => policy.moduleID)));
+  policyIds = policyIds.map(id => id.toString());
+  console.log(policyIds);
+  for (i = 0; i < policyIds.length; i++) {
+    let currentId = policyIds[i];
     output.push({id: currentId, status: "HEALTHY", violatedPolicies: []});
-    policiesForCurrentModuleId = policies.filter(policy => policy.moduleID === currentId);
+    policiesForCurrentModuleId = policies.filter(policy => policy.moduleID.toString() === currentId);
     for (j = 0; j < policiesForCurrentModuleId.length; j++) {
       let currentPolicy = policiesForCurrentModuleId[j];
       let dataType = currentPolicy.dataType;
@@ -126,6 +128,12 @@ function computeHealthStatuses(coordinates, policies) {
       }
     }
   }
+  const allIds = Object.keys(coordinates);
+  const leftoverIds = allIds.filter(id => !policyIds.includes(id));
+  for (i = 0; i < leftoverIds.length; i++) {
+    let currentId = leftoverIds[i].toString();
+    output.push({id: currentId, status: "HEALTHY", violatedPolicies: []});
+  }
   return output;
 }
 
@@ -145,16 +153,25 @@ const policies = [
     moduleID: 4831,
     policyID: 2,
     policyType: 'simple',
-    dataType: 'current',
+    dataType: 'temp',
     period: '1 min',
     comparison: '<',
     threshold: 50
   },
   {
-    moduleID: 4832,
+    moduleID: 4831,
     policyID: 3,
-    policyType: 'average',
+    policyType: 'simple',
     dataType: 'current',
+    period: '1 min',
+    comparison: '>',
+    threshold: 60
+  },
+  {
+    moduleID: 4832,
+    policyID: 1,
+    policyType: 'average',
+    dataType: 'power',
     period: '1 min',
     comparison: '<',
     threshold: 50
@@ -174,6 +191,17 @@ const coordinates = {
     ]
   },
   '4832': {
+    current: [
+      { x: 0, y: 56 },  { x: 1, y: 50 },  { x: 2, y: 58 },  { x: 3, y: 62 }
+    ],
+    power: [
+      { x: 0, y: 56 },  { x: 1, y: 50 },  { x: 2, y: 58 },  { x: 3, y: 20 }
+    ],
+    temp: [
+      { x: 0, y: 56 },  { x: 1, y: 50 },  { x: 2, y: 58 },  { x: 3, y: 30 }
+    ]
+  },
+  '4833': {
     current: [
       { x: 0, y: 56 },  { x: 1, y: 50 },  { x: 2, y: 58 },  { x: 3, y: 62 }
     ],
