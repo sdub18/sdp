@@ -44,12 +44,12 @@ export default function PolicyModal() {
     axios.post("http://localhost:3001/add_policy", newPolicy)
     .then(() => {
       alert("Policy added!");
+      handleClose();
     })
     .catch((err) => {
+      reset();
       alert(`BAD REQUEST: ${err.response.data}`);
     });
-
-    handleClose();
 
   }
 

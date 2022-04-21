@@ -26,10 +26,9 @@ export default function PolicyViewer() {
 	
 
 	const columns = [
-		{field: 'id', headerName:'id', width: 80},
-		{field: 'policyType', headerName: 'Policy Type', width: 200},
-		{field: 'dataType', headerName: 'Data Type', width: 200},
-		{field: 'period', headerName: 'Period', width: 200},
+		{field: 'id', headerName:'id', width: 150},
+		{field: 'policyType', headerName: 'Policy Type', width: 300},
+		{field: 'dataType', headerName: 'Data Type', width: 300},
 		{field: 'description', headerName: 'Description', sortable: false, width: 400},	
 		{
 			field: 'actions',
