@@ -6,6 +6,7 @@ import { AddonContext } from '../../contexts/AddonContext';
 import PolicyModal from './PolicyModal';
 import AddonSelector from './AddonSelector';
 import ChartPeriodSelector from './ChartPeriodSelector';
+import ChartPeriodSlider from './ChartPeriodSlider';
 import MainButton from '../../components/MainButton';
 
 
@@ -22,7 +23,7 @@ export default function UserInput() {
 					{views ? "Charts Viewer": "Policy List"}
 				</MainButton> 
 				<AddonSelector/>
-				{ !views && <ChartPeriodSelector />}
+				{ !views && <ChartPeriodSlider />}
 				{ views && addon && <PolicyModal />}
 			</Stack>
 		</React.Fragment>
