@@ -23,7 +23,7 @@ export default function UserInput() {
 					{views ? "Charts Viewer": "Policy List"}
 				</MainButton> 
 				<AddonSelector/>
-				{ !views && <ChartPeriodSlider />}
+				{ !views && addon && <ChartPeriodSlider />}
 				{ views && addon && <PolicyModal />}
 			</Stack>
 		</React.Fragment>

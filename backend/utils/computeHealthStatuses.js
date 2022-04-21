@@ -85,7 +85,6 @@ function computeHealthStatuses(coordinates, policies) {
   let output = [];
   let policyIds = Array.from(new Set(policies.map(policy => policy.moduleID)));
   policyIds = policyIds.map(id => id.toString());
-  console.log(policyIds);
   for (i = 0; i < policyIds.length; i++) {
     let currentId = policyIds[i];
     output.push({id: currentId, status: "HEALTHY", violatedPolicies: []});

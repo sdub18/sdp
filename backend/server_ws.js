@@ -1,6 +1,7 @@
 const net = require("net");
 const express = require("express");
 const cors = require("cors");
+const downsample = require("downsample");
 require('dotenv').config();
 
 const CLIENT_TO_MIDDLE_PORT = 49160;
@@ -72,6 +73,21 @@ app.post("/addon", (req, res) => {
 app.post("/chart_period", (req, res) => {
   period = req.body.period;
   active_period = period;
+  
+  config.dataTypes.every(dataType => {
+    console.log(dataType);
+    cur_data = crud.getLastPeriodicData(active_pid, active_period, dataType);
+    if (cur_data === undefined) {
+      return false;
+      
+    } else {
+      ds = downsample.LTD(cur_data, config.chartConfig.xMax);
+      for (i=0; i<config.chartConfig.xMax; i++) ds[i].x = i;
+      coordinates[active_pid][dataType] = ds;
+      return true;
+    }
+  });
+  
   res.sendStatus(200);
 })
 
@@ -87,7 +103,7 @@ app.get("/policy_modal", (req, res) => {
   let setup = {policyTypes: config.policyTypes, 
     periods: config.availablePolicyPeriods,
     comparisons: config.comparisons,
-    dataTypes: config.chartTypes,
+    dataTypes: config.dataTypes,
   }
   res.send(setup);
 })
@@ -163,18 +179,18 @@ function C2M_connectionHandler(conn){
         addons.push(pkt);
         console.log(addons);
 
-        coordinates[pkt.id] = createEmptyGraph(config.chartTypes, config.chartConfig); // init coords matrix for addon
+        coordinates[pkt.id] = createEmptyGraph(config.dataTypes, config.chartConfig); // init coords matrix for addon
         conn.write(Buffer.from([0x01]));  // send ACK byte
       } 
       if (("data" in pkt) && (pkt.id in coordinates)) {
         pkt_buffer.push(pkt);
         if (Date.now() - prevTime >= getSampleRate(active_period, config.chartConfig.xMax) * 0.8) {
           //console.log(Date.now() - prevTime);
-          for (let i = 0; i < config.chartTypes.length; i++) {
+          for (let i = 0; i < config.dataTypes.length; i++) {
             for (let j = 0; j < config.chartConfig.xMax - 1; j++) {
-              coordinates[pkt.id][config.chartTypes[i]][j].y = coordinates[pkt.id][config.chartTypes[i]][j+1].y;
+              coordinates[pkt.id][config.dataTypes[i]][j].y = coordinates[pkt.id][config.dataTypes[i]][j+1].y;
             }
-            coordinates[pkt.id][config.chartTypes[i]][config.chartConfig.xMax - 1].y = pkt.data[config.chartTypes[i]];
+            coordinates[pkt.id][config.dataTypes[i]][config.chartConfig.xMax - 1].y = pkt.data[config.dataTypes[i]];
           }
           prevTime = Date.now();
         }
