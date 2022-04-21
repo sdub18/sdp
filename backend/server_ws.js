@@ -62,12 +62,23 @@ app.route("/policy")
     res.sendStatus(200);
   });
 
+app.post("/addon", (req, res) => {
+  pid = req.body.addon.toString();
+  active_pid = pid;
+  res.sendStatus(200);
+});
+
+app.post("/chart_period", (req, res) => {
+  period = req.body.period;
+  active_period = config.period2seconds[period];
+  res.sendStatus(200);
+})
 
 app.get("/chart_periods", (req, res) => {
   res.send(config.availableGraphPeriods);
 });
 
-app.get("/chart_config", (req,res) => {
+app.get("/chart_config", (req, res) => {
   res.send(config.chartConfig);
 })
 
@@ -75,12 +86,12 @@ app.get("/policy_modal", (req, res) => {
   let setup = {policyTypes: config.policyTypes, 
     periods: config.availablePolicyPeriods,
     comparisons: config.comparisons,
-    dataTypes: Object.keys(coordinates[active_pid])
+    dataTypes: config.chartTypes,
   }
   res.send(setup);
 })
 
-app.get("/data_types", (req,res) => {
+app.get("/data_types", (req, res) => {
   try {
     res.send(Object.keys(coordinates[active_pid])) 
   } catch (error) {
@@ -110,19 +121,6 @@ function M2F_connectionHandler(client){
     active_pid = null;
     active_period = null;
     active_policies = [];
-  });
-
-  client.on("addon_selection", (pid) => {
-    active_pid = pid.toString();
-  })
-
-  client.on("chart_period_selection", (period) => {
-    // Receives label for x axis period as well as the polling frequency associated with it.
-    // This will allow us to query the database for the appropriate info, as well as change
-    // the frequency at which we poll the incoming data, so we can modify our coordinates array
-    // and send it back to the frontend.  
-    active_period = config.period2seconds[period];
-  
   });
 
   setInterval(() => {

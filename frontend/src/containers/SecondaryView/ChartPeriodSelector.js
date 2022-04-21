@@ -18,7 +18,7 @@ export default function ChartPeriodSelector() {
 	
 	const chooseChartPeriod = useCallback((event) => {
 		const selectedPeriod = event.target.value
-		socket.emit("chart_period_selection", selectedPeriod);
+		axios.post("http://localhost:3001/chart_period", {period: selectedPeriod});
 		setPeriod(selectedPeriod);
 	  }, []);
 
