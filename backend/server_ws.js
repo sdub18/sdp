@@ -1,11 +1,12 @@
 const net = require("net");
-const app = require("express")();
+const express = require("express");
 const cors = require("cors");
 require('dotenv').config();
 
 const CLIENT_TO_MIDDLE_PORT = 49160;
 const MIDDLE_TO_FRONT_PORT = 3001;
 
+const app = express();
 const C2M_server = net.createServer();
 const M2F_server = require('http').createServer(app);
 const M2F_socket = require('socket.io')(M2F_server,{cors:{origin: true, credentials: true}});
@@ -34,6 +35,25 @@ let active_phone = '857-258-3654';
 let prevTime = Date.now();
 
 app.use(cors());
+app.use(express.json());
+
+app.post("/add_policy", (req, res) => {
+  policy = req.body;
+
+  if (Object.values(policy).includes("")){
+    res.status(400).send("Field must not be empty");
+  }
+  else if (isNaN(policy.threshold)){
+    res.status(400).send("Threshold must be a number");
+  }
+  else{
+    crud.insertNewPolicy(active_pid, policy);
+    active_policies = crud.getPolicies(active_pid);
+    M2F_socket.emit("updatePolicies", formatPolicies(active_policies));
+    res.sendStatus(200);
+  }
+});
+
 
 app.get("/chart_periods", (req, res) => {
   res.send(config.availableGraphPeriods);
@@ -95,12 +115,6 @@ function M2F_connectionHandler(client){
     // and send it back to the frontend.  
     active_period = config.period2seconds[period];
   
-  });
-
-  client.on("add_policy", (policy) => {
-    crud.insertNewPolicy(active_pid, policy);
-    active_policies = crud.getPolicies(active_pid);
-    M2F_socket.emit("updatePolicies", formatPolicies(active_policies));
   });
 
   client.on("delete_policy", (id) => {

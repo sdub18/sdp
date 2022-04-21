@@ -52,8 +52,8 @@ function insertNewPolicy(active_module, policy) {
 
 	(highest_id == null) ? new_id = 1 : new_id = highest_id+1; 
 
-	const sqlCmd = `INSERT INTO policy VALUES (?, ?, ?, ?, ?, ?, ?)`;
-	db.insert(sqlCmd, [active_module, new_id, policy.policyType, policy.dataType, policy.period, policy.comparison, policy.threshold]);
+	const sqlCmd = `INSERT INTO policy VALUES (?, ?, ?, ?, ?, ?)`;
+	db.insert(sqlCmd, [active_module, new_id, policy.policyType, policy.dataType, policy.comparison, policy.threshold]);
 }
 
 function deletePolicy(active_module, id) {
