@@ -34,6 +34,20 @@ const SocketProvider = ({ children }) => {
 	const handlePoliciesUpdate = useCallback((updatedPolicies) => {
 		if (updatedPolicies){
 			holderPolicies.current = updatedPolicies;
+			for (let i = 0; i < holderPolicies.current.length; i++) {
+				if (holderPolicies.current[i].dataType === "current") {
+					holderPolicies.current[i].description += "A";
+				}
+				if (holderPolicies.current[i].dataType === "voltage") {
+					holderPolicies.current[i].description += "V";
+				}
+				if (holderPolicies.current[i].dataType === "power") {
+					holderPolicies.current[i].description += "W";
+				}
+				if (holderPolicies.current[i].dataType === "temp") {
+					holderPolicies.current[i].description += "°F";
+				}
+			}
 		}
 	},[]);
 
