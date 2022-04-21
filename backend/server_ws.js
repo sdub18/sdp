@@ -19,6 +19,7 @@ const createEmptyGraph = require('./utils/createEmptyGraph');
 const computeHealthStatuses = require('./utils/computeHealthStatuses');
 const formatPolicies = require('./utils/formatPolicies');
 const getSampleRate = require("./utils/getSampleRate");
+const formatHealthStatuses = require("./utils/formatHealthStatuses");
 
 
 let addons = [];      // backend local array to manage addon ids
@@ -133,7 +134,7 @@ function M2F_connectionHandler(client){
       });
 
       M2F_socket.emit("updateAddons", addons.map(a => a.id));
-      M2F_socket.emit("updateStatuses", statuses);
+      M2F_socket.emit("updateStatuses", formatHealthStatuses(statuses));
     if (active_pid != null) {
       M2F_socket.emit("updateCoords", coordinates[active_pid]);
       M2F_socket.emit("updatePolicies", formatPolicies(crud.getPolicies(active_pid)));
