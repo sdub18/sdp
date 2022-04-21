@@ -41,7 +41,7 @@ export default function PolicyModal() {
       threshold: threshold
     };
 
-    axios.post("http://localhost:3001/add_policy", newPolicy)
+    axios.post("http://localhost:3001/policy", newPolicy)
     .then(() => {
       alert("Policy added!");
       handleClose();

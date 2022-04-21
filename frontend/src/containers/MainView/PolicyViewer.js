@@ -1,4 +1,5 @@
 import { React, useState, useEffect, useCallback, useContext } from "react";
+import axios from 'axios';
 import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import { Stack } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
@@ -7,13 +8,13 @@ import { SocketContext } from '../../contexts/SocketContext';
 
 
 export default function PolicyViewer() {
-	const { socket, holderPolicies } = useContext(SocketContext);
+	const { holderPolicies } = useContext(SocketContext);
 	const [rows, setRows] = useState(holderPolicies.current);
 	
 	const handleDelete = useCallback((id) => () => {
-		socket.emit("delete_policy", id)
+		axios.delete("http://localhost:3001/policy", {data: {id: id}});
 		setTimeout(() => {
-		setRows((prevRows) => prevRows.filter((row) => row.id !== id));
+			setRows((prevRows) => prevRows.filter((row) => row.id !== id));
 		});
 	},[]);
 

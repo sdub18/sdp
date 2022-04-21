@@ -37,22 +37,30 @@ let prevTime = Date.now();
 app.use(cors());
 app.use(express.json());
 
-app.post("/add_policy", (req, res) => {
-  policy = req.body;
+app.route("/policy")
+  .post((req, res) => {
+    policy = req.body;
 
-  if (Object.values(policy).includes("")){
-    res.status(400).send("Field must not be empty");
-  }
-  else if (isNaN(policy.threshold)){
-    res.status(400).send("Threshold must be a number");
-  }
-  else{
-    crud.insertNewPolicy(active_pid, policy);
+    if (Object.values(policy).includes("")){
+      res.status(400).send("Field must not be empty");
+    }
+    else if (isNaN(policy.threshold)){
+      res.status(400).send("Threshold must be a number");
+    }
+    else{
+      crud.insertNewPolicy(active_pid, policy);
+      active_policies = crud.getPolicies(active_pid);
+      M2F_socket.emit("updatePolicies", formatPolicies(active_policies));
+      res.sendStatus(200);
+    }
+  })
+  .delete((req, res) => {
+    policy_id = req.body.id;
+    crud.deletePolicy(active_pid, policy_id);
     active_policies = crud.getPolicies(active_pid);
     M2F_socket.emit("updatePolicies", formatPolicies(active_policies));
     res.sendStatus(200);
-  }
-});
+  });
 
 
 app.get("/chart_periods", (req, res) => {
@@ -115,12 +123,6 @@ function M2F_connectionHandler(client){
     // and send it back to the frontend.  
     active_period = config.period2seconds[period];
   
-  });
-
-  client.on("delete_policy", (id) => {
-    crud.deletePolicy(active_pid, id);
-    active_policies = crud.getPolicies(active_pid);
-    M2F_socket.emit("updatePolicies", formatPolicies(active_policies));
   });
 
   setInterval(() => {
