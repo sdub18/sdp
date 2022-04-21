@@ -29,7 +29,7 @@ let statuses = [];
 
 let active_policies = [];
 let active_pid = null;
-let active_period = null;
+let active_period = 30;
 let active_phone = '857-258-3654';
 
 let prevTime = Date.now();
@@ -70,7 +70,7 @@ app.post("/addon", (req, res) => {
 
 app.post("/chart_period", (req, res) => {
   period = req.body.period;
-  active_period = config.period2seconds[period];
+  active_period = period;
   res.sendStatus(200);
 })
 
