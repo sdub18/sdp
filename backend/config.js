@@ -1,5 +1,5 @@
 var config = {};
-config.chartTypes = ["current", "voltage", "power", "temp"];
+config.dataTypes = ["current", "voltage", "power", "temp"];
 config.policyTypes = ["simple", "average"];
 config.availablePolicyPeriods = ["1 min", "5 min", "10 min"];
 config.availableGraphPeriods = ["10 s", "30 s", "1 min", "5 min"];
