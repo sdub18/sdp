@@ -1,30 +1,33 @@
 import React, { useState, useCallback, useContext, useEffect, useRef } from 'react';
 import axios from 'axios';
 
-import Selector from '../../components/Selector';
+import { Slider, Typography } from '@mui/material';
 import { PeriodContext } from '../../contexts/PeriodContext';
 
 
-export default function ChartPeriodSelector() {
+export default function ChartPeriodSlider() {
 	const [period, setPeriod] = useContext(PeriodContext);
-	const [chartPeriods, setChartPeriods] = useState([]);
 
-
-	useEffect(() =>{
-		axios.get("http://localhost:3001/chart_periods").then((res)=>{setChartPeriods(res.data)})	
-	},[]);
-	
 	const chooseChartPeriod = useCallback((event) => {
 		const selectedPeriod = event.target.value
 		axios.post("http://localhost:3001/chart_period", {period: selectedPeriod});
 		setPeriod(selectedPeriod);
 	  }, []);
 
+
 	return (
 		<React.Fragment>	
-			<Selector text="Period" labels={chartPeriods} value={period} onChangeHandler={chooseChartPeriod}>
-				Select Chart Period
-			</Selector>
+			<h2>Select Graph Period (seconds)</h2>
+			<Slider
+				defaultValue={30}
+				valueLabelDisplay="auto"
+				step={30}
+				marks
+				min={30}
+				max={300}
+				value={period}
+				onChange={chooseChartPeriod}
+			/>
 		</React.Fragment>
 	)
 }

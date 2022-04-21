@@ -4,6 +4,7 @@ coordinates: Coordinates array being stored in the program.
 policies: Array of all policy objects stored in the program.
 */
 
+/*
 function computeHealthStatuses(coordinates, policies) {
   let outputTemplate = {}
   let dangerousDataTypesById = {}
@@ -78,6 +79,55 @@ function computeHealthStatuses(coordinates, policies) {
   }
   return output;
 }
+*/
+
+function computeHealthStatuses(coordinates, policies) {
+  let output = [];
+  const allIds = Array.from(new Set(policies.map(policy => policy.moduleID)));
+  for (i = 0; i < allIds.length; i++) {
+    let currentId = allIds[i];
+    output.push({id: currentId, status: "HEALTHY", violatedPolicies: []});
+    policiesForCurrentModuleId = policies.filter(policy => policy.moduleID === currentId);
+    for (j = 0; j < policiesForCurrentModuleId.length; j++) {
+      let currentPolicy = policiesForCurrentModuleId[j];
+      let dataType = currentPolicy.dataType;
+      let subsetOfCoords = coordinates[currentId][dataType];
+      let comparison = currentPolicy.comparison;
+      let threshold = currentPolicy.threshold;
+      if (currentPolicy.policyType == "average") {
+        operand = computeAverage(subsetOfCoords.map(coord => coord.y));
+        if (comparison === '>') {
+          if (operand > threshold) {
+            output[i].status = "DANGEROUS";
+            output[i].violatedPolicies.push(currentPolicy.policyID);
+          }
+        }
+        if (comparison === '<') {
+          if (operand < threshold) {
+            output[i].status = "DANGEROUS";
+            output[i].violatedPolicies.push(currentPolicy.policyID);
+          }
+        }
+      }
+      if (currentPolicy.policyType == "simple") {
+        operand = subsetOfCoords[subsetOfCoords.length - 1].y;
+        if (comparison === '>') {
+          if (operand > threshold) {
+            output[i].status = "DANGEROUS";
+            output[i].violatedPolicies.push(currentPolicy.policyID);
+          }
+        }
+        if (comparison === '<') {
+          if (operand < threshold) {
+            output[i].status = "DANGEROUS";
+            output[i].violatedPolicies.push(currentPolicy.policyID);
+          }
+        }
+      }
+    }
+  }
+  return output;
+}
 
 // Uncomment and edit below for testing.
 /*
@@ -88,13 +138,42 @@ const policies = [
     policyType: 'average',
     dataType: 'current',
     period: '1 min',
-    comparison: '>',
+    comparison: '<',
+    threshold: 50
+  },
+  {
+    moduleID: 4831,
+    policyID: 2,
+    policyType: 'simple',
+    dataType: 'current',
+    period: '1 min',
+    comparison: '<',
+    threshold: 50
+  },
+  {
+    moduleID: 4832,
+    policyID: 3,
+    policyType: 'average',
+    dataType: 'current',
+    period: '1 min',
+    comparison: '<',
     threshold: 50
   }
 ];
 
 const coordinates = {
   '4831': {
+    current: [
+      { x: 0, y: 56 },  { x: 1, y: 50 },  { x: 2, y: 58 },  { x: 3, y: 62 }
+    ],
+    power: [
+      { x: 0, y: 56 },  { x: 1, y: 50 },  { x: 2, y: 58 },  { x: 3, y: 20 }
+    ],
+    temp: [
+      { x: 0, y: 56 },  { x: 1, y: 50 },  { x: 2, y: 58 },  { x: 3, y: 30 }
+    ]
+  },
+  '4832': {
     current: [
       { x: 0, y: 56 },  { x: 1, y: 50 },  { x: 2, y: 58 },  { x: 3, y: 62 }
     ],

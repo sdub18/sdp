@@ -50,6 +50,8 @@ const PORT = 49160;
 const UID = process.pid;
 const sendFreq = 10;
 
+const id_pkt = `{"id": ${UID}}`;
+
 const options = {family: 4, host:HOST, port: PORT}
 const client = net.createConnection(options, connectionHandler);
 let canSend = false;
@@ -80,11 +82,8 @@ async function sendData(port) {
     let a = 0;
     let direction = 1;
     while(1){
-        let data = "";
-
         if (!canSend){
-            type = "init";
-            data = port;
+            client.write(id_pkt);
         }
         else{
             let I = 100 + a;
@@ -92,21 +91,18 @@ async function sendData(port) {
             if (a == 20 || a == 0) {
                 direction *= -1;
             }
+            let V = 10 + (getRandomIntInRange(-100, 100) / 100);
             let P = 60 + (getRandomIntInRange(-10, 10));
             let T = 80 + getRandomIntInRange(0,5);
-            let A = 40 + getRandomIntInRange(-10, 10);
             let x = 0;
             let y = 0;
             let z = 9.8;
             type = "data";
-            data = `{"current": ${I}, "power": ${P}, "temperature": ${T}, "accelereation": {"x": ${x}, "y": ${y}, "z": ${z}}, "rpm": ${A}}`;
+            let data = `{"current": ${I}, "voltage": ${V},"power": ${P}, "temp": ${T}, "acceleration": {"x": ${x}, "y": ${y}, "z": ${z}}}`;
+            let data_pkt = `{"id": ${UID}, "data":${data}, "timestamp":${Date.now()}}\n`;
+            client.write(data_pkt);
+            console.log(data_pkt);
         }
-
-        data_pkt = `{"id": ${UID}, "data":${data}}`;  
-        
-        client.write(data_pkt);
-        console.log(data_pkt +'\n');
-        
         await sleep(sendFreq);  
     }    
 }

@@ -102,17 +102,17 @@ async function sendData(port) {
             let I = (I_base) + (getRandomIntInRange(-1, 1));
             let V = (V_base) + (getRandomIntInRange(-1, 1));
             let P = (P_base) + (getRandomIntInRange(-1, 1));
-            let Tf = (T_base) + getRandomIntInRange(-1, 1);
-            let Tc = 30 + getRandomIntInRange(-5,5);
+            let T = (T_base) + getRandomIntInRange(-1, 1);
             let x = 0;
             let y = 0;
             let z = 9.8;
-            let data = `{"current": ${I}, "voltage": ${V},"power": ${P}, "temp": ${Tf}, "accelereation": {"x": ${x}, "y": ${y}, "z": ${z}}}`;
-            let data_pkt = `{"id": ${UID}, "data":${data}}`;  
+            let data = `{"current": ${I}, "voltage": ${V},"power": ${P}, "temp": ${T}, "accelereation": {"x": ${x}, "y": ${y}, "z": ${z}}}`;
+            let data_pkt = `{"id": ${UID}, "data":${data}},"timestamp":${Date.now()}}\n`;  
             client.write(data_pkt);
             console.log(data_pkt);
         }
         await sleep(sendFreq);  
+    }
 }
 
 function sleep(ms){
@@ -123,4 +123,4 @@ function sleep(ms){
 
 function getRandomIntInRange(min, max) {
     return Math.floor(min + (Math.random() * (max - min)));
-}}
+}
