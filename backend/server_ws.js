@@ -26,7 +26,7 @@ const formatOldRuleViolations = require("./utils/formatOldRuleViolations");
 const createRuleViolationsString = require("./utils/createRuleViolationsString");
 
 
-let addons = [];      // backend local array to manage addon ids
+let addons = {};      // backend local array to manage addon ids
 let pkt_buffer = [];
 
 let coordinates = {};
@@ -38,8 +38,6 @@ let active_period = 30;
 let active_phone = '978-317-9713';
 
 let previousRuleViolations = {};
-
-let prevTime = Date.now();
 
 app.use(cors());
 app.use(express.json());
@@ -79,21 +77,25 @@ app.post("/chart_period", (req, res) => {
   period = req.body.period;
   active_period = period;
   
-  config.dataTypes.every(dataType => {
-    console.log(dataType);
+  downsampleFlag = config.dataTypes.every(dataType => {
     cur_data = crud.getLastPeriodicData(active_pid, active_period, dataType);
     if (cur_data === undefined) {
       return false;
       
     } else {
-      ds = downsample.LTD(cur_data, config.chartConfig.xMax);
-      for (i=0; i<config.chartConfig.xMax; i++) ds[i].x = i;
-      coordinates[active_pid][dataType] = ds;
+      try {
+        ds = downsample.LTD(cur_data, config.chartConfig.xMax);
+        for (i=0; i<config.chartConfig.xMax; i++) ds[i].x = i;
+        coordinates[active_pid][dataType] = ds;
+          
+      } catch {
+        return false;
+      }
       return true;
     }
   });
-  
-  res.sendStatus(200);
+
+  downsample ? res.sendStatus(400) : res.sendStatus(200);
 })
 
 app.get("/chart_periods", (req, res) => {
@@ -141,7 +143,7 @@ function C2M_serverHandler() {
 function M2F_connectionHandler(client){
   client.on("disconnect", () => {
     active_pid = null;
-    active_period = null;
+    active_period = 30;
     active_policies = [];
   });
 
@@ -153,7 +155,7 @@ function M2F_connectionHandler(client){
       if (message.length > 0) {
         alerts.sendMessage(message, active_phone);
       }
-      M2F_socket.emit("updateAddons", addons.map(a => a.id));
+      M2F_socket.emit("updateAddons", Object.keys(addons));
       M2F_socket.emit("updateStatuses", formatHealthStatuses(statuses));
     if (active_pid != null) {
       M2F_socket.emit("updateCoords", coordinates[active_pid]);
@@ -163,7 +165,6 @@ function M2F_connectionHandler(client){
 
 }
 
-// The function should also add something like { id: <some number>, data: <some number> } to the addons array
 function C2M_connectionHandler(conn){
   conn.setNoDelay(true);
   const remoteAddress = conn.remoteAddress + ':' + conn.remotePort;
@@ -172,14 +173,21 @@ function C2M_connectionHandler(conn){
     conn.destroy();
   });
 
+  setInterval(() => {
+    if (active_pid != null && addons[active_pid].period != active_period) {
+      conn.write(Buffer.writeInt16LE(getSampleRate(active_period, config.chartConfig.xMax)));
+      addons[active_pid].period = active_period;
+    }
+  },500);
+
   conn.on('error', (err) => {console.log('Connection %s error: %s', remoteAddress, err.message)});
 
   conn.on('data', (recv_d) => {
     let data = parseData(recv_d)    // parse buffer stream into individual packets of data and place into data array
     for (let pkt of data) { 
-      if (!addons.some(addon => addon.id === pkt.id)) {
-        pkt["remotePort"] = conn.remotePort;
-        addons.push(pkt);
+      if (!(pkt.id in addons)) {
+        let addon = {remoteAddress: remoteAddress, period: 30};
+        addons[pkt.id] = addon;
         console.log(addons);
 
         coordinates[pkt.id] = createEmptyGraph(config.dataTypes, config.chartConfig); // init coords matrix for addon
@@ -187,32 +195,34 @@ function C2M_connectionHandler(conn){
       } 
       if (("data" in pkt) && (pkt.id in coordinates)) {
         pkt_buffer.push(pkt);
-        if (Date.now() - prevTime >= getSampleRate(active_period, config.chartConfig.xMax) * 0.8) {
-          //console.log(Date.now() - prevTime);
-          for (let i = 0; i < config.dataTypes.length; i++) {
-            for (let j = 0; j < config.chartConfig.xMax - 1; j++) {
-              coordinates[pkt.id][config.dataTypes[i]][j].y = coordinates[pkt.id][config.dataTypes[i]][j+1].y;
-            }
-            coordinates[pkt.id][config.dataTypes[i]][config.chartConfig.xMax - 1].y = pkt.data[config.dataTypes[i]];
+
+        for (let i = 0; i < config.dataTypes.length; i++) {
+          for (let j = 0; j < config.chartConfig.xMax - 1; j++) {
+            coordinates[pkt.id][config.dataTypes[i]][j].y = coordinates[pkt.id][config.dataTypes[i]][j+1].y;
           }
-          prevTime = Date.now();
+          coordinates[pkt.id][config.dataTypes[i]][config.chartConfig.xMax - 1].y = pkt.data[config.dataTypes[i]];
         }
+      
       }
     }
   });
 
   conn.on('close', () => {
     // remove connection from addon array
-    addon_index = addons.findIndex(addon => addon.remotePort == conn.remotePort);
-    addon_id = addons[addon_index].id;
+    addon_id = Object.keys(addons).find(id => addons[id].remoteAddress == remoteAddress);
+    console.log(addon_id);
+    delete addons[addon_id];
+
+    // remove policices for module ID
     crud.deleteAllPoliciesForModule(addon_id);
     active_policies = crud.getPolicies(active_pid);
     M2F_socket.emit("updatePolicies", formatPolicies(active_policies));
-    addons.splice(addon_index, 1);
-
-    console.log('connection from %s closed', conn.remotePort);
+    
     // remove coordinate matrix for addon
     delete coordinates[addon_id];
     delete previousRuleViolations[addon_id];
+    
+    console.log('connection from %s closed', conn.remotePort);
+    console.log(addons);
   });
 }
