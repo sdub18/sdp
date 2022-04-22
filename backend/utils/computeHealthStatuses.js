@@ -137,7 +137,7 @@ function computeHealthStatuses(coordinates, policies) {
 }
 
 // Uncomment and edit below for testing.
-/*
+
 const policies = [
   {
     moduleID: 4831,
@@ -214,6 +214,6 @@ const coordinates = {
 }
 
 console.log(computeHealthStatuses(coordinates, policies));
-*/
+
 
 module.exports = computeHealthStatuses;

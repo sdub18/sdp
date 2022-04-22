@@ -21,6 +21,9 @@ const computeHealthStatuses = require('./utils/computeHealthStatuses');
 const formatPolicies = require('./utils/formatPolicies');
 const getSampleRate = require("./utils/getSampleRate");
 const formatHealthStatuses = require("./utils/formatHealthStatuses");
+const getNewRuleViolations = require("./utils/getNewRuleViolations");
+const formatOldRuleViolations = require("./utils/formatOldRuleViolations");
+const createRuleViolationsString = require("./utils/createRuleViolationsString");
 
 
 let addons = [];      // backend local array to manage addon ids
@@ -32,7 +35,9 @@ let statuses = [];
 let active_policies = [];
 let active_pid = null;
 let active_period = 30;
-let active_phone = '857-258-3654';
+let active_phone = '978-317-9713';
+
+let previousRuleViolations = {};
 
 let prevTime = Date.now();
 
@@ -142,14 +147,12 @@ function M2F_connectionHandler(client){
 
   setInterval(() => {
       statuses = computeHealthStatuses(coordinates, crud.getAllPolicies());
-      /*
-      statuses.forEach(status_obj => {
-        if (status_obj.status != 'HEALTHY') {
-          message = `WARNING: SENSING MODULE ID ${status_obj.id} - STATUS: ${status_obj.status}`
-          alerts.sendMessage(message, active_phone);
-        }
-      });
-      */
+      let newRuleViolations = getNewRuleViolations(statuses, previousRuleViolations);
+      previousRuleViolations = formatOldRuleViolations(previousRuleViolations, newRuleViolations);
+      let message = createRuleViolationsString(newRuleViolations);
+      if (message.length > 0) {
+        alerts.sendMessage(message, active_phone);
+      }
       M2F_socket.emit("updateAddons", addons.map(a => a.id));
       M2F_socket.emit("updateStatuses", formatHealthStatuses(statuses));
     if (active_pid != null) {
@@ -210,5 +213,6 @@ function C2M_connectionHandler(conn){
     console.log('connection from %s closed', conn.remotePort);
     // remove coordinate matrix for addon
     delete coordinates[addon_id];
+    delete previousRuleViolations[addon_id];
   });
 }
