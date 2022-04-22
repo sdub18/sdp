@@ -183,7 +183,7 @@ function C2M_connectionHandler(conn){
   setInterval(() => {
     if ((active_pid in addons) && addons[active_pid].period != active_period) {
       let buf = Buffer.alloc(2);
-      buf.writeInt16LE(getSampleRate(active_period, config.chartConfig.xMax))
+      buf.writeInt16LE(getSampleRate(active_period, config.chartConfig.xMax));
       conn.write(buf);
       addons[active_pid].period = active_period;
     }
