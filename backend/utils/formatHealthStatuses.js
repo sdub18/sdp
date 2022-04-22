@@ -17,7 +17,7 @@ function formatHealthStatuses(healthStatuses) {
                 statusText += ')';
             }
         }
-        output.push({id: moduleIds[i], status: statusText});
+        output.push({id: moduleIds[i].toString(), status: statusText});
     }
     return output;
 }
