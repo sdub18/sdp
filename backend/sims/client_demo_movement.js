@@ -48,13 +48,13 @@ const HOST = "localhost";
 const PORT = 49160;
 // The simulated client's Unique ID can be generated from the process' PID
 const UID = process.pid;
-const sendFreq = 10;
 
 const id_pkt = `{"id": ${UID}}`;
 
 const options = {family: 4, host:HOST, port: PORT}
 const client = net.createConnection(options, connectionHandler);
 let canSend = false;
+let sampelRate = 30/100 * 1000;
 
 function connectionHandler(conn){
     c_addr = client.address();
@@ -63,9 +63,14 @@ function connectionHandler(conn){
     sendData(c_addr.port);
 
     client.on('data', (d)=>{
-        console.log(d.toString());
-        console.log("Received ACK");
-        if (d.toString('hex') == "01") canSend = true;
+        if (d.toString('hex') == "01") {
+            console.log("Received ACK");
+            canSend = true;
+        } else {
+            let buf = Buffer.from(d).readInt16LE();
+            sampleRate = parseInt(Buffer.from(d).readInt16LE());
+            console.log(sampleRate);
+        }
     })
     client.on('error', (err)=>{
         console.log(err.message);
@@ -111,7 +116,7 @@ async function sendData(port) {
             client.write(data_pkt);
             console.log(data_pkt);
         }
-        await sleep(sendFreq);  
+        await sleep(sampleRate);  
     }
 }
 

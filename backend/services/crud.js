@@ -45,7 +45,6 @@ function getLastPeriodicData(moduleID, period, dataType) {
 		high = Date.now();
 	
 		const sqlCmd = `SELECT row_number() OVER() as x, ${dataType} as y FROM data WHERE moduleID=? AND timestamp BETWEEN ? AND ?`;
-		console.log(sqlCmd);
 		return db.query(sqlCmd,[moduleID, low, high]);
 
 	} catch (err){

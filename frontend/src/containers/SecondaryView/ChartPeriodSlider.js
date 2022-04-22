@@ -10,8 +10,12 @@ export default function ChartPeriodSlider() {
 
 	const chooseChartPeriod = useCallback((event) => {
 		const selectedPeriod = event.target.value
-		axios.post("http://localhost:3001/chart_period", {period: selectedPeriod});
-		setPeriod(selectedPeriod);
+		axios.post("http://localhost:3001/chart_period", {period: selectedPeriod})
+		.then(()=>{setPeriod(selectedPeriod)})
+		.catch((err)=>{
+			alert("Period selection failed: Try again later");
+			return;
+		});
 	  }, []);
 
 

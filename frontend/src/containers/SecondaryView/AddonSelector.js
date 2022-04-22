@@ -14,6 +14,7 @@ export default function AddonSelector() {
 
 	useEffect(() => {
 		if (!(holderAddons.current.includes(addon)) && !(addon === "")){
+			alert("Sensing module disconnected");
 		  	setAddon("");
 		}
 	}, [availableAddons])

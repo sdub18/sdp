@@ -8,16 +8,16 @@
 #include <ArduinoJson.h>
 #include <StreamUtils.h>
 
-const char* SSID = "Anime House";   
-const char* PASS = "gentletrail804";
-const char* HOST = "192.168.1.8"; // change to ip address of host computer
+const char* SSID = "Pixel_8846";   
+const char* PASS = "andtran123";
+const char* HOST = "192.168.180.57"; // change to ip address of host computer
 
 const uint16_t PORT = 49160;
 const uint16_t UID = 1;
 
 uint16_t prevDay = 0;
 bool canSend = false;
-
+uint16_t sampleRate = 100;
 // Json Document
 StaticJsonDocument<16> id_pkt;
 StaticJsonDocument<192> data_pkt;
@@ -150,8 +150,14 @@ void loop() {
 
     // ------ Check if server sent ACK ------
     if (client.available()) {
-      char c = client.read(); 
-      if (c == 0x01) canSend = true;
+      if (!canSend){
+        char c = client.read(); 
+        if (c == 0x01) canSend = true;
+      } else {
+        char low = client.read();
+        char high = client.read();
+        sampleRate = (high << 8) | low;
+      }
     }
 
     // -------- Communicate Results ---------
@@ -162,8 +168,10 @@ void loop() {
       Serial.println("");
       serializeJson(data_pkt, buffered_client);
       buffered_client.flush();
+      delay(sampleRate);
     } else {
       serializeJson(id_pkt, Serial);
+      Serial.println("");
       serializeJson(id_pkt, buffered_client);
       buffered_client.flush();
       delay(1000);
