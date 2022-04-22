@@ -177,6 +177,7 @@ const policies = [
   }
 ];
 
+/*
 const coordinates = {
   '4831': {
     current: [
@@ -214,6 +215,6 @@ const coordinates = {
 }
 
 console.log(computeHealthStatuses(coordinates, policies));
-
+*/
 
 module.exports = computeHealthStatuses;

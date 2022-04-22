@@ -8,8 +8,9 @@ function formatOldRuleViolations(previousRuleViolations, newRuleViolations) {
     return output;
 }
 
+/*
 const newRuleViolations = { '4831': [ 5 ], '4832': [ 4 ], '4833': [] }
 const previousRuleViolations = { '4831': [ 1, 2, 3 ], '4832': [ 2 ], '4833': [ 1 ] }
 console.log(formatOldRuleViolations(previousRuleViolations, newRuleViolations));
-
+*/
 module.exports = formatOldRuleViolations;
