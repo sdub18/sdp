@@ -55,6 +55,7 @@ const id_pkt = `{"id": ${UID}}`;
 const options = {family: 4, host:HOST, port: PORT}
 const client = net.createConnection(options, connectionHandler);
 let canSend = false;
+let sampleRate = 30/300 * 1000;
 
 function connectionHandler(conn){
     c_addr = client.address();
@@ -65,7 +66,11 @@ function connectionHandler(conn){
     client.on('data', (d)=>{
         console.log(d.toString());
         console.log("Received ACK");
-        if (d.toString('hex') == "01") canSend = true;
+        if (d.toString('hex') == "01") {
+            canSend = true;
+        } else {
+            sampleRate = parseInt(d);
+        }
     })
     client.on('error', (err)=>{
         console.log(err.message);
@@ -97,9 +102,10 @@ async function sendData(port) {
             let data = `{"current": ${I}, "voltage": ${V},"power": ${P}, "temp": ${T}, "acceleration": {"x": ${x}, "y": ${y}, "z": ${z}}}`;
             let data_pkt = `{"id": ${UID}, "data":${data}, "timestamp":${Date.now()}}\n`;  
             client.write(data_pkt);
-            console.log(data_pkt);
+            console.log(sampleRate);
+            //console.log(data_pkt);
         }
-        await sleep(sendFreq);  
+        await sleep(sampleRate);  
     }
 }
 
