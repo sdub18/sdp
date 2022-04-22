@@ -75,27 +75,34 @@ app.post("/addon", (req, res) => {
 
 app.post("/chart_period", (req, res) => {
   period = req.body.period;
-  active_period = period;
   
   downsampleFlag = config.dataTypes.every(dataType => {
-    cur_data = crud.getLastPeriodicData(active_pid, active_period, dataType);
+    cur_data = crud.getLastPeriodicData(active_pid, period, dataType);
     if (cur_data === undefined) {
       return false;
       
     } else {
-      try {
-        ds = downsample.LTD(cur_data, config.chartConfig.xMax);
-        for (i=0; i<config.chartConfig.xMax; i++) ds[i].x = i;
-        coordinates[active_pid][dataType] = ds;
-          
-      } catch {
-        return false;
+      ds = downsample.LTD(cur_data, config.chartConfig.xMax);
+
+      fill = config.chartConfig.xMax - ds.length;
+
+      for (i=0; i<fill; i++) {
+        coordinates[active_pid][dataType][i].y = 0;
+      }
+      for (i=fill; i<config.chartConfig.xMax; i++){
+        coordinates[active_pid][dataType][i].y = ds[i-fill].y;
       }
       return true;
     }
   });
 
-  downsample ? res.sendStatus(400) : res.sendStatus(200);
+  if (downsampleFlag) {
+    active_period = period;
+    res.sendStatus(200);
+  } else {
+    res.sendStatus(400);
+  }
+
 })
 
 app.get("/chart_periods", (req, res) => {
@@ -174,8 +181,10 @@ function C2M_connectionHandler(conn){
   });
 
   setInterval(() => {
-    if (active_pid != null && addons[active_pid].period != active_period) {
-      conn.write(Buffer.writeInt16LE(getSampleRate(active_period, config.chartConfig.xMax)));
+    if ((active_pid in addons) && addons[active_pid].period != active_period) {
+      let buf = Buffer.alloc(2);
+      buf.writeInt16LE(getSampleRate(active_period, config.chartConfig.xMax))
+      conn.write(buf);
       addons[active_pid].period = active_period;
     }
   },500);

@@ -2,7 +2,7 @@ const DBSOURCE = "db.sqlite";
 const Database = require('better-sqlite3');
 const fs = require('fs');
 
-if (fs.existsSync(DBSOURCE)) fs.unlinkSync(DBSOURCE);
+//if (fs.existsSync(DBSOURCE)) fs.unlinkSync(DBSOURCE);
 
 const options = { verbose: console.log };
 const db = new Database(DBSOURCE);
