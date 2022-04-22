@@ -37,6 +37,25 @@ function getAccelData(type, low, high){
 	}
 }
 
+function getLastPeriodicData(moduleID, period, dataType) {
+	try {
+		periodMillis = period*1000;
+
+		low = Date.now() - periodMillis;
+		high = Date.now();
+	
+		const sqlCmd = `SELECT row_number() OVER() as x, ${dataType} as y FROM data WHERE moduleID=? AND timestamp BETWEEN ? AND ?`;
+		console.log(sqlCmd);
+		return db.query(sqlCmd,[moduleID, low, high]);
+
+	} catch (err){
+		console.log(err);
+		return;
+	}
+
+
+}
+
 function getPolicies(active_module) {
 	const sqlCmd = `SELECT * FROM policy WHERE moduleID=?`;
 	return db.query(sqlCmd, [active_module]);
@@ -52,8 +71,8 @@ function insertNewPolicy(active_module, policy) {
 
 	(highest_id == null) ? new_id = 1 : new_id = highest_id+1; 
 
-	const sqlCmd = `INSERT INTO policy VALUES (?, ?, ?, ?, ?, ?, ?)`;
-	db.insert(sqlCmd, [active_module, new_id, policy.policyType, policy.dataType, policy.period, policy.comparison, policy.threshold]);
+	const sqlCmd = `INSERT INTO policy VALUES (?, ?, ?, ?, ?, ?)`;
+	db.insert(sqlCmd, [active_module, new_id, policy.policyType, policy.dataType, policy.comparison, policy.threshold]);
 }
 
 function deletePolicy(active_module, id) {
@@ -66,4 +85,4 @@ function deleteAllPoliciesForModule(active_module) {
 	db.del(sqlCmd, [active_module])
 }
 
-module.exports = { insertData, insertMany, insertNewPolicy, getAccelData, getPolicies, getAllPolicies, deletePolicy, deleteAllPoliciesForModule };
+module.exports = { insertData, insertMany, insertNewPolicy, getLastPeriodicData, getAccelData, getPolicies, getAllPolicies, deletePolicy, deleteAllPoliciesForModule };

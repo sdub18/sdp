@@ -1,4 +1,5 @@
 import { React, useState, useEffect, useCallback, useContext } from "react";
+import axios from 'axios';
 import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import { Stack } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
@@ -7,13 +8,13 @@ import { SocketContext } from '../../contexts/SocketContext';
 
 
 export default function PolicyViewer() {
-	const { socket, holderPolicies } = useContext(SocketContext);
+	const { holderPolicies } = useContext(SocketContext);
 	const [rows, setRows] = useState(holderPolicies.current);
 	
 	const handleDelete = useCallback((id) => () => {
-		socket.emit("delete_policy", id)
+		axios.delete("http://localhost:3001/policy", {data: {id: id}});
 		setTimeout(() => {
-		setRows((prevRows) => prevRows.filter((row) => row.id !== id));
+			setRows((prevRows) => prevRows.filter((row) => row.id !== id));
 		});
 	},[]);
 
@@ -26,10 +27,9 @@ export default function PolicyViewer() {
 	
 
 	const columns = [
-		{field: 'id', headerName:'id', width: 80},
-		{field: 'policyType', headerName: 'Policy Type', width: 200},
-		{field: 'dataType', headerName: 'Data Type', width: 200},
-		{field: 'period', headerName: 'Period', width: 200},
+		{field: 'id', headerName:'id', width: 150},
+		{field: 'policyType', headerName: 'Policy Type', width: 300},
+		{field: 'dataType', headerName: 'Data Type', width: 300},
 		{field: 'description', headerName: 'Description', sortable: false, width: 400},	
 		{
 			field: 'actions',

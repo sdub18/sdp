@@ -4,6 +4,7 @@ coordinates: Coordinates array being stored in the program.
 policies: Array of all policy objects stored in the program.
 */
 
+/*
 function computeHealthStatuses(coordinates, policies) {
   let outputTemplate = {}
   let dangerousDataTypesById = {}
@@ -26,7 +27,7 @@ function computeHealthStatuses(coordinates, policies) {
     }
     if (policies[i].comparison == '>') {
       if (operand > threshold) {
-        if (outputTemplate[moduleID] == undefined) {
+        if (outputTemplate[moduleID] == undefined || outputTemplate[moduleID] == "HEALTHY") {
           outputTemplate[moduleID] = "DANGEROUS (";
         }
         if (!dangerousDataTypesById[moduleID].includes(dataType)) {
@@ -41,7 +42,7 @@ function computeHealthStatuses(coordinates, policies) {
     }
     if (policies[i].comparison == '<') {
       if (operand < threshold) {
-        if (outputTemplate[moduleID] == undefined) {
+        if (outputTemplate[moduleID] == undefined || outputTemplate[moduleID] == "HEALTHY") {
           outputTemplate[moduleID] = "DANGEROUS (";
         }
         if (!dangerousDataTypesById[moduleID].includes(dataType)) {
@@ -78,6 +79,62 @@ function computeHealthStatuses(coordinates, policies) {
   }
   return output;
 }
+*/
+
+function computeHealthStatuses(coordinates, policies) {
+  let output = [];
+  let policyIds = Array.from(new Set(policies.map(policy => policy.moduleID)));
+  policyIds = policyIds.map(id => id.toString());
+  for (i = 0; i < policyIds.length; i++) {
+    let currentId = policyIds[i];
+    output.push({id: currentId, status: "HEALTHY", violatedPolicies: []});
+    policiesForCurrentModuleId = policies.filter(policy => policy.moduleID.toString() === currentId);
+    for (j = 0; j < policiesForCurrentModuleId.length; j++) {
+      let currentPolicy = policiesForCurrentModuleId[j];
+      let dataType = currentPolicy.dataType;
+      let subsetOfCoords = coordinates[currentId][dataType];
+      let comparison = currentPolicy.comparison;
+      let threshold = currentPolicy.threshold;
+      if (currentPolicy.policyType == "average") {
+        operand = computeAverage(subsetOfCoords.map(coord => coord.y));
+        if (comparison === '>') {
+          if (operand > threshold) {
+            output[i].status = "DANGEROUS";
+            output[i].violatedPolicies.push(currentPolicy.policyID);
+          }
+        }
+        if (comparison === '<') {
+          if (operand < threshold) {
+            output[i].status = "DANGEROUS";
+            output[i].violatedPolicies.push(currentPolicy.policyID);
+          }
+        }
+      }
+      if (currentPolicy.policyType == "simple") {
+        operand = subsetOfCoords[subsetOfCoords.length - 1].y;
+        if (comparison === '>') {
+          if (operand > threshold) {
+            output[i].status = "DANGEROUS";
+            output[i].violatedPolicies.push(currentPolicy.policyID);
+          }
+        }
+        if (comparison === '<') {
+          if (operand < threshold) {
+            output[i].status = "DANGEROUS";
+            output[i].violatedPolicies.push(currentPolicy.policyID);
+          }
+        }
+      }
+    }
+  }
+  const allIds = Object.keys(coordinates);
+  const leftoverIds = allIds.filter(id => !policyIds.includes(id));
+  for (i = 0; i < leftoverIds.length; i++) {
+    let currentId = leftoverIds[i].toString();
+    output.push({id: currentId, status: "HEALTHY", violatedPolicies: []});
+  }
+  return output;
+}
 
 // Uncomment and edit below for testing.
 /*
@@ -88,13 +145,62 @@ const policies = [
     policyType: 'average',
     dataType: 'current',
     period: '1 min',
+    comparison: '<',
+    threshold: 50
+  },
+  {
+    moduleID: 4831,
+    policyID: 2,
+    policyType: 'simple',
+    dataType: 'temp',
+    period: '1 min',
+    comparison: '<',
+    threshold: 50
+  },
+  {
+    moduleID: 4831,
+    policyID: 3,
+    policyType: 'simple',
+    dataType: 'current',
+    period: '1 min',
     comparison: '>',
+    threshold: 60
+  },
+  {
+    moduleID: 4832,
+    policyID: 1,
+    policyType: 'average',
+    dataType: 'power',
+    period: '1 min',
+    comparison: '<',
     threshold: 50
   }
 ];
 
 const coordinates = {
   '4831': {
+    current: [
+      { x: 0, y: 56 },  { x: 1, y: 50 },  { x: 2, y: 58 },  { x: 3, y: 62 }
+    ],
+    power: [
+      { x: 0, y: 56 },  { x: 1, y: 50 },  { x: 2, y: 58 },  { x: 3, y: 20 }
+    ],
+    temp: [
+      { x: 0, y: 56 },  { x: 1, y: 50 },  { x: 2, y: 58 },  { x: 3, y: 30 }
+    ]
+  },
+  '4832': {
+    current: [
+      { x: 0, y: 56 },  { x: 1, y: 50 },  { x: 2, y: 58 },  { x: 3, y: 62 }
+    ],
+    power: [
+      { x: 0, y: 56 },  { x: 1, y: 50 },  { x: 2, y: 58 },  { x: 3, y: 20 }
+    ],
+    temp: [
+      { x: 0, y: 56 },  { x: 1, y: 50 },  { x: 2, y: 58 },  { x: 3, y: 30 }
+    ]
+  },
+  '4833': {
     current: [
       { x: 0, y: 56 },  { x: 1, y: 50 },  { x: 2, y: 58 },  { x: 3, y: 62 }
     ],

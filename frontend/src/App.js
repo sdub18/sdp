@@ -6,9 +6,9 @@ import { theme } from "./theme";
 import { SocketProvider} from "./contexts/SocketContext";
 import { ViewProvider } from "./contexts/ViewContext";
 import { AddonProvider } from "./contexts/AddonContext";
+import { PeriodProvider } from "./contexts/PeriodContext";
 import Layout from "./layouts/Layout";
 import AppContainer from "./containers/AppContainer";
-import { PeriodProvider } from "./contexts/PeriodContext";
 
 
 function App() {
@@ -19,9 +19,9 @@ function App() {
         <ViewProvider>
           <AddonProvider>
             <PeriodProvider>
-              <Layout>
-                <AppContainer/>
-              </Layout>
+                <Layout>
+                  <AppContainer/>
+                </Layout>
             </PeriodProvider>
           </AddonProvider>
         </ViewProvider>

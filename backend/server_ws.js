@@ -1,11 +1,13 @@
 const net = require("net");
-const app = require("express")();
+const express = require("express");
 const cors = require("cors");
+const downsample = require("downsample");
 require('dotenv').config();
 
 const CLIENT_TO_MIDDLE_PORT = 49160;
 const MIDDLE_TO_FRONT_PORT = 3001;
 
+const app = express();
 const C2M_server = net.createServer();
 const M2F_server = require('http').createServer(app);
 const M2F_socket = require('socket.io')(M2F_server,{cors:{origin: true, credentials: true}});
@@ -18,6 +20,7 @@ const createEmptyGraph = require('./utils/createEmptyGraph');
 const computeHealthStatuses = require('./utils/computeHealthStatuses');
 const formatPolicies = require('./utils/formatPolicies');
 const getSampleRate = require("./utils/getSampleRate");
+const formatHealthStatuses = require("./utils/formatHealthStatuses");
 
 
 let addons = [];      // backend local array to manage addon ids
@@ -28,18 +31,71 @@ let statuses = [];
 
 let active_policies = [];
 let active_pid = null;
-let active_period = null;
+let active_period = 30;
 let active_phone = '857-258-3654';
 
 let prevTime = Date.now();
 
 app.use(cors());
+app.use(express.json());
+
+app.route("/policy")
+  .post((req, res) => {
+    policy = req.body;
+
+    if (Object.values(policy).includes("")){
+      res.status(400).send("Field must not be empty");
+    }
+    else if (isNaN(policy.threshold)){
+      res.status(400).send("Threshold must be a number");
+    }
+    else{
+      crud.insertNewPolicy(active_pid, policy);
+      active_policies = crud.getPolicies(active_pid);
+      M2F_socket.emit("updatePolicies", formatPolicies(active_policies));
+      res.sendStatus(200);
+    }
+  })
+  .delete((req, res) => {
+    policy_id = req.body.id;
+    crud.deletePolicy(active_pid, policy_id);
+    active_policies = crud.getPolicies(active_pid);
+    M2F_socket.emit("updatePolicies", formatPolicies(active_policies));
+    res.sendStatus(200);
+  });
+
+app.post("/addon", (req, res) => {
+  pid = req.body.addon.toString();
+  active_pid = pid;
+  res.sendStatus(200);
+});
+
+app.post("/chart_period", (req, res) => {
+  period = req.body.period;
+  active_period = period;
+  
+  config.dataTypes.every(dataType => {
+    console.log(dataType);
+    cur_data = crud.getLastPeriodicData(active_pid, active_period, dataType);
+    if (cur_data === undefined) {
+      return false;
+      
+    } else {
+      ds = downsample.LTD(cur_data, config.chartConfig.xMax);
+      for (i=0; i<config.chartConfig.xMax; i++) ds[i].x = i;
+      coordinates[active_pid][dataType] = ds;
+      return true;
+    }
+  });
+  
+  res.sendStatus(200);
+})
 
 app.get("/chart_periods", (req, res) => {
   res.send(config.availableGraphPeriods);
 });
 
-app.get("/chart_config", (req,res) => {
+app.get("/chart_config", (req, res) => {
   res.send(config.chartConfig);
 })
 
@@ -47,12 +103,12 @@ app.get("/policy_modal", (req, res) => {
   let setup = {policyTypes: config.policyTypes, 
     periods: config.availablePolicyPeriods,
     comparisons: config.comparisons,
-    dataTypes: Object.keys(coordinates[active_pid])
+    dataTypes: config.dataTypes,
   }
   res.send(setup);
 })
 
-app.get("/data_types", (req,res) => {
+app.get("/data_types", (req, res) => {
   try {
     res.send(Object.keys(coordinates[active_pid])) 
   } catch (error) {
@@ -84,42 +140,18 @@ function M2F_connectionHandler(client){
     active_policies = [];
   });
 
-  client.on("addon_selection", (pid) => {
-    active_pid = pid.toString();
-  })
-
-  client.on("chart_period_selection", (period) => {
-    // Receives label for x axis period as well as the polling frequency associated with it.
-    // This will allow us to query the database for the appropriate info, as well as change
-    // the frequency at which we poll the incoming data, so we can modify our coordinates array
-    // and send it back to the frontend.  
-    active_period = config.period2seconds[period];
-  
-  });
-
-  client.on("add_policy", (policy) => {
-    crud.insertNewPolicy(active_pid, policy);
-    active_policies = crud.getPolicies(active_pid);
-    M2F_socket.emit("updatePolicies", formatPolicies(active_policies));
-  });
-
-  client.on("delete_policy", (id) => {
-    crud.deletePolicy(active_pid, id);
-    active_policies = crud.getPolicies(active_pid);
-    M2F_socket.emit("updatePolicies", formatPolicies(active_policies));
-  });
-
   setInterval(() => {
       statuses = computeHealthStatuses(coordinates, crud.getAllPolicies());
+      /*
       statuses.forEach(status_obj => {
         if (status_obj.status != 'HEALTHY') {
           message = `WARNING: SENSING MODULE ID ${status_obj.id} - STATUS: ${status_obj.status}`
           alerts.sendMessage(message, active_phone);
         }
       });
-
+      */
       M2F_socket.emit("updateAddons", addons.map(a => a.id));
-      M2F_socket.emit("updateStatuses", statuses);
+      M2F_socket.emit("updateStatuses", formatHealthStatuses(statuses));
     if (active_pid != null) {
       M2F_socket.emit("updateCoords", coordinates[active_pid]);
       M2F_socket.emit("updatePolicies", formatPolicies(crud.getPolicies(active_pid)));
@@ -147,18 +179,18 @@ function C2M_connectionHandler(conn){
         addons.push(pkt);
         console.log(addons);
 
-        coordinates[pkt.id] = createEmptyGraph(config.chartTypes, config.chartConfig); // init coords matrix for addon
+        coordinates[pkt.id] = createEmptyGraph(config.dataTypes, config.chartConfig); // init coords matrix for addon
         conn.write(Buffer.from([0x01]));  // send ACK byte
       } 
       if (("data" in pkt) && (pkt.id in coordinates)) {
         pkt_buffer.push(pkt);
         if (Date.now() - prevTime >= getSampleRate(active_period, config.chartConfig.xMax) * 0.8) {
           //console.log(Date.now() - prevTime);
-          for (let i = 0; i < config.chartTypes.length; i++) {
+          for (let i = 0; i < config.dataTypes.length; i++) {
             for (let j = 0; j < config.chartConfig.xMax - 1; j++) {
-              coordinates[pkt.id][config.chartTypes[i]][j].y = coordinates[pkt.id][config.chartTypes[i]][j+1].y;
+              coordinates[pkt.id][config.dataTypes[i]][j].y = coordinates[pkt.id][config.dataTypes[i]][j+1].y;
             }
-            coordinates[pkt.id][config.chartTypes[i]][config.chartConfig.xMax - 1].y = pkt.data[config.chartTypes[i]];
+            coordinates[pkt.id][config.dataTypes[i]][config.chartConfig.xMax - 1].y = pkt.data[config.dataTypes[i]];
           }
           prevTime = Date.now();
         }

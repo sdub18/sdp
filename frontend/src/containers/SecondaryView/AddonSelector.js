@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useContext, useEffect, useRef } from 'react'
+import axios from 'axios';
 
 import { SocketContext } from '../../contexts/SocketContext';
 import { AddonContext } from '../../contexts/AddonContext';
@@ -6,7 +7,7 @@ import Selector from '../../components/Selector';
 
 
 export default function AddonSelector() {
-	const {socket, holderAddons} = useContext(SocketContext);
+	const {holderAddons} = useContext(SocketContext);
 	const [addon, setAddon] = useContext(AddonContext);
 
 	const [availableAddons, setAvailableAddons] = useState([]);	
@@ -28,7 +29,7 @@ export default function AddonSelector() {
 
 	const chooseAddon = useCallback((event) => {
 		const selectedAddon = event.target.value
-		socket.emit("addon_selection", selectedAddon);
+		axios.post("http://localhost:3001/addon", {addon: selectedAddon});
 		setAddon(Number(selectedAddon));
 	  }, []);
 
