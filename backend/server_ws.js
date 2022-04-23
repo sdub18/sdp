@@ -197,7 +197,7 @@ function C2M_connectionHandler(conn){
       if (!(pkt.id in addons)) {
         let addon = {remoteAddress: remoteAddress, period: 30};
         addons[pkt.id] = addon;
-        console.log(addons);
+        console.log(Object.keys(addons));
 
         coordinates[pkt.id] = createEmptyGraph(config.dataTypes, config.chartConfig); // init coords matrix for addon
         conn.write(Buffer.from([0x01]));  // send ACK byte
@@ -232,6 +232,5 @@ function C2M_connectionHandler(conn){
     delete previousRuleViolations[addon_id];
     
     console.log('connection from %s closed', conn.remotePort);
-    console.log(addons);
   });
 }
