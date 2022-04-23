@@ -5,8 +5,6 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
-  Legend,
   Label
 } from "recharts";
 import { Box, makeStyles } from "@material-ui/core";
@@ -31,10 +29,8 @@ export default function DynamicGraph(props) {
         ticks.push(i);
     }
   return (
-    <Box
-        className={classes.marginAutoItem}
-        position="relative"
-    >
+    <React.Fragment>
+        <h2>{props.title.toUpperCase()}</h2>
         <LineChart
         className={classes.graph}
         width={props.width}
@@ -64,8 +60,6 @@ export default function DynamicGraph(props) {
                 fill="white"
             />
         </YAxis>
-        {/*<Tooltip />*/}
-        <Legend />
         <Line
             name={props.title}
             type="linear"
@@ -81,6 +75,6 @@ export default function DynamicGraph(props) {
              dot={false}
     />*/}
         </LineChart>
-    </Box>
+    </React.Fragment>
   );
 }

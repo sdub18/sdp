@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState, useCallback, useRef  } from 'react';
 import axios from 'axios';
+import { Stack } from '@mui/material';
 
 import { SocketContext } from '../../contexts/SocketContext';
 import DynamicGraph from '../../components/DynamicGraph';
@@ -28,18 +29,20 @@ export default function ChartsViewer() {
 
 	return (
 		<React.Fragment>
-			{dataTypes.map((type) => (
-				<DynamicGraph
-					key={type}
-					title={type}
-					data={coords[type]}
-					yAxisLabel={type + " (" + units[type] + ")"}
-					xMax={chartConfig.xMax}
-					xIncrement={chartConfig.xIncrement}
-					width={chartConfig.width}
-					height={chartConfig.height}>
-				</DynamicGraph>
-		  	))}
+			<Stack alignItems='center'>
+				{dataTypes.map((type) => (
+					<DynamicGraph
+						key={type}
+						title={type}
+						data={coords[type]}
+						yAxisLabel={type + " (" + units[type] + ")"}
+						xMax={chartConfig.xMax}
+						xIncrement={chartConfig.xIncrement}
+						width={chartConfig.width}
+						height={chartConfig.height}>
+					</DynamicGraph>
+				))}
+			</Stack>
 		</React.Fragment>
 	);
 }
