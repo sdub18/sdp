@@ -35,7 +35,7 @@ export default function ChartsViewer() {
 						key={type}
 						title={type}
 						data={coords[type]}
-						yAxisLabel={type + " (" + units[type] + ")"}
+						yAxisLabel={type + " [" + units[type] + "]"}
 						xMax={chartConfig.xMax}
 						xIncrement={chartConfig.xIncrement}
 						width={chartConfig.width}
