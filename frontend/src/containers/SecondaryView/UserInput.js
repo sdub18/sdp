@@ -5,9 +5,9 @@ import { ViewContext } from '../../contexts/ViewContext';
 import { AddonContext } from '../../contexts/AddonContext';
 import PolicyModal from './PolicyModal';
 import AddonSelector from './AddonSelector';
-import ChartPeriodSelector from './ChartPeriodSelector';
 import ChartPeriodSlider from './ChartPeriodSlider';
 import MainButton from '../../components/MainButton';
+import PhoneInput from './PhoneInput';
 
 
 export default function UserInput() {
@@ -23,6 +23,7 @@ export default function UserInput() {
 					{views ? "Charts Viewer": "Policy List"}
 				</MainButton> 
 				<AddonSelector/>
+				<PhoneInput />
 				{ !views && addon && <ChartPeriodSlider />}
 				{ views && addon && <PolicyModal />}
 			</Stack>
