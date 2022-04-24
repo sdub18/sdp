@@ -24,6 +24,7 @@ const formatHealthStatuses = require("./utils/formatHealthStatuses");
 const getNewRuleViolations = require("./utils/getNewRuleViolations");
 const formatOldRuleViolations = require("./utils/formatOldRuleViolations");
 const createRuleViolationsString = require("./utils/createRuleViolationsString");
+const validatePhoneNumber = require("./utils/validatePhoneNumber");
 
 
 let addons = {};      // backend local array to manage addon ids
@@ -35,7 +36,7 @@ let statuses = [];
 let active_policies = [];
 let active_pid = null;
 let active_period = 30;
-let active_phone = '978-317-9713';
+let active_phone = null;
 
 let previousRuleViolations = {};
 
@@ -105,6 +106,19 @@ app.post("/chart_period", (req, res) => {
 
 })
 
+app.post("/phone", (req, res) => {
+  req_phone = req.body.phone;
+  console.log(req_phone, validatePhoneNumber(req_phone));
+  if (!validatePhoneNumber(req_phone)) {
+    res.status(400).send("Please enter valid phone number!");
+  } else {
+    console.log(`Setting phone number for SMS alerts to ${req_phone}`)
+    active_phone = req_phone;
+    res.sendStatus(200);
+  }
+
+});
+
 app.get("/chart_periods", (req, res) => {
   res.send(config.availableGraphPeriods);
 });
@@ -159,7 +173,7 @@ function M2F_connectionHandler(client){
       let newRuleViolations = getNewRuleViolations(statuses, previousRuleViolations);
       previousRuleViolations = formatOldRuleViolations(previousRuleViolations, newRuleViolations);
       let message = createRuleViolationsString(newRuleViolations);
-      if (message.length > 0) {
+      if (message.length > 0 && active_phone != null) {
         alerts.sendMessage(message, active_phone);
       }
       M2F_socket.emit("updateAddons", Object.keys(addons));
