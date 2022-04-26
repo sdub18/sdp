@@ -36,13 +36,13 @@ const SocketProvider = ({ children }) => {
 			holderPolicies.current = updatedPolicies;
 			for (let i = 0; i < holderPolicies.current.length; i++) {
 				if (holderPolicies.current[i].dataType === "current") {
-					holderPolicies.current[i].description += "A";
+					holderPolicies.current[i].description += "mA";
 				}
 				if (holderPolicies.current[i].dataType === "voltage") {
-					holderPolicies.current[i].description += "V";
+					holderPolicies.current[i].description += "mV";
 				}
 				if (holderPolicies.current[i].dataType === "power") {
-					holderPolicies.current[i].description += "W";
+					holderPolicies.current[i].description += "mW";
 				}
 				if (holderPolicies.current[i].dataType === "temp") {
 					holderPolicies.current[i].description += "°F";
