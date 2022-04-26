@@ -2,7 +2,6 @@ import React, { useState, useCallback, useContext, useEffect, useRef } from 'rea
 import axios from 'axios';
 
 import { Button, Stack, TextField } from '@mui/material';
-import MainButton from '../../components/MainButton';
 import SecondaryButton from '../../components/SecondaryButton';
 
 export default function PhoneInput() {
@@ -20,7 +19,7 @@ export default function PhoneInput() {
 			alert(`BAD REQUEST: ${err.response.data}`);
 			return;
 		});
-	  }, []);
+	  });
 
 
 	return (
