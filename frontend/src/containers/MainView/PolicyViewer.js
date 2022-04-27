@@ -28,7 +28,7 @@ export default function PolicyViewer() {
 
 	const columns = [
 		{field: 'id', headerName:'id', width: 150},
-		{field: 'policyType', headerName: 'Policy Type', width: 300},
+		{field: 'policyType', headerName: 'Rule Type', width: 300},
 		{field: 'dataType', headerName: 'Data Type', width: 300},
 		{field: 'description', headerName: 'Description', sortable: false, width: 400},	
 		{
@@ -48,7 +48,7 @@ export default function PolicyViewer() {
 
 
 	return (
-		<div className='policy-viewer'>
+		<div className='rule-viewer'>
 			<Stack
 				alignItems='center'
 				justifyContent='center'

@@ -20,7 +20,7 @@ export default function UserInput() {
 		<React.Fragment>
 			<Stack sx={{mt: 3}} spacing={3}>
 				<MainButton onClick={handleView}>
-					{views ? "Charts Viewer": "Policy List"}
+					{views ? "Charts Viewer": "Rules List"}
 				</MainButton> 
 				<AddonSelector/>
 				<PhoneInput />

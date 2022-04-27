@@ -45,7 +45,7 @@ export default function PolicyModal() {
     };
     axios.post("http://localhost:3001/policy", newPolicy)
     .then(() => {
-      alert("Policy added!");
+      alert("Rule added!");
       handleClose();
     })
     .catch((err) => {
@@ -90,7 +90,7 @@ export default function PolicyModal() {
   return (
     <div className='add-new-policy'>
       <MainButton onClick={handleOpen}>
-        Create New Policy
+        Create New Rule
       </MainButton>
 
       <Dialog open={open} onClose={handleClose}>
