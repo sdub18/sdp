@@ -42,107 +42,14 @@ let previousRuleViolations = {};
 
 app.use(cors());
 app.use(express.json());
-
-app.route("/policy")
-  .post((req, res) => {
-    policy = req.body;
-
-    if (Object.values(policy).includes("")){
-      res.status(400).send("Field must not be empty");
-    }
-    else if (isNaN(policy.threshold)){
-      res.status(400).send("Threshold must be a number");
-    }
-    else{
-      crud.insertNewPolicy(active_pid, policy);
-      active_policies = crud.getPolicies(active_pid);
-      M2F_socket.emit("updatePolicies", formatPolicies(active_policies));
-      res.sendStatus(200);
-    }
-  })
-  .delete((req, res) => {
-    policy_id = req.body.id;
-    crud.deletePolicy(active_pid, policy_id);
-    active_policies = crud.getPolicies(active_pid);
-    M2F_socket.emit("updatePolicies", formatPolicies(active_policies));
-    res.sendStatus(200);
-  });
+app.use(require('./routes'));
 
 app.post("/addon", (req, res) => {
-  pid = req.body.addon.toString();
-  active_pid = pid;
-  res.sendStatus(200);
+	pid = req.body.addon.toString();
+	active_pid = pid;
+	console.log(active_pid);
+	res.sendStatus(200);
 });
-
-app.post("/chart_period", (req, res) => {
-  period = req.body.period;
-  
-  downsampleFlag = config.dataTypes.every(dataType => {
-    cur_data = crud.getLastPeriodicData(active_pid, period, dataType);
-    if (cur_data === undefined) {
-      return false;
-      
-    } else {
-      ds = downsample.LTD(cur_data, config.chartConfig.xMax);
-
-      fill = config.chartConfig.xMax - ds.length;
-
-      for (i=0; i<fill; i++) {
-        coordinates[active_pid][dataType][i].y = 0;
-      }
-      for (i=fill; i<config.chartConfig.xMax; i++){
-        coordinates[active_pid][dataType][i].y = ds[i-fill].y;
-      }
-      return true;
-    }
-  });
-
-  if (downsampleFlag) {
-    active_period = period;
-    res.sendStatus(200);
-  } else {
-    res.sendStatus(400);
-  }
-
-})
-
-app.post("/phone", (req, res) => {
-  req_phone = req.body.phone;
-  console.log(req_phone, validatePhoneNumber(req_phone));
-  if (!validatePhoneNumber(req_phone)) {
-    res.status(400).send("Please enter valid phone number!");
-  } else {
-    console.log(`Setting phone number for SMS alerts to ${req_phone}`)
-    active_phone = req_phone;
-    res.sendStatus(200);
-  }
-
-});
-
-app.get("/chart_periods", (req, res) => {
-  res.send(config.availableGraphPeriods);
-});
-
-app.get("/chart_config", (req, res) => {
-  res.send(config.chartConfig);
-})
-
-app.get("/policy_modal", (req, res) => {
-  let setup = {policyTypes: config.policyTypes, 
-    periods: config.availablePolicyPeriods,
-    comparisons: config.comparisons,
-    dataTypes: config.dataTypes,
-  }
-  res.send(setup);
-})
-
-app.get("/data_types", (req, res) => {
-  try {
-    res.send(Object.keys(coordinates[active_pid])) 
-  } catch (error) {
-    res.send([]);
-  }
-}); 
 
 M2F_socket.on("connection", M2F_connectionHandler);
 M2F_server.listen(MIDDLE_TO_FRONT_PORT, () => {console.log(`M2F_server listening on ${MIDDLE_TO_FRONT_PORT}`)});
@@ -150,6 +57,30 @@ M2F_server.listen(MIDDLE_TO_FRONT_PORT, () => {console.log(`M2F_server listening
 C2M_server.on('connection', C2M_connectionHandler);
 C2M_server.listen(CLIENT_TO_MIDDLE_PORT, C2M_serverHandler);
 
+function M2F_connectionHandler(client){
+	client.on("disconnect", () => {
+	  active_pid = null;
+	  active_period = 30;
+	  active_policies = [];
+	});
+  
+	setInterval(() => {
+		statuses = computeHealthStatuses(coordinates, crud.getAllPolicies());
+		let newRuleViolations = getNewRuleViolations(statuses, previousRuleViolations);
+		previousRuleViolations = formatOldRuleViolations(previousRuleViolations, newRuleViolations);
+		let message = createRuleViolationsString(newRuleViolations);
+		if (message.length > 0 && active_phone != null) {
+		  alerts.sendMessage(message, active_phone);
+		}
+		M2F_socket.emit("updateAddons", Object.keys(addons));
+		M2F_socket.emit("updateStatuses", formatHealthStatuses(statuses));
+	  if (active_pid != null) {
+		M2F_socket.emit("updateCoords", coordinates[active_pid]);
+		M2F_socket.emit("updatePolicies", formatPolicies(crud.getPolicies(active_pid)));
+	  }
+	}, 100);
+  
+}
 
 function C2M_serverHandler() {
   console.log(`C2M_server listening on ${CLIENT_TO_MIDDLE_PORT}`);
@@ -158,31 +89,6 @@ function C2M_serverHandler() {
     crud.insertMany(pkt_buffer);
     pkt_buffer.length = 0;
   }, 1000);
-
-}
-
-function M2F_connectionHandler(client){
-  client.on("disconnect", () => {
-    active_pid = null;
-    active_period = 30;
-    active_policies = [];
-  });
-
-  setInterval(() => {
-      statuses = computeHealthStatuses(coordinates, crud.getAllPolicies());
-      let newRuleViolations = getNewRuleViolations(statuses, previousRuleViolations);
-      previousRuleViolations = formatOldRuleViolations(previousRuleViolations, newRuleViolations);
-      let message = createRuleViolationsString(newRuleViolations);
-      if (message.length > 0 && active_phone != null) {
-        alerts.sendMessage(message, active_phone);
-      }
-      M2F_socket.emit("updateAddons", Object.keys(addons));
-      M2F_socket.emit("updateStatuses", formatHealthStatuses(statuses));
-    if (active_pid != null) {
-      M2F_socket.emit("updateCoords", coordinates[active_pid]);
-      M2F_socket.emit("updatePolicies", formatPolicies(crud.getPolicies(active_pid)));
-    }
-  }, 100);
 
 }
 
