@@ -44,8 +44,9 @@ export default function DynamicGraph(props) {
         <XAxis
             dataKey="x"
             type="number"
-            tick={{fontSize: 15}}
-            ticks={ticks}
+            //tick={{fontSize: 15}}
+            //ticks={ticks}
+            tick={false}
         />
         <YAxis
             type="number"
