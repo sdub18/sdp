@@ -9,18 +9,21 @@ import SecondaryButton from '../../components/SecondaryButton';
 const DropdownMemo = React.memo(Dropdown);
 
 export default function PolicyModal() {
+  let dataTypeModalLabel;
+
   const [open, setOpen] = useState(false);
 
   const policyTypes = useRef([]);
   const dataTypes = useRef([]);
   const policyPeriods = useRef([]);
-  const comparisons = useRef([])
+  const comparisons = useRef([]);
+  const modalDataTypeLabels = useRef({});
 
   const [policy, setPolicyType] = useState("");
   const [dataType, setDataType] = useState("");
   const [comparison, setComparison] = useState("");
   const [threshold, setThreshold] = useState("");
-
+  
   useEffect(() =>{
 		axios.get("http://localhost:3001/policy_modal")
     .then((res)=>{
@@ -29,18 +32,17 @@ export default function PolicyModal() {
       dataTypes.current = setup.dataTypes;
       policyPeriods.current = setup.periods;
       comparisons.current = setup.comparisons;
+      modalDataTypeLabels.current = setup.modalDataTypeLabels;
     })	
 	},[]);
-
 
   const handleAdd = () => {
     const newPolicy = {
       policyType: policy,
       dataType: dataType,
       comparison: comparison,
-      threshold: threshold
+      threshold: dataType === "current" || dataType === "power" ? threshold * 1000 : threshold
     };
-
     axios.post("http://localhost:3001/policy", newPolicy)
     .then(() => {
       alert("Policy added!");
@@ -78,7 +80,7 @@ export default function PolicyModal() {
   },[]);
 
   const chooseDataType = React.useCallback((event) => {
-    setDataType(event.target.value);
+    setDataType(modalDataTypeLabels.current[event.target.value]);
   }, []);
 
   const chooseComparison = React.useCallback((event) => {
@@ -98,7 +100,7 @@ export default function PolicyModal() {
           <Stack alignItems='center' spacing={2} justifyContent='flex-start'>
             
             <DropdownMemo minWidth={250} text="Policy Type" labels={policyTypes.current} value={policy} onChangeHandler={choosePolicy} />
-            <DropdownMemo minWidth={250} text="Data Type" labels={dataTypes.current} value={dataType} onChangeHandler={chooseDataType} />
+            <DropdownMemo minWidth={250} text="Data Type" labels={Object.keys(modalDataTypeLabels.current)} value={dataTypeModalLabel} onChangeHandler={chooseDataType} />
             <DropdownMemo minWidth={250} text="Comparison" labels={comparisons.current} value={comparison} onChangeHandler={chooseComparison} />
 
             <TextField  

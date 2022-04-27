@@ -132,6 +132,7 @@ app.get("/policy_modal", (req, res) => {
     periods: config.availablePolicyPeriods,
     comparisons: config.comparisons,
     dataTypes: config.dataTypes,
+    modalDataTypeLabels: config.modalDataTypeLabels
   }
   res.send(setup);
 })

@@ -1,5 +1,6 @@
 var config = {};
 config.dataTypes = ["current", "voltage", "power", "temp"];
+config.modalDataTypeLabels = {"current (A)": "current", "voltage (V)": "voltage", "power (W)": "power", "temperature (°F)": "temp"};
 config.policyTypes = ["simple", "average"];
 config.availablePolicyPeriods = ["1 min", "5 min", "10 min"];
 config.availableGraphPeriods = ["10 s", "30 s", "1 min", "5 min"];

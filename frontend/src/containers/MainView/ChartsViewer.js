@@ -6,7 +6,7 @@ import { SocketContext } from '../../contexts/SocketContext';
 import DynamicGraph from '../../components/DynamicGraph';
 
 export default function ChartsViewer() {
-	const units = {"current": "mA", "voltage": "mV", "power": "mW", "temp": "°F"};
+	const units = {"current": "mA", "voltage": "V", "power": "mW", "temp": "°F"};
 
 	const {holderCoords} = useContext(SocketContext);
 	
