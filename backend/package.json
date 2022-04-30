@@ -11,8 +11,8 @@
     "twilio": "^3.76.1"
   },
   "scripts": {
-    "start-server": "nodemon server_ws.js",
-    "start-client": "nodemon ./sims/client_demo_sin.js",
+    "server": "nodemon server_ws.js",
+    "client": "nodemon ./sims/client_demo_sin.js",
     "test": "node ./sims/client_demo_sin.js"
   }
 }
