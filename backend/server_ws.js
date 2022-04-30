@@ -177,11 +177,11 @@ function M2F_connectionHandler(client){
       if (message.length > 0 && active_phone != null) {
         alerts.sendMessage(message, active_phone);
       }
-      M2F_socket.emit("updateAddons", Object.keys(addons));
-      M2F_socket.emit("updateStatuses", formatHealthStatuses(statuses));
+      client.emit("updateAddons", Object.keys(addons));
+      client.emit("updateStatuses", formatHealthStatuses(statuses));
     if (active_pid != null) {
-      M2F_socket.emit("updateCoords", coordinates[active_pid]);
-      M2F_socket.emit("updatePolicies", formatPolicies(crud.getPolicies(active_pid)));
+      client.emit("updateCoords", coordinates[active_pid]);
+      client.emit("updatePolicies", formatPolicies(crud.getPolicies(active_pid)));
     }
   }, 100);
 
