@@ -1,3 +1,4 @@
-node ./backend/server_ws.js &
-cd frontend
-serve -s build &
+cd backend
+npm run server &
+cd ../frontend
+npm run prod
