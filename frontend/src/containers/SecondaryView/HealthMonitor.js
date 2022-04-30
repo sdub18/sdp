@@ -37,7 +37,7 @@ export default function HealthMonitor() {
           mt: 5, 
           width: '50%', 
           bgcolor: 'background.paper', 
-          maxHeight: 350, 
+          maxHeight: 500, 
           overflow:'auto'}}
       >
         {
