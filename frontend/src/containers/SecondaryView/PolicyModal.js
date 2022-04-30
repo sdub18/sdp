@@ -94,12 +94,12 @@ export default function PolicyModal() {
       </MainButton>
 
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle sx={{fontSize: 30, fontWeight: 'bold', color:'white', bgcolor: '#32363d'}}>Policy Creation</DialogTitle>
+        <DialogTitle sx={{fontSize: 30, fontWeight: 'bold', color:'white', bgcolor: '#32363d'}}>Create a New Rule</DialogTitle>
 
         <DialogContent sx={{ bgcolor: '#32363d'}}>
           <Stack alignItems='center' spacing={2} justifyContent='flex-start'>
             
-            <DropdownMemo minWidth={250} text="Policy Type" labels={policyTypes.current} value={policy} onChangeHandler={choosePolicy} />
+            <DropdownMemo minWidth={250} text="Rule Type" labels={policyTypes.current} value={policy} onChangeHandler={choosePolicy} />
             <DropdownMemo minWidth={250} text="Data Type" labels={Object.keys(modalDataTypeLabels.current)} value={dataTypeModalLabel} onChangeHandler={chooseDataType} />
             <DropdownMemo minWidth={250} text="Comparison" labels={comparisons.current} value={comparison} onChangeHandler={chooseComparison} />
 
