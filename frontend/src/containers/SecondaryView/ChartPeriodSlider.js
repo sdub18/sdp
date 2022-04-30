@@ -21,7 +21,7 @@ export default function ChartPeriodSlider() {
 
 	return (
 		<React.Fragment>	
-			<h2>Select Graph Period (seconds)</h2>
+			<h2>Select Timeframe (seconds)</h2>
 			<Slider
 				defaultValue={30}
 				valueLabelDisplay="auto"
