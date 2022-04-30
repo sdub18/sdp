@@ -204,7 +204,7 @@ function C2M_connectionHandler(conn){
     }
   },500);
 
-  conn.on('error', (err) => {console.log('Connection %s error: %s', remoteAddress, err.message)});
+  conn.on('error', (err) => { if (err.errno != -4077) console.log(err.message); });
 
   conn.on('data', (recv_d) => {
     let data = parseData(recv_d)    // parse buffer stream into individual packets of data and place into data array
@@ -234,7 +234,6 @@ function C2M_connectionHandler(conn){
   conn.on('close', () => {
     // remove connection from addon array
     addon_id = Object.keys(addons).find(id => addons[id].remoteAddress == remoteAddress);
-    console.log(addon_id);
     delete addons[addon_id];
 
     // remove policices for module ID
