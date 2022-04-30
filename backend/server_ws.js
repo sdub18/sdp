@@ -2,6 +2,7 @@ const net = require("net");
 const express = require("express");
 const cors = require("cors");
 const downsample = require("downsample");
+
 require('dotenv').config();
 
 const CLIENT_TO_MIDDLE_PORT = 49160;
@@ -25,6 +26,7 @@ const getNewRuleViolations = require("./utils/getNewRuleViolations");
 const formatOldRuleViolations = require("./utils/formatOldRuleViolations");
 const createRuleViolationsString = require("./utils/createRuleViolationsString");
 const validatePhoneNumber = require("./utils/validatePhoneNumber");
+const upsample = require('./utils/upsample');
 
 
 let addons = {};      // backend local array to manage addon ids
@@ -76,16 +78,24 @@ app.post("/addon", (req, res) => {
 
 app.post("/chart_period", (req, res) => {
   period = req.body.period;
-  
-  downsampleFlag = config.dataTypes.every(dataType => {
-    cur_data = crud.getLastPeriodicData(active_pid, period, dataType);
-    if (cur_data === undefined) {
-      return false;
-      
-    } else {
-      ds = downsample.LTD(cur_data, config.chartConfig.xMax);
 
-      fill = config.chartConfig.xMax - ds.length;
+  if (period == active_period) {
+	  res.sendStatus(200);
+	  return;
+  }
+  
+  resampleFlag = config.dataTypes.every(dataType => {
+    cur_data = crud.getLastPeriodicData(active_pid, period, dataType); // list of objects {x: int, y: int}
+    target_res = config.chartConfig.xMax;
+
+    if (cur_data === undefined) return false;
+
+    // downsamplme if increading timeframe
+    else if (period > active_period) {  
+      // replaces cooordintes array with downsampled values
+      // fills in with 0 if not enough data
+      ds = downsample.LTD(cur_data, target_res);
+      fill = target_res - ds.length;
 
       for (i=0; i<fill; i++) {
         coordinates[active_pid][dataType][i].y = 0;
@@ -95,9 +105,20 @@ app.post("/chart_period", (req, res) => {
       }
       return true;
     }
+     
+    // upsample if decreasing time frame
+    else {  
+      us = upsample(cur_data, target_res);
+    
+      for (i=0; i<config.chartConfig.xMax; i++) {
+        coordinates[active_pid][dataType][i].y = us[i].y;
+      }
+
+    return true;
+    }
   });
 
-  if (downsampleFlag) {
+  if (resampleFlag) {
     active_period = period;
     res.sendStatus(200);
   } else {
