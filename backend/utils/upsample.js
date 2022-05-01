@@ -1,4 +1,4 @@
-function upsample(data, target_resolution) {
+function nearestNeighborUpsample(data, target_resolution) {
 	num_missing = target_resolution - data.length;
 
 	res = [...data];
@@ -21,4 +21,4 @@ function upsample(data, target_resolution) {
 
 }
 
-module.exports = upsample;
+module.exports = { nearestNeighborUpsample };

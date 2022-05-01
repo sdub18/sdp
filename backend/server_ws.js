@@ -26,21 +26,20 @@ const getNewRuleViolations = require("./utils/getNewRuleViolations");
 const formatOldRuleViolations = require("./utils/formatOldRuleViolations");
 const createRuleViolationsString = require("./utils/createRuleViolationsString");
 const validatePhoneNumber = require("./utils/validatePhoneNumber");
-const upsample = require('./utils/upsample');
+const { nearestNeighborUpsample } = require('./utils/upsample');
 
+let coordinates = {};   // {id: {type1: [], type2: [], ...}};
+let addons = {};        // {id: int, remoteAddress: str, period: int}
+let statuses = [];      // list of objects {id: int, status: str}
 
-let addons = {};      // backend local array to manage addon ids
-let pkt_buffer = [];
-
-let coordinates = {};
-let statuses = [];
-
-let active_policies = [];
+// variables to hold active sensing module information
+let active_policies = [];   
 let active_pid = null;
 let active_period = 30;
 let active_phone = null;
 
-let previousRuleViolations = {};
+let previousRuleViolations = {};   // object to detect rule violations
+let pkt_buffer = [];  // buffer to hold all packets for bulk INSERT into db
 
 app.use(cors());
 app.use(express.json());
@@ -108,7 +107,7 @@ app.post("/chart_period", (req, res) => {
      
     // upsample if decreasing time frame
     else {  
-      us = upsample(cur_data, target_res);
+      us = nearestNeighborUpsample(cur_data, target_res);
     
       for (i=0; i<config.chartConfig.xMax; i++) {
         coordinates[active_pid][dataType][i].y = us[i].y;
@@ -125,7 +124,7 @@ app.post("/chart_period", (req, res) => {
     res.sendStatus(400);
   }
 
-})
+});
 
 app.post("/phone", (req, res) => {
   req_phone = req.body.phone;
@@ -146,7 +145,7 @@ app.get("/chart_periods", (req, res) => {
 
 app.get("/chart_config", (req, res) => {
   res.send(config.chartConfig);
-})
+});
 
 app.get("/policy_modal", (req, res) => {
   let setup = {policyTypes: config.policyTypes, 
@@ -156,7 +155,7 @@ app.get("/policy_modal", (req, res) => {
     modalDataTypeLabels: config.modalDataTypeLabels
   }
   res.send(setup);
-})
+});
 
 app.get("/data_types", (req, res) => {
   try {
