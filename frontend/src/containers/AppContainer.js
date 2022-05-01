@@ -16,11 +16,11 @@ export default function AppContainer() {
 					alignItems="flex-start"
 					wrap={"nowrap"}
 				>
-					<Grid item xs={8} style={{maxHeight: '86vh', overflow: 'auto', marginTop:5}}>
+					<Grid item xs={8} style={{maxHeight: '84vh', overflow: 'auto', marginTop:5}}>
 						<MainView />
 					</Grid>
 				
-					<Divider orientation="vertical" flexItem style={{display: "flex", minHeight: "87vh", height: "100%", width: 5, marginRight:"-1px"}}/>
+					<Divider orientation="vertical" flexItem style={{display: "flex", minHeight: "85vh", height: "100%", width: 5, marginRight:"-1px"}}/>
 					
 					<Grid item xs={4}>
 						<SecondaryView />
