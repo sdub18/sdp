@@ -1,6 +1,8 @@
 import React from 'react';
 import { Box } from '@material-ui/core';
+
 import './Header.css';
+import Navbar from './Navbar';
 
 export default function Header() {
     return (
@@ -15,12 +17,15 @@ export default function Header() {
                     fontWeight: 'bold',
                 }}
             >
-                    <Box sx={{ml: 2, mr: 5}}>
-                        <img src={process.env.PUBLIC_URL +"/logo.png"} className="Header__logo" alt="logo" />
-                    </Box>
-                    <Box sx={{color: 'white', fontSize: 25}}>
-                        <h1>Watchdog</h1>
-                    </Box>
+                <Box sx={{ml: 2}}>
+                    <Navbar />
+                </Box>
+                <Box sx={{ml: 2, mr: 5}}>
+                    <img src={process.env.PUBLIC_URL +"/logo.png"} className="Header__logo" alt="logo" />
+                </Box>
+                <Box sx={{color: 'white', fontSize: 25}}>
+                    <h1>Watchdog</h1>
+                </Box>
             </Box>
         </div>
     );
