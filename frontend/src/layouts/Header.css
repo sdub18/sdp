@@ -3,7 +3,7 @@
     pointer-events: none;
   }
   
-@media (prefers-reduced-motion: no-preference) {
+/*@media (prefers-reduced-motion: no-preference) {
 .Header__logo {
     animation: Header__logo-spin infinite 20s linear;
 }
@@ -16,4 +16,4 @@ from {
 to {
     transform: rotate(360deg);
 }
-}
+}*/

@@ -19,7 +19,7 @@ export default function PhoneInput() {
 			alert(`BAD REQUEST: ${err.response.data}`);
 			return;
 		});
-	  });
+	});
 
 
 	return (
