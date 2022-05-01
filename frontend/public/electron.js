@@ -1,6 +1,6 @@
 const path = require('path');
 
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, Menu } = require('electron');
 const isDev = require('electron-is-dev');
 
 function createWindow() {
@@ -11,8 +11,8 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
     },
+    icon: __dirname + '/dogo512.png'
   });
-  win.removeMenu(true);
   win.maximize();
   // and load the index.html of the app.
   // win.loadFile("index.html");
@@ -22,9 +22,9 @@ function createWindow() {
       : `file://${path.join(__dirname, '../build/index.html')}`
   );
   // Open the DevTools.
-  /*if (isDev) {
+  if (isDev) {
     win.webContents.openDevTools({ mode: 'detach' });
-  }*/
+  }
 
 }
 

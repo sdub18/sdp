@@ -15,11 +15,11 @@ export default function Header() {
                     fontWeight: 'bold',
                 }}
             >
-                    <Box sx={{mx: 2}}>
+                    <Box sx={{ml: 2, mr: 5}}>
                         <img src={process.env.PUBLIC_URL +"/logo.png"} className="Header__logo" alt="logo" />
                     </Box>
                     <Box sx={{color: 'white', fontSize: 25}}>
-                        <h1>MHSA Watchdog</h1>
+                        <h1>Watchdog</h1>
                     </Box>
             </Box>
         </div>
