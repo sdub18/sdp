@@ -1,6 +1,5 @@
 import React from 'react';
 import { Box } from '@material-ui/core';
-import logo from './logo.svg';
 import './Header.css';
 
 export default function Header() {
@@ -16,11 +15,11 @@ export default function Header() {
                     fontWeight: 'bold',
                 }}
             >
-                    <Box>
-                        <img src={logo} className="Header__logo" alt="logo" />
+                    <Box sx={{mx: 2}}>
+                        <img src={process.env.PUBLIC_URL +"/logo.png"} className="Header__logo" alt="logo" />
                     </Box>
                     <Box sx={{color: 'white', fontSize: 25}}>
-                        <h1>Motor Health Analysis and Feedback</h1>
+                        <h1>MHSA Watchdog</h1>
                     </Box>
             </Box>
         </div>
