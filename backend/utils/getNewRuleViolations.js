@@ -9,8 +9,8 @@ function getNewRuleViolations(healthStatuses, previousRuleViolations) {
             previousRuleViolations[currentId] = [];
             continue;
         }
-        let newViolatedPoliciesForId = healthStatuses[i].violatedPolicies.filter(rule => !violatedPoliciesForId.includes(rule));
-        output[currentId] = newViolatedPoliciesForId;
+        let newViolatedPoliciesByOrderEntered = healthStatuses[i].violatedPoliciesByOrderEntered.filter(rule => !violatedPoliciesForId.includes(rule));
+        output[currentId] = newViolatedPoliciesByOrderEntered;
     }
     return output;
 }

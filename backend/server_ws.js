@@ -23,6 +23,7 @@ const formatPolicies = require('./utils/formatPolicies');
 const getSampleRate = require("./utils/getSampleRate");
 const formatHealthStatuses = require("./utils/formatHealthStatuses");
 const getNewRuleViolations = require("./utils/getNewRuleViolations");
+const getNewRuleViolationsForString = require("./utils/getNewRuleViolationsForString");
 const formatOldRuleViolations = require("./utils/formatOldRuleViolations");
 const createRuleViolationsString = require("./utils/createRuleViolationsString");
 const validatePhoneNumber = require("./utils/validatePhoneNumber");
@@ -194,7 +195,8 @@ function M2F_connectionHandler(client){
       statuses = computeHealthStatuses(coordinates, crud.getAllPolicies());
       let newRuleViolations = getNewRuleViolations(statuses, previousRuleViolations);
       previousRuleViolations = formatOldRuleViolations(previousRuleViolations, newRuleViolations);
-      let message = createRuleViolationsString(newRuleViolations);
+      newRuleViolationsForString = getNewRuleViolationsForString(statuses, newRuleViolations)
+      let message = createRuleViolationsString(newRuleViolationsForString);
       if (message.length > 0 && active_phone != null) {
         alerts.sendMessage(message, active_phone);
       }

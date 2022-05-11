@@ -7,7 +7,7 @@ function formatHealthStatuses(healthStatuses) {
             statusText = "HEALTHY";
         } else {
             statusText = "DANGEROUS ";
-            let violatedPolicies = healthStatuses[i].violatedPolicies;
+            let violatedPolicies = healthStatuses[i].violatedPoliciesByIdOnScreen;
             if (violatedPolicies !== 0) {
                 statusText += '(';
                 for (j = 0; j < violatedPolicies.length; j++) {

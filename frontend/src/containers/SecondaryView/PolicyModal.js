@@ -8,6 +8,8 @@ import SecondaryButton from '../../components/SecondaryButton';
 
 const DropdownMemo = React.memo(Dropdown);
 
+let policyNumber = 0;
+
 export default function PolicyModal() {
   let dataTypeModalLabel;
 
@@ -41,8 +43,10 @@ export default function PolicyModal() {
       policyType: policy,
       dataType: dataType,
       comparison: comparison,
-      threshold: dataType === "current" || dataType === "power" ? threshold * 1000 : threshold
+      threshold: dataType === "current" || dataType === "power" ? threshold * 1000 : threshold,
+      orderEntered: policyNumber
     };
+    policyNumber++;
     axios.post("http://localhost:3001/policy", newPolicy)
     .then(() => {
       alert("Rule added!");
@@ -52,7 +56,6 @@ export default function PolicyModal() {
       reset();
       alert(`BAD REQUEST: ${err.response.data}`);
     });
-
   }
 
   const reset = () => {

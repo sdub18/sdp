@@ -8,7 +8,7 @@ const options = { verbose: console.log };
 const db = new Database(DBSOURCE);
 db.exec("CREATE TABLE IF NOT EXISTS data (timestamp DATE NOT NULL, moduleID INTEGER NOT NULL, current REAL, voltage REAL, power REAL, temp REAL, x REAL, y REAL, z REAL)");
 db.exec("CREATE TABLE IF NOT EXISTS freq (fx REAL, fy REAL, fz REAL)");
-db.exec("CREATE TABLE IF NOT EXISTS policy (moduleID REAL, policyID REAL, policyType TEXT, dataType TEXT, comparison TEXT, threshold REAL)");
+db.exec("CREATE TABLE IF NOT EXISTS policy (moduleID REAL, policyID REAL, policyType TEXT, dataType TEXT, comparison TEXT, threshold REAL, orderEntered REAL)");
 db.pragma("synchronous = off");
 
 function query(sql, params) {

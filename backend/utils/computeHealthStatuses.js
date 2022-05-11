@@ -87,7 +87,7 @@ function computeHealthStatuses(coordinates, policies) {
   policyIds = policyIds.map(id => id.toString());
   for (i = 0; i < policyIds.length; i++) {
     let currentId = policyIds[i];
-    output.push({id: currentId, status: "HEALTHY", violatedPolicies: []});
+    output.push({id: currentId, status: "HEALTHY", violatedPoliciesByIdOnScreen: [], violatedPoliciesByOrderEntered: []});
     policiesForCurrentModuleId = policies.filter(policy => policy.moduleID.toString() === currentId);
     for (j = 0; j < policiesForCurrentModuleId.length; j++) {
       let currentPolicy = policiesForCurrentModuleId[j];
@@ -100,13 +100,15 @@ function computeHealthStatuses(coordinates, policies) {
         if (comparison === '>') {
           if (operand > threshold) {
             output[i].status = "DANGEROUS";
-            output[i].violatedPolicies.push(currentPolicy.policyID);
+            output[i].violatedPoliciesByIdOnScreen.push(currentPolicy.policyID);
+            output[i].violatedPoliciesByOrderEntered.push(currentPolicy.orderEntered);
           }
         }
         if (comparison === '<') {
           if (operand < threshold) {
             output[i].status = "DANGEROUS";
-            output[i].violatedPolicies.push(currentPolicy.policyID);
+            output[i].violatedPoliciesByIdOnScreen.push(currentPolicy.policyID);
+            output[i].violatedPoliciesByOrderEntered.push(currentPolicy.orderEntered);
           }
         }
       }
@@ -115,13 +117,15 @@ function computeHealthStatuses(coordinates, policies) {
         if (comparison === '>') {
           if (operand > threshold) {
             output[i].status = "DANGEROUS";
-            output[i].violatedPolicies.push(currentPolicy.policyID);
+            output[i].violatedPoliciesByIdOnScreen.push(currentPolicy.policyID);
+            output[i].violatedPoliciesByOrderEntered.push(currentPolicy.orderEntered);
           }
         }
         if (comparison === '<') {
           if (operand < threshold) {
             output[i].status = "DANGEROUS";
-            output[i].violatedPolicies.push(currentPolicy.policyID);
+            output[i].violatedPoliciesByIdOnScreen.push(currentPolicy.policyID);
+            output[i].violatedPoliciesByOrderEntered.push(currentPolicy.orderEntered);
           }
         }
       }
@@ -131,7 +135,7 @@ function computeHealthStatuses(coordinates, policies) {
   const leftoverIds = allIds.filter(id => !policyIds.includes(id));
   for (i = 0; i < leftoverIds.length; i++) {
     let currentId = leftoverIds[i].toString();
-    output.push({id: currentId, status: "HEALTHY", violatedPolicies: []});
+    output.push({id: currentId, status: "HEALTHY", violatedPoliciesByIdOnScreen: [], violatedPoliciesByOrderEntered: []});
   }
   return output;
 }
